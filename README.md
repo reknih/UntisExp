@@ -19,4 +19,4 @@ Also make sure that you call `refresh` on each `Data` instance you modify manual
 
 How to get it
 -------------------------------
-You can clone this repo or get it from NuGet.
+You can clone this repo and add it to your Solution or get it from NuGet (Soon).
