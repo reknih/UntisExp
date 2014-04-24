@@ -23,6 +23,12 @@ namespace UntisExp
 		public static Regex cellSearch      = new Regex("<t{1}d{1}.*?>.*?</td>");
 		public static string specialEvtAb   = "Veranst.";
 		public static Dictionary<string, string> lessonAbbr = new Dictionary<string, string>();
+		public static string noPageErrTtl   = "Du bist nicht schuld";
+		public static string noPageErrTxt   = "Die Vertretungsplanseite gibt's noch nicht. Ich vermute, es sind Ferien.";
+		public static string noPageErrBtn   = "Na hoffentlich!";
+		public static string unknownErrTtl  = "Husten, wir haben ein Problem.";
+		public static string unknownErrTxt  = "Und ich hoffte, das das nie von jemandem gelesen wird: Unbekannter Fehler!";
+		public static string unknownErrBtn  = "Träume sind Schäumes";
 
 		public static void Populate () {
 			try {

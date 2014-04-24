@@ -85,8 +85,20 @@ namespace UntisExp
 			{
 				request.BeginGetResponse(new AsyncCallback((iar) =>
 					{
-						var response = (HttpWebResponse)((HttpWebRequest)iar.AsyncState).EndGetResponse(iar);
-						responseAction(response);
+						try {
+							var response = (HttpWebResponse)((HttpWebRequest)iar.AsyncState).EndGetResponse(iar);
+							responseAction(response);
+						} catch (WebException we) {
+							HttpWebResponse errorResponse = we.Response as HttpWebResponse;
+							if (we.Response == null) {
+								alert (VConfig.eventIErrorTtl, VConfig.groupIErrorTxt, VConfig.groupIErrorBtn);
+							}
+							else if (errorResponse.StatusCode == HttpStatusCode.NotFound) {
+								alert (VConfig.noPageErrTtl, VConfig.noPageErrTxt, VConfig.noPageErrBtn);
+							} else {
+								alert (VConfig.unknownErrTtl, VConfig.unknownErrTxt, VConfig.unknownErrBtn);
+							}
+						}
 					}), request);
 			};
 			wrapperAction.BeginInvoke(new AsyncCallback((iar) =>
