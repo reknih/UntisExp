@@ -75,32 +75,37 @@ namespace UntisExp
             refreshSet = _refeshAll;
         }
 
+		protected void DownloadData(string url, Action<String> callback, Action<IAsyncResult> preCallback, bool alerting = false, string aHead = "", string aBody = "", string aBtn = "")
+		{
+			try
+			{
+				request = (HttpWebRequest)WebRequest.Create(url);
+				DoWithResponse(request, (response) =>
+					{
+						var body = new StreamReader(response.GetResponseStream()).ReadToEnd();
+						callback(body);
+					});
+			}
+			catch
+			{
+				try
+				{
+					request = (HttpWebRequest)WebRequest.Create(url);
+					request.BeginGetResponse(new AsyncCallback(preCallback), request);
+				}
+				catch
+				{
+					if (alerting)
+						alert(aHead, aBody, aBtn);
+				}
+			}
+		}
         /// <summary>
         /// Downloads a list of groups asynchronously. Uses the callbacks from the constructor.
         /// </summary>
         public void getClasses()
         {
-            try
-            {
-                request = (HttpWebRequest)WebRequest.Create(VConfig.url + VConfig.pathToNavbar);
-                DoWithResponse(request, (response) =>
-                {
-                    var body = new StreamReader(response.GetResponseStream()).ReadToEnd();
-                    groups_DownloadStringCompleted(body);
-                });
-            }
-            catch
-            {
-                try
-                {
-                    request = (HttpWebRequest)WebRequest.Create(VConfig.url + VConfig.pathToNavbar);
-                    request.BeginGetResponse(new AsyncCallback(FinishRequest), request);
-                }
-                catch
-                {
-                    alert(VConfig.groupIErrorTtl, VConfig.groupIErrorTxt, VConfig.groupIErrorBtn);
-                }
-            }
+			DownloadData (VConfig.url + VConfig.pathToNavbar, groups_DownloadStringCompleted, FinishRequest, true, VConfig.eventIErrorTtl, VConfig.eventIErrorTxt, VConfig.eventIErrorBtn);
         }
         private string GetBody(IAsyncResult result)
         {
@@ -218,48 +223,13 @@ namespace UntisExp
                 weekStr = Convert.ToString(week);
             }
 
-            request = (HttpWebRequest)WebRequest.Create("http://www.cws-usingen.de/stupla/Schueler/" + weekStr + "/w/" + groupStr + ".htm");
-            try
-            {
-                DoWithResponse(request, (response) =>
-                {
-                    try
-                    {
-                        var body = new StreamReader(response.GetResponseStream()).ReadToEnd();
-                        if (follow == true)
-                        {
-                            timesNext_DownloadStringCompleted(body);
-                        }
-                        else
-                        {
-                            times_DownloadStringCompleted(body);
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        alert(VConfig.groupIErrorTtl, VConfig.groupIErrorTxt /* + e.Message + e.StackTrace*/, VConfig.groupIErrorBtn);
-                    }
-                });
-            }
-            catch
-            {
-                try
-                {
-                    if (follow == true)
-                    {
-                        request.BeginGetResponse(new AsyncCallback(FinishThingyRequest), request);
-                    }
-                    else
-                    {
-                        request.BeginGetResponse(new AsyncCallback(FinishOtherRequest), request);
-                    }
-                }
-                catch
-                {
-                    alert(VConfig.groupIErrorTtl, VConfig.groupIErrorTxt /* + e.Message + e.StackTrace*/, VConfig.groupIErrorBtn);
-                }
-            }
-        }
+			var nav = VConfig.url + weekStr + "/w/" + groupStr + ".htm";
+			if (follow) {
+				DownloadData (nav, timesNext_DownloadStringCompleted, FinishThingyRequest);
+			} else {
+				DownloadData (nav, times_DownloadStringCompleted, FinishOtherRequest, true, VConfig.eventIErrorTtl, VConfig.eventIErrorTxt, VConfig.eventIErrorBtn);
+			}
+		}
         private void times_DownloadStringCompleted(String res)
         {
             string comp = res;
@@ -410,7 +380,6 @@ namespace UntisExp
                     raw[i] = comp.Substring(comp.IndexOf("<table"), comp.IndexOf("</table>") - comp.IndexOf("<table") + 8);
                     comp = comp.Substring(comp.IndexOf("</table>") + 8);
                 }
-                List<Data> v1 = new List<Data>();
                 int iOuter = 0;
                 int daysRec = 0;
                 foreach (var item in raw)
