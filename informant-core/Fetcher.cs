@@ -13,7 +13,6 @@ namespace UntisExp
     /// </summary>
     public class Fetcher
     {
-        private HttpWebRequest request;
         private Action del;
         private Action<String, String, String> alert;
         private Action<List<Data>> refreshAll;
@@ -74,77 +73,13 @@ namespace UntisExp
             alert = _alert;
             refreshSet = _refeshAll;
         }
-
-		protected void DownloadData(string url, Action<String> callback, Action<IAsyncResult> preCallback, bool alerting = false, string aHead = "", string aBody = "", string aBtn = "")
-		{
-			try
-			{
-				request = (HttpWebRequest)WebRequest.Create(url);
-				DoWithResponse(request, (response) =>
-					{
-						var body = new StreamReader(response.GetResponseStream()).ReadToEnd();
-						callback(body);
-					});
-			}
-			catch
-			{
-				try
-				{
-					request = (HttpWebRequest)WebRequest.Create(url);
-					request.BeginGetResponse(new AsyncCallback(preCallback), request);
-				}
-				catch
-				{
-					if (alerting)
-						alert(aHead, aBody, aBtn);
-				}
-			}
-		}
+			
         /// <summary>
         /// Downloads a list of groups asynchronously. Uses the callbacks from the constructor.
         /// </summary>
         public void getClasses()
         {
-			DownloadData (VConfig.url + VConfig.pathToNavbar, groups_DownloadStringCompleted, FinishRequest, true, VConfig.eventIErrorTtl, VConfig.eventIErrorTxt, VConfig.eventIErrorBtn);
-        }
-        private string GetBody(IAsyncResult result)
-        {
-            HttpWebResponse response = (result.AsyncState as HttpWebRequest).EndGetResponse(result) as HttpWebResponse;
-            Stream receiveStream = response.GetResponseStream();
-            StreamReader readStream = new StreamReader(receiveStream, Encoding.UTF8);
-            string body = readStream.ReadToEnd();
-            return body;
-        }
-        private void FinishRequest(IAsyncResult result)
-        {
-            string body = GetBody(result);
-            groups_DownloadStringCompleted(body);
-        }
-        private void FinishOtherRequest(IAsyncResult result)
-        {
-            string body = GetBody(result);
-            times_DownloadStringCompleted(body);
-        }
-        private void FinishThingyRequest(IAsyncResult result)
-        {
-            string body = GetBody(result);
-            timesNext_DownloadStringCompleted(body);
-        }
-        private void DoWithResponse(HttpWebRequest request, Action<HttpWebResponse> responseAction)
-        {
-            Action wrapperAction = () =>
-            {
-                request.BeginGetResponse(new AsyncCallback((iar) =>
-                {
-                    var response = (HttpWebResponse)((HttpWebRequest)iar.AsyncState).EndGetResponse(iar);
-                    responseAction(response);
-                }), request);
-            };
-            wrapperAction.BeginInvoke(new AsyncCallback((iar) =>
-            {
-                var action = (Action)iar.AsyncState;
-                action.EndInvoke(iar);
-            }), wrapperAction);
+			Networking.DownloadData (VConfig.url + VConfig.pathToNavbar, groups_DownloadStringCompleted, alert, true, VConfig.groupIErrorTtl, VConfig.groupIErrorTxt, VConfig.groupIErrorBtn);
         }
         private void groups_DownloadStringCompleted(String res)
         {
@@ -225,9 +160,9 @@ namespace UntisExp
 
 			var nav = VConfig.url + weekStr + "/w/" + groupStr + ".htm";
 			if (follow) {
-				DownloadData (nav, timesNext_DownloadStringCompleted, FinishThingyRequest);
+				Networking.DownloadData (nav, timesNext_DownloadStringCompleted, alert);
 			} else {
-				DownloadData (nav, times_DownloadStringCompleted, FinishOtherRequest, true, VConfig.eventIErrorTtl, VConfig.eventIErrorTxt, VConfig.eventIErrorBtn);
+				Networking.DownloadData (nav, times_DownloadStringCompleted, alert, true, VConfig.eventIErrorTtl, VConfig.eventIErrorTxt, VConfig.eventIErrorBtn);
 			}
 		}
         private void times_DownloadStringCompleted(String res)
