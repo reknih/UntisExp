@@ -171,6 +171,7 @@ namespace UntisExp
             comp = comp.Replace(" ", string.Empty);
             //TO-DO: Parse VPlan
             int stringcnt = 5;
+			bool silentLast = false;
             if (!silent)
                 del();
             string haystack = comp;
@@ -277,10 +278,12 @@ namespace UntisExp
                     else
                     {
                         if (!silent) refreshOne(new Data());
+						if (iOuter == (stringcnt - 1))
+							silentLast = true;
                     }
                 }
                 iOuter++;
-                if (iOuter == stringcnt && daysRec == 1 && mode != 0)
+				if (iOuter == stringcnt && (daysRec == 1 || silentLast) && mode != 0)
                 {
                     getTimes(Group, true);
                     globData = v1;
