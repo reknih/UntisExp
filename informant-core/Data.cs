@@ -84,10 +84,12 @@ namespace UntisExp
 			if (MitbeStr != "" && EntfallStr != null)
 			{
 				Mitbetreung = true;
+                PrintMitbet = "Ja";
 			}
 			else
 			{
 				Mitbetreung = false;
+                PrintMitbet = "Nein";
 			}
 			Line1 = Stunde + ". Std: " + Fach;
 
@@ -162,7 +164,8 @@ namespace UntisExp
 
 		public string MitbeStr { get; set; }
 
-		public bool Mitbetreung { get; set; }
+        public bool Mitbetreung { get; set; }
+        public string PrintMitbet { get; set; }
 
 		public bool Veranstaltung { get; set; }
 

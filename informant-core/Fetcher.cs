@@ -165,7 +165,7 @@ namespace UntisExp
 				Networking.DownloadData (nav, times_DownloadStringCompleted, alert, true, VConfig.eventIErrorTtl, VConfig.eventIErrorTxt, VConfig.eventIErrorBtn);
 			}
 		}
-        private void times_DownloadStringCompleted(String res)
+        private void times_DownloadStringCompleted(string res)
         {
             string comp = res;
             comp = comp.Replace(" ", string.Empty);
@@ -298,7 +298,7 @@ namespace UntisExp
             {
                 string comp = res;
                 comp = comp.Replace(" ", string.Empty);
-                if (res.IndexOf("NotFound") != -1 || res.Length != 0)
+                if (comp.IndexOf("NotFound") != -1 || comp.Length == 0)
                 {
                     refreshAll(globData);
                     return;

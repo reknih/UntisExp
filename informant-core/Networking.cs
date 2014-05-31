@@ -13,13 +13,14 @@ namespace UntisExp
 		{
 			defCallback = callback;
 			defAlert = alertmet;
+            
 			try
 			{
 				var request = (HttpWebRequest)WebRequest.Create(url);
 				DoWithResponse(request, (response) =>
 					{
 						var body = new StreamReader(response.GetResponseStream()).ReadToEnd();
-						callback(body);
+						defCallback(body);
 					});
 			}
 			catch
@@ -43,7 +44,7 @@ namespace UntisExp
 				request.BeginGetResponse(new AsyncCallback((iar) =>
 					{
 						try {
-							var response = (HttpWebResponse)((HttpWebRequest)iar.AsyncState).EndGetResponse(iar);
+                            var response = (HttpWebResponse)((HttpWebRequest)iar.AsyncState).EndGetResponse(iar);
 							responseAction(response);
 						} catch (Exception e) {
 							defAlert(VConfig.noPageErrTtl, VConfig.noPageErrTxt, VConfig.noPageErrBtn);

@@ -9,8 +9,9 @@ namespace UntisExp
 	/// </summary>
 	public static class VConfig
 	{
-		public static string url            = "http://www.cws-usingen.de/stupla/Schueler/";
-		public static string pathToNavbar   = "frames/navbar.htm";
+        public static string url            = "http://www.cws-usingen.de/stupla/Schueler/";
+        public static string feed = "http://thedadletters.com/feed/";
+        public static string pathToNavbar   = "frames/navbar.htm";
 		public static string groupIErrorTtl = "Dumm, dumm, dumm.";
 		public static string groupIErrorTxt = "Wir haben keine Verbndung zum Internet. Die brauchst du aber jetzt.";
 		public static string groupIErrorBtn = "Ich komme wieder!";
@@ -26,7 +27,7 @@ namespace UntisExp
 		public static string noPageErrTtl   = "Du bist nicht schuld";
 		public static string noPageErrTxt   = "Die Vertretungsplanseite gibt's noch nicht. Ich vermute, es sind Ferien.";
 		public static string noPageErrBtn   = "Na hoffentlich!";
-		public static string unknownErrTtl  = "Husten, wir haben ein Problem.";
+        public static string unknownErrTtl  = "Houston, wir haben ein Problem.";
 		public static string unknownErrTxt  = "Und ich hoffte, das das nie von jemandem gelesen wird: Unbekannter Fehler!";
 		public static string unknownErrBtn  = "Träume sind Schäumes";
 
