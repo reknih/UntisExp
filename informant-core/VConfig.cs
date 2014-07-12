@@ -40,7 +40,7 @@ namespace UntisExp
 			lessonAbbr.Add ("ER", "Ev. Religion");
 			lessonAbbr.Add ("KR", "Kath. Religion");
 			lessonAbbr.Add ("MA", "Mathe");
-			lessonAbbr.Add ("BI", "Bio");
+			lessonAbbr.Add ("BIO", "Bio");
 			lessonAbbr.Add ("CH", "Chemie");
 			lessonAbbr.Add ("PH", "Physik");
 			lessonAbbr.Add ("POWI", "PoWi");
