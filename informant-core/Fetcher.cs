@@ -109,7 +109,7 @@ namespace UntisExp
                 //alert("ERROR", + e.Message + " " + e.StackTrace, "");
             }
         }
-
+        
         /// <summary>
         /// Downloads a list of events for the given group
         /// </summary>

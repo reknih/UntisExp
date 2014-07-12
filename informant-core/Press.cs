@@ -14,6 +14,10 @@ namespace UntisExp
 		public Press ()
 		{
 		}
+        /// <summary>
+        /// Gets news articles from the RSS feed specified in VConfig <seealso cref="VConfig"/>
+        /// </summary>
+        /// <returns>List of news articles (asynchronous)</returns>
 		public async Task<List<News>> getNews(){
             XDocument doc;
             var r = new Regex("<.*?>");
@@ -51,18 +55,19 @@ namespace UntisExp
                     var mediaQuery = from medias in articlet.Descendants(medians + "content")
                                      select medias.Attribute("url").Value;
                     writing.Image = mediaQuery.ElementAtOrDefault(1);
+                    writing.Refresh();
                     gathered.Add(writing);
                 }
             });
             return gathered;
 		}
 
-		public void wrong(string aa, string bb, string cc) {}
+		protected void wrong(string aa, string bb, string cc) {}
 
 		/// <summary>
 		/// Remove HTML tags from string using char array.
 		/// </summary>
-		public string StripTagsCharArray(string source)
+		protected string StripTagsCharArray(string source)
 		{
 			char[] array = new char[source.Length];
 			int arrayIndex = 0;
