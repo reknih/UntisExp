@@ -19,8 +19,13 @@ namespace UntisExp
         private Action<Data> refreshOne;
         private Action<List<Group>> refreshSet;
         private List<Data> globData;
-
-        private int Group;
+		protected int iOuter;
+		protected int stringcnt;
+		protected bool lastD;
+		protected int daysRec;
+        protected int Group;
+		protected List<Data> v1;
+		protected bool doNot;
         private bool silent;
         // MODE 0: Nur heute, MODE 1: Nur Morgen, MODE 2: Beide
         private int mode = 5;
@@ -165,130 +170,153 @@ namespace UntisExp
 				Networking.DownloadData (nav, times_DownloadStringCompleted, alert, true, VConfig.eventIErrorTtl, VConfig.eventIErrorTxt, VConfig.eventIErrorBtn);
 			}
 		}
+
+		protected string prepareText (string input) {
+			return input.Replace(" ", string.Empty);
+		}
+
+		protected int getNewsBoxesLength(string input) {
+			string haystack = input;
+			string needle = VConfig.titleOfMsgBox.Replace(" ", string.Empty);
+			return (haystack.Length - input.Replace(needle, "").Length) / needle.Length;
+		}
+
+		protected string [] getDayArray(string input, int tables)
+		{
+			string[] result = new string[tables];
+			for (int i = 0; i < tables; i++)
+			{
+				result[i] = input.Substring(input.IndexOf("<table"), input.IndexOf("</table>") - input.IndexOf("<table") + 8);
+				input = input.Substring(input.IndexOf("</table>") + 8);
+			}
+			return result;
+		}
+
+		protected void processRow(string item, bool two = false)
+		{
+			string it = item;
+			if (item.IndexOf(VConfig.searchNoAccess) == -1)
+			{
+				if (iOuter == (stringcnt - 1))
+					lastD = true;
+				daysRec++;
+				it = item.Replace("&nbsp;", String.Empty);
+				MatchCollection mc;
+				if (item.IndexOf(VConfig.noEventsText.Replace(" ", string.Empty)) == -1)
+				{
+					int i = 0;
+					while (it.IndexOf("<trclass='list") != -1)
+					{
+						if (i == 0)
+							it = it.Substring(it.IndexOf("</tr>") + 5, it.Length - it.IndexOf("</tr>") - 5);
+						string w;
+						Data data = new Data();
+
+						w = it.Substring(it.IndexOf("<trclass='list"));
+						w = w.Substring(0, w.IndexOf("</tr>"));
+						it = it.Substring(it.IndexOf("</tr>") + 5, it.Length - it.IndexOf("</tr>") - 5);
+						mc = VConfig.cellSearch.Matches(w);
+						int iInner = 0;
+						foreach (var thing in mc)
+						{
+							string thingy = thing.ToString();
+							thingy = thingy.Substring(thingy.IndexOf(">") + 1, thingy.Length - thingy.IndexOf(">") - 1);
+							thingy = thingy.Substring(0, thingy.IndexOf("<"));
+							switch (iInner)
+							{
+							case 0:
+								if (thingy == VConfig.specialEvtAb)
+								{ data.Veranstaltung = true; }
+								break;
+							case 1:
+								int day = Convert.ToInt16(thingy.Substring(0, thingy.IndexOf(".")));
+								string dayStr = thingy.Substring(thingy.IndexOf(".") + 1);
+								dayStr = dayStr.Replace(".", string.Empty);
+								int month = Convert.ToInt16(dayStr);
+								int year = DateTime.Now.Year;
+								DateTime dt = new DateTime(year, month, day);
+								data.Date = dt;
+								if (i == 0 && !silent)
+								{
+									v1.Add(new Data(dt));
+								}
+								break;
+							case 2:
+								data.Stunde = thingy;
+								break;
+							case 3:
+								data.Vertreter = thingy;
+								break;
+							case 4:
+								data.Fach = thingy;
+								break;
+							case 5:
+								data.AltFach = thingy;
+								break;
+							case 6:
+								data.Raum = thingy;
+								break;
+							case 7:
+								data.Klasse = thingy;
+								break;
+							case 8:
+								data.Lehrer = thingy;
+								break;
+							case 13:
+								data.Notiz = thingy;
+								break;
+							case 14:
+								data.EntfallStr = thingy;
+								break;
+							case 15:
+								data.MitbeStr = thingy;
+								break;
+							default:
+								break;
+							}
+							iInner++;
+						}
+						data.refresh();
+						v1.Add(data);
+						i++;
+					}
+				}
+				else if (two == false)
+				{
+					if (!silent) refreshOne(new Data());
+				}
+			}
+			iOuter++;
+			if (iOuter == stringcnt && (daysRec == 1 && lastD) && mode != 0 && two == false)
+			{
+				getTimes(Group, true);
+				globData = v1;
+				doNot = true;
+			}
+		}
+
+		protected void initPaser(bool two = false)
+		{
+			v1 = new List<Data>();
+			iOuter = 0;
+			daysRec = 0;
+			doNot = false;
+		}
+
         private void times_DownloadStringCompleted(string res)
         {
-            string comp = res;
-            comp = comp.Replace(" ", string.Empty);
+			string comp = prepareText(res);
             //TO-DO: Parse VPlan
-            int stringcnt = 5;
-			bool lastD = false;
+			lastD = false;
             if (!silent)
                 del();
-            string haystack = comp;
-            string needle = VConfig.titleOfMsgBox.Replace(" ", string.Empty);
-            int needleCount = (haystack.Length - comp.Replace(needle, "").Length) / needle.Length;
-            stringcnt = stringcnt + needleCount;
-            string[] raw = new string[stringcnt];
-            for (int i = 0; i < stringcnt; i++)
-            {
-                raw[i] = comp.Substring(comp.IndexOf("<table"), comp.IndexOf("</table>") - comp.IndexOf("<table") + 8);
-                comp = comp.Substring(comp.IndexOf("</table>") + 8);
-            }
-            List<Data> v1 = new List<Data>();
-            int iOuter = 0;
-            int daysRec = 0;
-            bool doNot = false;
+			int needleCount = getNewsBoxesLength(comp);
+			int stringcnt = VConfig.expectedDayNum + needleCount;
+			string[] raw = getDayArray (comp, stringcnt);
+			initPaser ();
             foreach (var item in raw)
             {
-                string it = item;
-                if (item.IndexOf(VConfig.searchNoAccess) == -1)
-                {
-					if (iOuter == (stringcnt - 1))
-						lastD = true;
-                    daysRec++;
-                    it = item.Replace("&nbsp;", String.Empty);
-                    MatchCollection mc;
-                    if (item.IndexOf(VConfig.noEventsText.Replace(" ", string.Empty)) == -1)
-                    {
-                        int i = 0;
-                        while (it.IndexOf("<trclass='list") != -1)
-                        {
-                            if (i == 0)
-                                it = it.Substring(it.IndexOf("</tr>") + 5, it.Length - it.IndexOf("</tr>") - 5);
-                            string w;
-                            Data data = new Data();
-
-                            w = it.Substring(it.IndexOf("<trclass='list"));
-                            w = w.Substring(0, w.IndexOf("</tr>"));
-                            it = it.Substring(it.IndexOf("</tr>") + 5, it.Length - it.IndexOf("</tr>") - 5);
-                            mc = VConfig.cellSearch.Matches(w);
-                            int iInner = 0;
-                            foreach (var thing in mc)
-                            {
-                                string thingy = thing.ToString();
-                                thingy = thingy.Substring(thingy.IndexOf(">") + 1, thingy.Length - thingy.IndexOf(">") - 1);
-                                thingy = thingy.Substring(0, thingy.IndexOf("<"));
-                                switch (iInner)
-                                {
-                                    case 0:
-                                        if (thingy == VConfig.specialEvtAb)
-                                        { data.Veranstaltung = true; }
-                                        break;
-                                    case 1:
-                                        int day = Convert.ToInt16(thingy.Substring(0, thingy.IndexOf(".")));
-                                        string dayStr = thingy.Substring(thingy.IndexOf(".") + 1);
-                                        dayStr = dayStr.Replace(".", string.Empty);
-                                        int month = Convert.ToInt16(dayStr);
-                                        int year = DateTime.Now.Year;
-                                        DateTime dt = new DateTime(year, month, day);
-                                        data.Date = dt;
-                                        if (i == 0 && !silent)
-                                        {
-                                            v1.Add(new Data(dt));
-                                        }
-                                        break;
-                                    case 2:
-                                        data.Stunde = thingy;
-                                        break;
-                                    case 3:
-                                        data.Vertreter = thingy;
-                                        break;
-                                    case 4:
-                                        data.Fach = thingy;
-                                        break;
-                                    case 5:
-                                        data.AltFach = thingy;
-                                        break;
-                                    case 6:
-                                        data.Raum = thingy;
-                                        break;
-                                    case 7:
-                                        data.Klasse = thingy;
-                                        break;
-                                    case 8:
-                                        data.Lehrer = thingy;
-                                        break;
-                                    case 13:
-                                        data.Notiz = thingy;
-                                        break;
-                                    case 14:
-                                        data.EntfallStr = thingy;
-                                        break;
-                                    case 15:
-                                        data.MitbeStr = thingy;
-                                        break;
-                                    default:
-                                        break;
-                                }
-                                iInner++;
-                            }
-                            data.refresh();
-                            v1.Add(data);
-                            i++;
-                        }
-                    }
-                    else
-                    {
-                        if (!silent) refreshOne(new Data());
-                    }
-                }
-                iOuter++;
-				if (iOuter == stringcnt && (daysRec == 1 && lastD) && mode != 0)
-                {
-                    getTimes(Group, true);
-                    globData = v1;
-                    doNot = true;
-                }
+				processRow (item);
             }
             if (doNot != true)
             {
@@ -299,116 +327,22 @@ namespace UntisExp
         {
             try
             {
-                string comp = res;
-                comp = comp.Replace(" ", string.Empty);
+				string comp = prepareText(res);
                 if (comp.IndexOf("NotFound") != -1 || comp.Length == 0)
                 {
                     refreshAll(globData);
                     return;
                 }
                 //TO-DO: Parse VPlan
-                int stringcnt = 5;
-                string haystack = comp;
-                string needle = VConfig.titleOfMsgBox.Replace(" ", string.Empty);
-                int needleCount = (haystack.Length - comp.Replace(needle, "").Length) / needle.Length;
-                stringcnt = stringcnt + needleCount;
-                string[] raw = new string[stringcnt];
-                for (int i = 0; i < stringcnt; i++)
-                {
-                    raw[i] = comp.Substring(comp.IndexOf("<table"), comp.IndexOf("</table>") - comp.IndexOf("<table") + 8);
-                    comp = comp.Substring(comp.IndexOf("</table>") + 8);
-                }
-                int iOuter = 0;
-                int daysRec = 0;
+				int needleCount = getNewsBoxesLength(comp);
+				int stringcnt = VConfig.expectedDayNum + needleCount;
+				string[] raw = getDayArray (comp, stringcnt);
+				initPaser();
                 foreach (var item in raw)
                 {
-                    string it = item;
-                    if (item.IndexOf(VConfig.searchNoAccess) == -1)
-                    {
-                        daysRec++;
-                        it = item.Replace("&nbsp;", String.Empty);
-                        MatchCollection mc;
-                        if (item.IndexOf(VConfig.noEventsText.Replace(" ", string.Empty)) == -1)
-                        {
-                            int i = 0;
-                            while (it.IndexOf("<trclass='list") != -1)
-                            {
-                                if (i == 0)
-                                    it = it.Substring(it.IndexOf("</tr>") + 5, it.Length - it.IndexOf("</tr>") - 5);
-                                string w;
-                                Data data = new Data();
-                                w = it.Substring(it.IndexOf("<trclass='list"));
-                                w = w.Substring(0, w.IndexOf("</tr>"));
-                                it = it.Substring(it.IndexOf("</tr>") + 5, it.Length - it.IndexOf("</tr>") - 5);
-                                mc = VConfig.cellSearch.Matches(w);
-                                int iInner = 0;
-                                foreach (var thing in mc)
-                                {
-                                    string thingy = thing.ToString();
-                                    thingy = thingy.Substring(thingy.IndexOf(">") + 1, thingy.Length - thingy.IndexOf(">") - 1);
-                                    thingy = thingy.Substring(0, thingy.IndexOf("<"));
-                                    switch (iInner)
-                                    {
-                                        case 0:
-                                            if (thingy == VConfig.specialEvtAb)
-                                            { data.Veranstaltung = true; }
-                                            break;
-                                        case 1:
-                                            int day = Convert.ToInt16(thingy.Substring(0, thingy.IndexOf(".")));
-                                            string dayStr = thingy.Substring(thingy.IndexOf(".") + 1);
-                                            dayStr = dayStr.Replace(".", string.Empty);
-                                            int month = Convert.ToInt16(dayStr);
-                                            int year = DateTime.Now.Year;
-                                            DateTime dt = new DateTime(year, month, day);
-                                            data.Date = dt;
-                                            if (i == 0 && !silent)
-                                            {
-                                                globData.Add(new Data(dt));
-                                            }
-                                            break;
-                                        case 2:
-                                            data.Stunde = thingy;
-                                            break;
-                                        case 3:
-                                            data.Vertreter = thingy;
-                                            break;
-                                        case 4:
-                                            data.Fach = thingy;
-                                            break;
-                                        case 5:
-                                            data.AltFach = thingy;
-                                            break;
-                                        case 6:
-                                            data.Raum = thingy;
-                                            break;
-                                        case 7:
-                                            data.Klasse = thingy;
-                                            break;
-                                        case 8:
-                                            data.Lehrer = thingy;
-                                            break;
-                                        case 13:
-                                            data.Notiz = thingy;
-                                            break;
-                                        case 14:
-                                            data.EntfallStr = thingy;
-                                            break;
-                                        case 15:
-                                            data.MitbeStr = thingy;
-                                            break;
-                                        default:
-                                            break;
-                                    }
-                                    iInner++;
-                                }
-                                data.refresh();
-                                globData.Add(data);
-                                i++;
-                            }
-                        }
-                    }
-                    iOuter++;
+					processRow (item, true);
                 }
+				globData.AddRange(v1);
                 refreshAll(globData);
             }
             catch
