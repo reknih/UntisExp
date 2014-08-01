@@ -16,18 +16,23 @@ namespace UntisExp
         private Action del;
         private Action<String, String, String> alert;
         private Action<List<Data>> refreshAll;
-        private Action<Data> refreshOne;
+		private Action<Data> refreshOne;
+		private Action<News> addTheNews;
         private Action<List<Group>> refreshSet;
         private List<Data> globData;
 		protected int iOuter;
 		protected int stringcnt;
 		protected bool lastD;
 		protected int daysRec;
-        protected int Group;
+		protected int Group;
+		protected int iInner;
+		protected Data data;
+		protected News news;
 		protected List<Data> v1;
 		protected bool doNot;
         private bool silent;
-        // MODE 0: Nur heute, MODE 1: Nur Morgen, MODE 2: Beide
+		protected int i;
+        // MODE 0: Nur heute, MODE 1: Nur Morgen, MODE 2: Beide, MODE 5: Alles
         private int mode = 5;
         /// <summary>
         /// Initializes a new instance of the <see cref="UntisExp.Fetcher"/> class.
@@ -78,6 +83,16 @@ namespace UntisExp
             alert = _alert;
             refreshSet = _refeshAll;
         }
+
+		public Fetcher(Action<News> _refreshOne, int group = 5, int week = -1)
+		{
+			addTheNews = _refreshOne;
+			alert = delegate(string arg1, string arg2, string arg3) {
+				string test;
+			};
+			getTimes (group, Activity.getNews, week);
+		}
+
 			
         /// <summary>
         /// Downloads a list of groups asynchronously. Uses the callbacks from the constructor.
@@ -121,10 +136,8 @@ namespace UntisExp
         /// <param name="group">The group number</param>
         /// <param name="follow">Optonal. If set to <c>true</c> the next week is processed. Some changes for processsing apply.</param>
         /// <param name="week">Optional, if it's not set, the current week will be fetched. Sets the calender week to get.</param>
-        public void getTimes(int group, bool follow = false, int week = -1)
+		public void getTimes(int group, Activity activity = Activity.ParseFirstSchedule, int week = -1)
         {
-            if (mode == 1)
-                follow = true;
             Group = group;
             string groupStr = "";
             string weekStr = "";
@@ -152,7 +165,7 @@ namespace UntisExp
             Calendar cal = dfi.Calendar;
             if (week == -1)
                 week = cal.GetWeekOfYear(DateTime.Now, dfi.CalendarWeekRule, dfi.FirstDayOfWeek);
-            if (follow == true)
+			if (activity == Activity.ParseSecondSchedule)
                 week++;
             if (week < 10)
             {
@@ -164,10 +177,12 @@ namespace UntisExp
             }
 
 			var nav = VConfig.url + weekStr + "/w/" + groupStr + ".htm";
-			if (follow) {
+			if (activity == Activity.ParseSecondSchedule) {
 				Networking.DownloadData (nav, timesNext_DownloadStringCompleted, alert);
-			} else {
+			} else if (activity == Activity.ParseFirstSchedule) {
 				Networking.DownloadData (nav, times_DownloadStringCompleted, alert, true, VConfig.eventIErrorTtl, VConfig.eventIErrorTxt, VConfig.eventIErrorBtn);
+			} else if (activity == Activity.getNews) {
+				Networking.DownloadData (nav, news_DownloadStringCompleted, alert, true, VConfig.eventIErrorTtl, VConfig.eventIErrorTxt, VConfig.eventIErrorBtn);
 			}
 		}
 
@@ -192,7 +207,7 @@ namespace UntisExp
 			return result;
 		}
 
-		protected void processRow(string item, bool two = false)
+		protected void processRow(string item, Activity activity = Activity.ParseFirstSchedule)
 		{
 			string it = item;
 			if (item.IndexOf(VConfig.searchNoAccess) == -1)
@@ -202,97 +217,132 @@ namespace UntisExp
 				daysRec++;
 				it = item.Replace("&nbsp;", String.Empty);
 				MatchCollection mc;
+				string searchInFront;
+				if (activity == Activity.getNews) {
+					searchInFront = "<tr>";
+					if (news == null) {
+						news = new News ();
+						news.Image = "http://centrallink.de/sr/Blackboard.png";
+						news.Source = new Uri (VConfig.url);
+					}
+				} else {
+					searchInFront = "<trclass='list";
+				}
 				if (item.IndexOf(VConfig.noEventsText.Replace(" ", string.Empty)) == -1)
 				{
-					int i = 0;
-					while (it.IndexOf("<trclass='list") != -1)
+					i = 0;
+					while (it.IndexOf(searchInFront) != -1)
 					{
+						if (activity == Activity.getNews && news.Summary != null) {
+							news.Summary += ", ";
+						}
 						if (i == 0)
 							it = it.Substring(it.IndexOf("</tr>") + 5, it.Length - it.IndexOf("</tr>") - 5);
 						string w;
-						Data data = new Data();
-
-						w = it.Substring(it.IndexOf("<trclass='list"));
+						data = new Data();
+						w = it.Substring(it.IndexOf(searchInFront));
 						w = w.Substring(0, w.IndexOf("</tr>"));
 						it = it.Substring(it.IndexOf("</tr>") + 5, it.Length - it.IndexOf("</tr>") - 5);
 						mc = VConfig.cellSearch.Matches(w);
-						int iInner = 0;
+						iInner = 0;
 						foreach (var thing in mc)
 						{
-							string thingy = thing.ToString();
-							thingy = thingy.Substring(thingy.IndexOf(">") + 1, thingy.Length - thingy.IndexOf(">") - 1);
-							thingy = thingy.Substring(0, thingy.IndexOf("<"));
-							switch (iInner)
-							{
-							case 0:
-								if (thingy == VConfig.specialEvtAb)
-								{ data.Veranstaltung = true; }
-								break;
-							case 1:
-								int day = Convert.ToInt16(thingy.Substring(0, thingy.IndexOf(".")));
-								string dayStr = thingy.Substring(thingy.IndexOf(".") + 1);
-								dayStr = dayStr.Replace(".", string.Empty);
-								int month = Convert.ToInt16(dayStr);
-								int year = DateTime.Now.Year;
-								DateTime dt = new DateTime(year, month, day);
-								data.Date = dt;
-								if (i == 0 && !silent)
-								{
-									v1.Add(new Data(dt));
-								}
-								break;
-							case 2:
-								data.Stunde = thingy;
-								break;
-							case 3:
-								data.Vertreter = thingy;
-								break;
-							case 4:
-								data.Fach = thingy;
-								break;
-							case 5:
-								data.AltFach = thingy;
-								break;
-							case 6:
-								data.Raum = thingy;
-								break;
-							case 7:
-								data.Klasse = thingy;
-								break;
-							case 8:
-								data.Lehrer = thingy;
-								break;
-							case 13:
-								data.Notiz = thingy;
-								break;
-							case 14:
-								data.EntfallStr = thingy;
-								break;
-							case 15:
-								data.MitbeStr = thingy;
-								break;
-							default:
-								break;
+							string compute = prepareScheduleItem (thing);
+							if (activity != Activity.getNews) {
+								proceedScheduleItem (compute);
+							} else {
+								proceedNewsItem (compute);
 							}
-							iInner++;
 						}
-						data.refresh();
-						v1.Add(data);
+						if (activity != Activity.getNews) {
+							data.refresh();
+							v1.Add(data);
+						}
 						i++;
 					}
 				}
-				else if (two == false)
+				else if (activity == Activity.ParseFirstSchedule)
 				{
 					if (!silent) refreshOne(new Data());
 				}
 			}
 			iOuter++;
-			if (iOuter == stringcnt && (daysRec == 1 && lastD) && mode != 0 && two == false)
+			if (iOuter == stringcnt && (daysRec == 1 && lastD) && mode != 0 && activity == Activity.ParseFirstSchedule)
 			{
-				getTimes(Group, true);
+				getTimes(Group, Activity.ParseSecondSchedule);
 				globData = v1;
 				doNot = true;
 			}
+		}
+
+		protected string prepareScheduleItem(object input)
+		{
+			string thingy = input.ToString();
+			thingy = thingy.Substring(thingy.IndexOf(">") + 1, thingy.Length - thingy.IndexOf(">") - 1);
+			thingy = thingy.Substring(0, thingy.IndexOf("<"));
+			return thingy;
+		}
+
+		protected void proceedNewsItem (string thingy) {
+			news.Title = "Vom Vertretungsplan:";
+			news.Summary = news.Summary + Helpers.AddSpaces(thingy);
+			news.Content = news.Summary;
+		}
+
+		protected void proceedScheduleItem (string thingy) {
+			switch (iInner)
+			{
+			case 0:
+				if (thingy == VConfig.specialEvtAb)
+				{ data.Veranstaltung = true; }
+				break;
+			case 1:
+				int day = Convert.ToInt16(thingy.Substring(0, thingy.IndexOf(".")));
+				string dayStr = thingy.Substring(thingy.IndexOf(".") + 1);
+				dayStr = dayStr.Replace(".", string.Empty);
+				int month = Convert.ToInt16(dayStr);
+				int year = DateTime.Now.Year;
+				DateTime dt = new DateTime(year, month, day);
+				data.Date = dt;
+				if (i == 0 && !silent)
+				{
+					v1.Add(new Data(dt));
+				}
+				break;
+			case 2:
+				data.Stunde = thingy;
+				break;
+			case 3:
+				data.Vertreter = thingy;
+				break;
+			case 4:
+				data.Fach = thingy;
+				break;
+			case 5:
+				data.AltFach = thingy;
+				break;
+			case 6:
+				data.Raum = thingy;
+				break;
+			case 7:
+				data.Klasse = thingy;
+				break;
+			case 8:
+				data.Lehrer = thingy;
+				break;
+			case 13:
+				data.Notiz = thingy;
+				break;
+			case 14:
+				data.EntfallStr = thingy;
+				break;
+			case 15:
+				data.MitbeStr = thingy;
+				break;
+			default:
+				break;
+			}
+			iInner++;
 		}
 
 		protected void initPaser(bool two = false)
@@ -303,26 +353,41 @@ namespace UntisExp
 			doNot = false;
 		}
 
-        private void times_DownloadStringCompleted(string res)
-        {
+		private void times_DownloadStringCompleted(string res)
+		{
 			string comp = prepareText(res);
-            //TO-DO: Parse VPlan
+			//TO-DO: Parse VPlan
 			lastD = false;
-            if (!silent)
-                del();
+			if (!silent)
+				del();
 			int needleCount = getNewsBoxesLength(comp);
 			int stringcnt = VConfig.expectedDayNum + needleCount;
 			string[] raw = getDayArray (comp, stringcnt);
 			initPaser ();
-            foreach (var item in raw)
-            {
+			foreach (var item in raw)
+			{
 				processRow (item);
-            }
-            if (doNot != true)
-            {
-                refreshAll(v1);
-            }
-        }
+			}
+			if (doNot != true)
+			{
+				refreshAll(v1);
+			}
+		}
+		private void news_DownloadStringCompleted(string res)
+		{
+			string comp = prepareText(res);
+			//TO-DO: Parse VPlan
+			lastD = false;
+			int needleCount = getNewsBoxesLength(comp);
+			int stringcnt = VConfig.expectedDayNum + needleCount;
+			string[] raw = getDayArray (comp, stringcnt);
+			initPaser ();
+			foreach (var item in raw)
+			{
+				processRow (item, Activity.getNews);
+			}
+			addTheNews (news);
+		}
         private void timesNext_DownloadStringCompleted(String res)
         {
             try
@@ -340,7 +405,7 @@ namespace UntisExp
 				initPaser();
                 foreach (var item in raw)
                 {
-					processRow (item, true);
+					processRow (item, Activity.ParseSecondSchedule);
                 }
 				globData.AddRange(v1);
                 refreshAll(globData);

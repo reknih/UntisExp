@@ -42,6 +42,7 @@
     <Compile Include="Press.cs" />
     <Compile Include="News.cs" />
     <Compile Include="Helpers.cs" />
+    <Compile Include="Activity.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
 </Project>

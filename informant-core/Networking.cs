@@ -19,7 +19,12 @@ namespace UntisExp
 				var request = (HttpWebRequest)WebRequest.Create(url);
 				DoWithResponse(request, (response) =>
 					{
-						var body = new StreamReader(response.GetResponseStream()).ReadToEnd();
+						string body;
+						if (url.IndexOf(VConfig.url) != -1) {
+							body = new StreamReader(response.GetResponseStream(), Encoding.GetEncoding("ISO-8859-1")).ReadToEnd();
+						} else {
+							body = new StreamReader(response.GetResponseStream(), Encoding.UTF8).ReadToEnd();
+						}
 						defCallback(body);
 					});
 			}
@@ -46,7 +51,7 @@ namespace UntisExp
 						try {
                             var response = (HttpWebResponse)((HttpWebRequest)iar.AsyncState).EndGetResponse(iar);
 							responseAction(response);
-						} catch {
+						} catch (Exception e) {
 							defAlert(VConfig.noPageErrTtl, VConfig.noPageErrTxt, VConfig.noPageErrBtn);
 						}
 					}), request);
@@ -61,7 +66,7 @@ namespace UntisExp
 		{
 			HttpWebResponse response = (result.AsyncState as HttpWebRequest).EndGetResponse(result) as HttpWebResponse;
 			Stream receiveStream = response.GetResponseStream();
-			StreamReader readStream = new StreamReader(receiveStream, Encoding.UTF8);
+			StreamReader readStream = new StreamReader(receiveStream, Encoding.GetEncoding("ISO-8859-1"));
 			string body = readStream.ReadToEnd();
 			return body;
 		}
