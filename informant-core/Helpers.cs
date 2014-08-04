@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace UntisExp
 {
@@ -10,7 +11,7 @@ namespace UntisExp
 		}
 		public static string TruncateWithPreservation(string s, int len)
 		{
-			s = s.Replace ("\n", "");
+			s = s.Replace ("\n", " ");
 			string[] parts = s.Split(' ');
 			StringBuilder sb = new StringBuilder();
 
@@ -24,6 +25,11 @@ namespace UntisExp
 			}
 
 			return sb.ToString();
+		}
+		public static string AddSpaces (string s) {
+			string Result = Regex.Replace(s, "((?<=\\p{Ll})\\p{Lu})|((?!\\A)\\p{Lu}(?>\\p{Ll})|\\d)", " $0");
+			Result = Regex.Replace(Result, "(\\.(?=\\S)|:(?=\\S))(.)", "$1 $2");
+			return Result;
 		}
 	}
 }

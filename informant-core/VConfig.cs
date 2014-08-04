@@ -30,6 +30,7 @@ namespace UntisExp
         public static string unknownErrTtl  = "Houston, wir haben ein Problem.";
 		public static string unknownErrTxt  = "Und ich hoffte, das das nie von jemandem gelesen wird: Unbekannter Fehler!";
 		public static string unknownErrBtn  = "Träume sind Schäumes";
+		public static int    expectedDayNum = 5;
 
 		public static void Populate () {
 			try {

@@ -131,8 +131,7 @@ namespace UntisExp
 			}
 			if (Notiz != "")
 			{
-				Notiz = Regex.Replace(Notiz, "((?<=\\p{Ll})\\p{Lu})|((?!\\A)\\p{Lu}(?>\\p{Ll})|\\d)", " $0");
-				Notiz = Regex.Replace(Notiz, "(\\.(?=\\S)|:(?=\\S))(.)", "$1 $2");
+				Notiz = Helpers.AddSpaces (Notiz);
 				Line2 = Notiz + "; " + Line2;
 			}
 		}
