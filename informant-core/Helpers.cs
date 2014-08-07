@@ -31,6 +31,11 @@ namespace UntisExp
 			Result = Regex.Replace(Result, "(\\.(?=\\S)|:(?=\\S))(.)", "$1 $2");
 			return Result;
 		}
+        public static string getRandomArrayItem(string [] array) {
+            var rand = new Random();
+            int pos = rand.Next(array.Length);
+            return array[pos];
+        }
 	}
 }
 

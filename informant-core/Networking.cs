@@ -7,8 +7,9 @@ namespace UntisExp
 {
 	public static class Networking
 	{
-		public static Action<String> defCallback;
-		public static Action<string, string, string> defAlert;
+        public static Action<String> defCallback;
+        public static Action<Stream> defStreamCallback;
+        public static Action<string, string, string> defAlert;
 		public static void DownloadData(string url, Action<String> callback, Action<string, string, string> alertmet, bool alerting = false, string aHead = "", string aBody = "", string aBtn = "")
 		{
 			defCallback = callback;
@@ -42,6 +43,22 @@ namespace UntisExp
 				}
 			}
 		}
+        public static void DownloadLegacyStream(string url, Action<Stream> callback, Action<string, string, string> alertmet, bool alerting = false, string aHead = "", string aBody = "", string aBtn = "")
+        {
+            defStreamCallback = callback;
+            defAlert = alertmet;
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create(url);
+                request.BeginGetResponse(new AsyncCallback(FinishStreamRequest), request);
+            }
+            catch
+            {
+                if (alerting)
+                    alertmet(aHead, aBody, aBtn);
+            }
+        }
+
 		public static void DoWithResponse(HttpWebRequest request, Action<HttpWebResponse> responseAction)
 		{
 			Action wrapperAction = () =>
@@ -72,11 +89,17 @@ namespace UntisExp
 		}
 		public static void dummy (string a1, string a2, string a3){
 		}
-		public static void FinishRequest(IAsyncResult result)
-		{
-			string body = Networking.GetBody(result);
-			defCallback(body);
-		}
-	}
+        public static void FinishRequest(IAsyncResult result)
+        {
+            string body = Networking.GetBody(result);
+            defCallback(body);
+        }
+        public static void FinishStreamRequest(IAsyncResult result)
+        {
+            HttpWebResponse response = (result.AsyncState as HttpWebRequest).EndGetResponse(result) as HttpWebResponse;
+            Stream receiveStream = response.GetResponseStream();
+            defStreamCallback(receiveStream);
+        }
+    }
 }
 
