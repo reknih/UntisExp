@@ -41,6 +41,7 @@ namespace UntisExp
         /// Website of it
         /// </summary>
 		public Uri Source { get; set; }
+        public string SourcePrint { get; set; }
         /// <summary>
         /// Short excerpt or similar. Will be created automatically if not given
         /// </summary>
@@ -60,6 +61,14 @@ namespace UntisExp
         public void Refresh() {
             if (Summary == "") {
                 Summary = Helpers.TruncateWithPreservation(Content, 50);
+            }
+            if (Source.AbsoluteUri.IndexOf(VConfig.url) != -1)
+            {
+                SourcePrint = "CHRISTIAN-WIRTH-SCHULE";
+            }
+            else
+            {
+                SourcePrint = "SR-BLOG";
             }
         }
 	}
