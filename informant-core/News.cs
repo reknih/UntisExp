@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 
 namespace UntisExp
 {
@@ -59,6 +60,11 @@ namespace UntisExp
         /// Generates Summary, if empty
         /// </summary>
         public void Refresh() {
+			try {
+				Content = WebUtility.HtmlDecode (Content);
+				Title = WebUtility.HtmlDecode (Title);
+			} catch {
+			}
             if (Summary == "") {
                 Summary = Helpers.TruncateWithPreservation(Content, 50);
             }
