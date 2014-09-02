@@ -81,10 +81,17 @@ namespace UntisExp
 		}
 		public static string GetBody(IAsyncResult result)
 		{
-			HttpWebResponse response = (result.AsyncState as HttpWebRequest).EndGetResponse(result) as HttpWebResponse;
-			Stream receiveStream = response.GetResponseStream();
-			StreamReader readStream = new StreamReader(receiveStream, Encoding.GetEncoding("ISO-8859-1"));
-			string body = readStream.ReadToEnd();
+            string body = "";
+            try
+            {
+                HttpWebResponse response = (result.AsyncState as HttpWebRequest).EndGetResponse(result) as HttpWebResponse;
+                Stream receiveStream = response.GetResponseStream();
+                StreamReader readStream = new StreamReader(receiveStream, Encoding.GetEncoding("ISO-8859-1"));
+                body = readStream.ReadToEnd();
+            }
+            catch {
+                defAlert(VConfig.noPageErrTtl, VConfig.noPageErrTxt, VConfig.noPageErrBtn);
+            }
 			return body;
 		}
 		public static void dummy (string a1, string a2, string a3){
@@ -92,7 +99,8 @@ namespace UntisExp
         public static void FinishRequest(IAsyncResult result)
         {
             string body = Networking.GetBody(result);
-            defCallback(body);
+            if (body != "")
+                defCallback(body);
         }
         public static void FinishStreamRequest(IAsyncResult result)
         {
