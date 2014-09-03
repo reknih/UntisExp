@@ -86,7 +86,7 @@ namespace UntisExp
             writing.Summary = Helpers.TruncateWithPreservation(writing.Content, 30);
             var mediaQuery = from medias in articlet.Descendants(medians + "content")
                              select medias.Attribute("url").Value;
-            writing.Image = mediaQuery.ElementAtOrDefault(1);
+            writing.Image = mediaQuery.ElementAtOrDefault(0);
             writing.Refresh();
             return writing;
         }

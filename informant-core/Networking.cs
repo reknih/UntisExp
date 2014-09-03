@@ -26,6 +26,13 @@ namespace UntisExp
 						} else {
 							body = new StreamReader(response.GetResponseStream(), Encoding.UTF8).ReadToEnd();
 						}
+                        try
+                        {
+                            body = WebUtility.HtmlDecode(body);
+                        }
+                        catch
+                        {
+                        }
 						defCallback(body);
 					});
 			}
@@ -88,6 +95,14 @@ namespace UntisExp
                 Stream receiveStream = response.GetResponseStream();
                 StreamReader readStream = new StreamReader(receiveStream, Encoding.GetEncoding("ISO-8859-1"));
                 body = readStream.ReadToEnd();
+                try
+                {
+                    body = WebUtility.HtmlDecode(body);
+                }
+                catch
+                {
+                }
+
             }
             catch {
                 defAlert(VConfig.noPageErrTtl, VConfig.noPageErrTxt, VConfig.noPageErrBtn);

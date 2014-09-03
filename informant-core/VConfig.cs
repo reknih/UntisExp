@@ -10,7 +10,7 @@ namespace UntisExp
 	public static class VConfig
 	{
         public static string url            = "http://www.cws-usingen.de/stupla/Schueler/";
-        public static string feed = "http://thedadletters.com/feed/";
+        public static string feed           = "http://srdercws.wordpress.com/feed/";
         public static string pathToNavbar   = "frames/navbar.htm";
 		public static string groupIErrorTtl = "Dumm, dumm, dumm.";
 		public static string groupIErrorTxt = "Wir haben keine Verbndung zum Internet. Die brauchst du aber jetzt.";
@@ -66,4 +66,3 @@ namespace UntisExp
 		}
 	}
 }
-
