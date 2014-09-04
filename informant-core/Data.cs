@@ -73,7 +73,8 @@ namespace UntisExp
 			Head = false;
 			Fach = faecherSchreib(Fach);
 			AltFach = faecherSchreib(AltFach);
-			if (EntfallStr != "" && EntfallStr != null)
+            Regex emptycheck = new Regex(@"^\s*$");
+            if (!(emptycheck.Matches(EntfallStr).Count  > 0))
 			{
 				Entfall = true;
 			}
@@ -81,7 +82,7 @@ namespace UntisExp
 			{
 				Entfall = false;
 			}
-			if (MitbeStr != "" && EntfallStr != null)
+            if (!(emptycheck.Matches(MitbeStr).Count > 0))
 			{
 				Mitbetreung = true;
                 PrintMitbet = "Ja";
@@ -113,7 +114,7 @@ namespace UntisExp
 					Line2 = "Mit " + Lehrer + " und " + Klasse;
 				}
 			}
-			else if (Lehrer == "" || AltFach == "")
+            else if ((emptycheck.Matches(Lehrer).Count > 0) || !(emptycheck.Matches(AltFach).Count > 0))
 			{
 				Line2 = "Bei " + Vertreter + " in " + Raum;
 			}
@@ -129,7 +130,7 @@ namespace UntisExp
 			{
 				Line2 = "Raum: " + Raum + " | " + Lehrer;
 			}
-			if (Notiz != "")
+            if (!(emptycheck.Matches(Notiz).Count > 0))
 			{
 				Notiz = Helpers.AddSpaces (Notiz);
 				Line2 = Notiz + "; " + Line2;
