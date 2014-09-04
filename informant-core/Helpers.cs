@@ -37,7 +37,7 @@ namespace UntisExp
             int pos = rand.Next(array.Length);
             return array[pos];
         }
-        public static int[] getTodayTomorrowNum (List<Data> source) {
+        /*public static int[] getTodayTomorrowNum (List<Data> source) {
             List<int> headIndexes = new List<int>();
             int currIndex = 0;
             foreach (var item in source)
@@ -74,7 +74,16 @@ namespace UntisExp
                     break;
             }
             return new int[] { listlist[0].Count, listlist[1].Count };
-        }
+        }*/
+		public static bool IsEmpty(string s)
+		{
+			Regex emptycheck = new Regex(@"^\s*$");
+			if (emptycheck.Matches(s).Count > 1 || s == "")
+			{
+				return true;
+			}
+			return false;
+		}
 	}
 }
 
