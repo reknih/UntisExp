@@ -160,10 +160,11 @@ namespace UntisExp
             {
                 groupStr = "w" + Convert.ToString(group);
             }
+			var date = DateTime.Now.AddDays (1.3);
             DateTimeFormatInfo dfi = DateTimeFormatInfo.CurrentInfo;
             Calendar cal = dfi.Calendar;
             if (week == -1)
-                week = cal.GetWeekOfYear(DateTime.Now, dfi.CalendarWeekRule, dfi.FirstDayOfWeek);
+				week = cal.GetWeekOfYear(date, dfi.CalendarWeekRule, dfi.FirstDayOfWeek);
 			if (activity == Activity.ParseSecondSchedule)
                 week++;
             if (week < 10)

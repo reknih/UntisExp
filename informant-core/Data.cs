@@ -114,7 +114,7 @@ namespace UntisExp
 					Line2 = "Mit " + Lehrer + " und " + Klasse;
 				}
 			}
-			else if (Helpers.IsEmpty(Lehrer) || !Helpers.IsEmpty(Vertreter))
+			else if (Helpers.IsEmpty(Lehrer) && !Helpers.IsEmpty(Vertreter))
 			{
 				Line2 = "Bei " + Vertreter + " in " + Raum;
 			}
