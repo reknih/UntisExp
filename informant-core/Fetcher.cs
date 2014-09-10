@@ -386,7 +386,8 @@ namespace UntisExp
 			{
 				processRow (item, Activity.getNews);
 			}
-			addTheNews (news);
+			if (news.Content != null)
+				addTheNews (news);
 		}
         private void timesNext_DownloadStringCompleted(String res)
         {

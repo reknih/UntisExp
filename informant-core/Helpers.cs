@@ -78,7 +78,7 @@ namespace UntisExp
 		public static bool IsEmpty(string s)
 		{
 			Regex emptycheck = new Regex(@"^\s*$");
-			if (emptycheck.Matches(s).Count > 0 || s == "")
+			if (emptycheck.Matches(s).Count > 0 || s == "" || s == null)
 			{
 				return true;
 			}
