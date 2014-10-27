@@ -9,14 +9,14 @@ namespace UntisExp
 	/// </summary>
 	public static class VConfig
 	{
-        public static string url            = "http://www.cws-usingen.de/stupla/Schueler/";
+        public static string url            = "http://www.vp.cws-usingen.de/stupla/Schueler/";
         public static string feed           = "http://srdercws.wordpress.com/feed/";
         public static string pathToNavbar   = "frames/navbar.htm";
 		public static string groupIErrorTtl = "Dumm, dumm, dumm.";
 		public static string groupIErrorTxt = "Wir haben keine Verbndung zum Internet. Die brauchst du aber jetzt.";
 		public static string groupIErrorBtn = "Ich komme wieder!";
 		public static string eventIErrorTtl = "Aslack-Provider!";
-		public static string eventIErrorTxt = "Wir haben keine Verbndung zum Internet oder der Vertretungsplan der Woche ist nicht verfügbar.";
+		public static string eventIErrorTxt = "Wir haben keine Verbndung zum Internet gefunden.";
 		public static string eventIErrorBtn = "Huuurra.";
 		public static string titleOfMsgBox  = "Nachrichten zum Tag";
 		public static string noEventsText   = "Keine Vertretungen";
@@ -24,13 +24,13 @@ namespace UntisExp
 		public static Regex cellSearch      = new Regex("<t{1}d{1}.*?>.*?</td>");
 		public static string specialEvtAb   = "Veranst.";
 		public static Dictionary<string, string> lessonAbbr = new Dictionary<string, string>();
-		public static string noPageErrTtl   = "Du bist nicht schuld";
-		public static string noPageErrTxt   = "Die Vertretungsplanseite gibt's noch nicht. Ich vermute, es sind Ferien.";
-		public static string noPageErrBtn   = "Na hoffentlich!";
+		public static string noPageErrTtl   = "So ein Mist";
+		public static string noPageErrTxt   = "Vertretungsplanseite nicht gefunden";
+		public static string noPageErrBtn   = "In der Tat!";
         public static string unknownErrTtl  = "Houston, wir haben ein Problem.";
 		public static string unknownErrTxt  = "Und ich hoffte, das das nie von jemandem gelesen wird: Unbekannter Fehler!";
-        public static string unknownErrBtn  = "Träume sind Schäumes";
-        public static string[] successJokes = new string [] {"Und fertig!", "Heute schon Bertie gesehen?", "Sacrebleu", "Arrriba!", "Dein Tag könnte sich soeben verbessert haben"};
+        public static string unknownErrBtn  = "Si, Si.";
+        public static string[] successJokes = new string [] {"Und fertig!", "Heute schon Bertie gesehen?", "Sacrebleu", "Arrriba!", "Dein Tag könnte sich soeben verbessert haben", "Käsekuchen"};
         public static int expectedDayNum = 5;
 
 		public static void Populate () {
