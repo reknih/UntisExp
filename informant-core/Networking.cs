@@ -50,7 +50,7 @@ namespace UntisExp
 				}
 			}
 		}
-        public static void DownloadLegacyStream(string url, Action<Stream> callback, Action<string, string, string> alertmet, bool alerting = false, string aHead = "", string aBody = "", string aBtn = "")
+        public static void DownloadLegacyStream(string url, Action<Stream> callback, Action<string, string, string> alertmet = null, bool alerting = false, string aHead = "", string aBody = "", string aBtn = "")
         {
             defStreamCallback = callback;
             defAlert = alertmet;
@@ -75,7 +75,7 @@ namespace UntisExp
 						try {
                             var response = (HttpWebResponse)((HttpWebRequest)iar.AsyncState).EndGetResponse(iar);
 							responseAction(response);
-						} catch (Exception e) {
+						} catch{
 							defAlert(VConfig.noPageErrTtl, VConfig.noPageErrTxt, VConfig.noPageErrBtn);
 						}
 					}), request);
@@ -109,11 +109,9 @@ namespace UntisExp
             }
 			return body;
 		}
-		public static void dummy (string a1, string a2, string a3){
-		}
         public static void FinishRequest(IAsyncResult result)
         {
-            string body = Networking.GetBody(result);
+            string body = GetBody(result);
             if (body != "")
                 defCallback(body);
         }

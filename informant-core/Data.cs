@@ -27,9 +27,9 @@ namespace UntisExp
 		/// <param name="date">Date object</param>
 		public Data(DateTime date)
 		{
+			Head = true;
 			Line1 = date.ToString("dddd", new System.Globalization.CultureInfo("de-DE")) + ", " + Convert.ToString(date.Day) + "." + Convert.ToString(date.Month);
 			Line2 = "";
-			Head = true;
 			VConfig.Populate ();
 		}
 		/// <summary>
@@ -85,12 +85,12 @@ namespace UntisExp
 			if (!Helpers.IsEmpty(MitbeStr))
 			{
 				Mitbetreung = true;
-                PrintMitbet = "Ja";
+              //  PrintMitbet = "Ja";
 			}
 			else
 			{
 				Mitbetreung = false;
-                PrintMitbet = "Nein";
+               // PrintMitbet = "Nein";
 			}
 			Line1 = Stunde + ". Std: " + Fach;
 
@@ -165,7 +165,7 @@ namespace UntisExp
 		public string MitbeStr { get; set; }
 
         public bool Mitbetreung { get; set; }
-        public string PrintMitbet { get; set; }
+      //  public string PrintMitbet { get; set; }
 
 		public bool Veranstaltung { get; set; }
 
