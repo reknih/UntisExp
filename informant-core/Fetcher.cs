@@ -34,20 +34,7 @@ namespace UntisExp
 		protected int i;
         // MODE 0: Nur heute, MODE 1: Nur Morgen, MODE 2: Beide, MODE 5: Alles
         private int mode = 5;
-        /// <summary>
-        /// Initializes a new instance of the <see cref="UntisExp.Fetcher"/> class.
-        /// </summary>
-        /// <param name="_del">Callback function name for clearing the current list</param>
-        /// <param name="_alert">Callbck function name for displaying an error with title, text and dismiss-button</param>
-        /// <param name="_refeshAll">Callback function for updating the view with a List of entries.</param>
-        /// <param name="_refreshOne">Callback function for adding one entry to the view.</param>
-        public Fetcher(Action _del, Action<String, String, String> _alert, Action<List<Data>> _refeshAll, Action<Data> _refreshOne)
-        {
-            del = _del;
-            alert = _alert;
-            refreshAll = _refeshAll;
-            refreshOne = _refreshOne;
-        }
+
         public Fetcher(Action Stop, Action<List<Data>> _refeshAll, int _mode)
         {
             alert = delegate(string a, string b, string c) { Stop(); };
@@ -64,7 +51,7 @@ namespace UntisExp
         /// <param name="_refeshAll">Callback function for updating the view with a List of event entries.</param>
         /// <param name="_refreshOne">Callback function for adding one event entry to the view.</param>
         /// <param name="_refreshSet">Callback function for updating the view with a List of group entries.</param>
-        public Fetcher(Action _del, Action<String, String, String> _alert, Action<List<Data>> _refeshAll, Action<Data> _refreshOne, Action<List<Group>> _refreshSet)
+        public Fetcher(Action _del, Action<String, String, String> _alert, Action<List<Data>> _refeshAll, Action<Data> _refreshOne, Action<List<Group>> _refreshSet=null)
         {
             del = _del;
             alert = _alert;
@@ -122,9 +109,9 @@ namespace UntisExp
             }
             catch
             {
-                if (silent != true)
-                {
-                }
+//                if (silent != true)
+//                {
+//                }
                 //alert("ERROR", + e.Message + " " + e.StackTrace, "");
             }
         }
@@ -137,34 +124,20 @@ namespace UntisExp
         /// <param name="week">Optional, if it's not set, the current week will be fetched. Sets the calender week to get.</param>
 		public void getTimes(int group, Activity activity = Activity.ParseFirstSchedule, int week = -1)
         {
+
             Group = group;
             string groupStr = "";
             string weekStr = "";
-            if (group < 10)
-            {
-                groupStr = "w0000" + Convert.ToString(group);
-            }
-            else if (group < 100)
-            {
-                groupStr = "w000" + Convert.ToString(group);
-            }
-            else if (group < 1000)
-            {
-                groupStr = "w00" + Convert.ToString(group);
-            }
-            else if (group < 10000)
-            {
-                groupStr = "w0" + Convert.ToString(group);
-            }
-            else if (group < 100000)
-            {
-                groupStr = "w" + Convert.ToString(group);
-            }
-			var date = DateTime.Now.AddDays (1.3);
+			int length = group.ToString ().Length;
+			groupStr = "w";
+			for (int i = 0; i < (5 - length); i++) {
+				groupStr = groupStr + "0";
+			}
+			groupStr = groupStr + Convert.ToString (group);
             DateTimeFormatInfo dfi = DateTimeFormatInfo.CurrentInfo;
             Calendar cal = dfi.Calendar;
             if (week == -1)
-				week = cal.GetWeekOfYear(date, dfi.CalendarWeekRule, dfi.FirstDayOfWeek);
+                week = cal.GetWeekOfYear(DateTime.Now, dfi.CalendarWeekRule, dfi.FirstDayOfWeek);
 			if (activity == Activity.ParseSecondSchedule)
                 week++;
             if (week < 10)
@@ -184,10 +157,6 @@ namespace UntisExp
 			} else if (activity == Activity.getNews) {
 				Networking.DownloadData (nav, news_DownloadStringCompleted, alert, true, VConfig.eventIErrorTtl, VConfig.eventIErrorTxt, VConfig.eventIErrorBtn);
 			}
-		}
-
-		protected string prepareText (string input) {
-			return input.Replace(" ", string.Empty);
 		}
 
 		protected int getNewsBoxesLength(string input) {
@@ -228,16 +197,15 @@ namespace UntisExp
 				} else {
 					searchInFront = "<trclass='list";
 				}
-				if (item.IndexOf(VConfig.noEventsText.Replace(" ", string.Empty)) == -1)
+				if ((item.IndexOf(VConfig.noEventsText.Replace(" ", string.Empty)) == -1)||activity==Activity.getNews)
 				{
 					i = 0;
+					it = it.Substring(it.IndexOf("</tr>") + 5, it.Length - it.IndexOf("</tr>") - 5);
 					while (it.IndexOf(searchInFront) != -1)
 					{
 						if (activity == Activity.getNews && news.Summary != null) {
 							news.Summary += ", ";
 						}
-						if (i == 0)
-							it = it.Substring(it.IndexOf("</tr>") + 5, it.Length - it.IndexOf("</tr>") - 5);
 						string w;
 						data = new Data();
 						w = it.Substring(it.IndexOf(searchInFront));
@@ -278,9 +246,7 @@ namespace UntisExp
 		protected string prepareScheduleItem(object input)
 		{
 			string thingy = input.ToString();
-			thingy = thingy.Substring(thingy.IndexOf(">") + 1, thingy.Length - thingy.IndexOf(">") - 1);
-			thingy = thingy.Substring(0, thingy.IndexOf("<"));
-			return thingy;
+			return thingy.Substring(thingy.IndexOf(">") + 1,thingy.LastIndexOf("<")-thingy.IndexOf(">")-1);
 		}
 
 		protected void proceedNewsItem (string thingy) {
@@ -355,7 +321,7 @@ namespace UntisExp
 
 		private void times_DownloadStringCompleted(string res)
 		{
-			string comp = prepareText(res);
+			string comp = res.Replace(" ", string.Empty);
 			//TO-DO: Parse VPlan
 			lastD = false;
 			if (!silent)
@@ -375,7 +341,7 @@ namespace UntisExp
 		}
 		private void news_DownloadStringCompleted(string res)
 		{
-			string comp = prepareText(res);
+			string comp = res.Replace (" ", string.Empty);
 			//TO-DO: Parse VPlan
 			lastD = false;
 			int needleCount = getNewsBoxesLength(comp);
@@ -386,14 +352,13 @@ namespace UntisExp
 			{
 				processRow (item, Activity.getNews);
 			}
-			if (news.Content != null)
-				addTheNews (news);
+			addTheNews (news);
 		}
         private void timesNext_DownloadStringCompleted(String res)
         {
             try
             {
-				string comp = prepareText(res);
+				string comp = res.Replace(" ", string.Empty);
                 if (comp.IndexOf("NotFound") != -1 || comp.Length == 0)
                 {
                     refreshAll(globData);
