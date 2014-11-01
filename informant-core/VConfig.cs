@@ -25,12 +25,12 @@ namespace UntisExp
 		public static string specialEvtAb   = "Veranst.";
 		public static Dictionary<string, string> lessonAbbr = new Dictionary<string, string>();
 		public static string noPageErrTtl   = "Du bist nicht schuld";
-		public static string noPageErrTxt   = "Die Vertretungsplanseite gibt's noch nicht. Ich vermute, es sind Ferien.";
+		public static string noPageErrTxt   = "Die Vertretungsplanseite wurde nicht gefunden.";
 		public static string noPageErrBtn   = "Na hoffentlich!";
         public static string unknownErrTtl  = "Houston, wir haben ein Problem.";
 		public static string unknownErrTxt  = "Und ich hoffte, das das nie von jemandem gelesen wird: Unbekannter Fehler!";
-        public static string unknownErrBtn  = "Träume sind Schäume";
-        public static string[] successJokes = new string [] {"Und fertig!", "Heute schon Bertie gesehen?", "Sacrebleu", "Arrriba!", "Dein Tag könnte sich soeben verbessert haben"};
+        public static string unknownErrBtn  = "Si, Si";
+        public static string[] successJokes = new string [] {"Und fertig!", "Heute schon Bertie gesehen?", "Sacrebleu", "Arrriba!", "Dein Tag könnte sich soeben verbessert haben", "Käsekuchen"};
         public static int expectedDayNum = 5;
 
 		public static void Populate () {
