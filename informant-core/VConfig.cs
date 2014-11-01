@@ -9,7 +9,7 @@ namespace UntisExp
 	/// </summary>
 	public static class VConfig
 	{
-        public static string url            = "http://www.vp.cws-usingen.de/stupla/Schueler/";
+        public static string url            = "http://vp.cws-usingen.de/Schueler/";
         public static string feed           = "http://srdercws.wordpress.com/feed/";
         public static string pathToNavbar   = "frames/navbar.htm";
 		public static string groupIErrorTtl = "Dumm, dumm, dumm.";
@@ -29,7 +29,7 @@ namespace UntisExp
 		public static string noPageErrBtn   = "Na hoffentlich!";
         public static string unknownErrTtl  = "Houston, wir haben ein Problem.";
 		public static string unknownErrTxt  = "Und ich hoffte, das das nie von jemandem gelesen wird: Unbekannter Fehler!";
-        public static string unknownErrBtn  = "Träume sind Schäumes";
+        public static string unknownErrBtn  = "Träume sind Schäume";
         public static string[] successJokes = new string [] {"Und fertig!", "Heute schon Bertie gesehen?", "Sacrebleu", "Arrriba!", "Dein Tag könnte sich soeben verbessert haben"};
         public static int expectedDayNum = 5;
 
