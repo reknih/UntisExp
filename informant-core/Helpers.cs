@@ -39,7 +39,7 @@ namespace UntisExp
             return array[pos];
         }
 #endif
-#if WINDOWS
+#if WINDOWS_APP
         public static int[] getTodayTomorrowNum (List<Data> source) {
             List<int> headIndexes = new List<int>();
             int currIndex = 0;

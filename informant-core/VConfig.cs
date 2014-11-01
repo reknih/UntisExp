@@ -21,7 +21,7 @@ namespace UntisExp
 		public static string titleOfMsgBox  = "Nachrichten zum Tag";
 		public static string noEventsText   = "Keine Vertretungen";
 		public static string searchNoAccess = "freigegeben";
-		public static Regex cellSearch      = new Regex("<t{1}d{1}.*?>.*?</td>");
+		public static Regex  cellSearch      = new Regex("<t{1}d{1}.*?>.*?</td>");
 		public static string specialEvtAb   = "Veranst.";
 		public static Dictionary<string, string> lessonAbbr = new Dictionary<string, string>();
 		public static string noPageErrTtl   = "Du bist nicht schuld";
@@ -31,7 +31,7 @@ namespace UntisExp
 		public static string unknownErrTxt  = "Und ich hoffte, das das nie von jemandem gelesen wird: Unbekannter Fehler!";
         public static string unknownErrBtn  = "Si, Si";
         public static string[] successJokes = new string [] {"Und fertig!", "Heute schon Bertie gesehen?", "Sacrebleu", "Arrriba!", "Dein Tag könnte sich soeben verbessert haben", "Käsekuchen"};
-        public static int expectedDayNum = 5;
+        public static int    expectedDayNum = 5;
 
 		public static void Populate () {
 			try {
