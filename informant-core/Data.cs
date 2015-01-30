@@ -18,9 +18,10 @@ namespace UntisExp
 			Line1 = "Keine Vertretungen.";
 			Line2 = "";
 			Veranstaltung = false;
+            DateHeader = false;
 			Head = true;
 			VConfig.Populate ();
-		}
+		} 
 		/// <summary>
 		/// Creates a heading for the given day.
 		/// </summary>
@@ -28,10 +29,12 @@ namespace UntisExp
 		public Data(DateTime date)
 		{
 			Head = true;
+            DateHeader = true;
 			Line1 = date.ToString("dddd", new System.Globalization.CultureInfo("de-DE")) + ", " + Convert.ToString(date.Day) + "." + Convert.ToString(date.Month);
 			Line2 = "";
 			VConfig.Populate ();
 		}
+       
 		/// <summary>
 		/// Creates a Data object with some fields prefilled
 		/// </summary>
@@ -51,6 +54,7 @@ namespace UntisExp
 			Notiz = notiz;
 			VConfig.Populate ();
 			refresh();
+            DateHeader = false;
 		}
 
 		/// <summary>
@@ -63,6 +67,7 @@ namespace UntisExp
 			Line1 = head;
 			Line2 = "";
 			VConfig.Populate ();
+            DateHeader = false;
 		}
 
 		/// <summary>
@@ -178,5 +183,7 @@ namespace UntisExp
 		public DateTime Date { get; set; }
 
 		public bool Head { get; set; }
+
+        public bool DateHeader { get; set; }
 	}
 }
