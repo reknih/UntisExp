@@ -28,7 +28,7 @@ namespace UntisExp
 		public static string noPageErrTxt   = "Die Vertretungsplanseite wurde nicht gefunden.";
 		public static string noPageErrBtn   = "Na hoffentlich!";
         public static string unknownErrTtl  = "Houston, wir haben ein Problem.";
-		public static string unknownErrTxt  = "Und ich hoffte, das das nie von jemandem gelesen wird: Unbekannter Fehler!";
+		public static string unknownErrTxt  = "Und ich hoffte, dass das nie von jemandem gelesen wird: Unbekannter Fehler!";
         public static string unknownErrBtn  = "Si, Si";
         public static string[] successJokes = new string [] {"Und fertig!", "Heute schon Bertie gesehen?", "Sacrebleu", "Arrriba!", "Dein Tag könnte sich soeben verbessert haben", "Käsekuchen"};
         public static int    expectedDayNum = 5;

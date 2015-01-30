@@ -22,7 +22,7 @@ namespace UntisExp
         private List<Data> globData;
 		protected int iOuter;
 		protected int stringcnt;
-		protected bool lastD;
+		//protected bool lastD;
 		protected int daysRec;
 		protected int Group;
 		protected int iInner;
@@ -181,9 +181,8 @@ namespace UntisExp
 			string it = item;
 			if (item.IndexOf(VConfig.searchNoAccess) == -1)
 			{
-				if (iOuter == (stringcnt - 1))
-					lastD = true;
-				daysRec++;
+                //if (iOuter == (stringcnt - 1))
+                //    lastD = true;
 				it = item.Replace("&nbsp;", String.Empty);
 				MatchCollection mc;
 				string searchInFront;
@@ -203,6 +202,10 @@ namespace UntisExp
 					it = it.Substring(it.IndexOf("</tr>") + 5, it.Length - it.IndexOf("</tr>") - 5);
 					while (it.IndexOf(searchInFront) != -1)
 					{
+                        if (i == 0)
+                        {
+                            daysRec++;
+                        }
 						if (activity == Activity.getNews && news.Summary != null) {
 							news.Summary += ", ";
 						}
@@ -228,14 +231,34 @@ namespace UntisExp
 						}
 						i++;
 					}
-				}
-				else if (activity == Activity.ParseFirstSchedule)
-				{
-					if (!silent) refreshOne(new Data());
-				}
+                }
+                else 
+                {
+                    if (!silent)
+                    {
+                        //Adds Date
+                        DateTime date = DateTime.Now;
+                        while (date.DayOfWeek != DayOfWeek.Monday)
+                        {
+                            if (activity == Activity.ParseFirstSchedule)
+                            {
+                                date = date.AddDays(-1);
+                            }
+                            else
+                            {
+                                date = date.AddDays(1);
+                            }
+                        }
+                        date = date.AddDays(iOuter);
+                        v1.Add(new Data(date));
+                        //Adds no events message
+                        v1.Add(new Data());
+
+                    }
+                }
 			}
 			iOuter++;
-			if (iOuter == stringcnt && (daysRec == 1 && lastD) && mode != 0 && activity == Activity.ParseFirstSchedule)
+			if (iOuter == stringcnt && (daysRec == 1) && mode != 0 && activity == Activity.ParseFirstSchedule)
 			{
 				getTimes(Group, Activity.ParseSecondSchedule);
 				globData = v1;
@@ -251,7 +274,7 @@ namespace UntisExp
 
 		protected void proceedNewsItem (string thingy) {
 			news.Title = "Vom Vertretungsplan:";
-			news.Summary = news.Summary + Helpers.AddSpaces(thingy);
+			news.Summary += Helpers.AddSpaces(thingy);
 			news.Content = news.Summary;
 		}
 
@@ -321,13 +344,22 @@ namespace UntisExp
 
 		private void times_DownloadStringCompleted(string res)
 		{
-			string comp = res.Replace(" ", string.Empty);
+#if DEBUG
+            //Nur zum testen, ob zweite Woche geladen wird, da zum Halbjahr klassen geändert wurden und heute am Fr. noch Do. da ist.
+
+            //ToDo: Anschließend löschen!!!!!!
+            if (DateTime.Now < new DateTime(2015, 2, 2))
+            {
+                res = "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML//EN\">\r\n<html>\r\n<head>\r\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\"><meta http-equiv=\"expires\" content=\"0\"><meta name=\"keywords\" content=\"Stundenplan, timetable\">\r\n<meta name=\"GENERATOR\" content=\"Untis 2013\">\r\n<title>Untis 2013  STUNDENPLAN 14/15  CHRIST.-WIRTH-SCHULE USINGEN  1</title>\r\n<style type=\"text/css\">\r\na {color:#000000;}\r\n</style>\r\n<link rel=\"stylesheet\" href=\"../../untisinfo.css\" type=\"text/css\">\r\n</head>\r\n<body bgcolor=\"#FFFFFF\">\r\n<CENTER><font size=\"3\" face=\"Arial\">\r\n<BR><h2>GS/WM</h2><p><div id=\"vertretung\">\r\n<a name=\"1\"> </a><br><b>26.1. Montag</b> | <a href=\"#2\">[ Dienstag ]</a> | <a href=\"#3\">[ Mittwoch ]</a> | <a href=\"#4\">[ Donnerstag ]</a> | <a href=\"#5\">[ Freitag ]</a><p>\r\n<table class=\"subst\" >\r\n<tr><td align=\"center\" colspan=\"17\" >Vertretungen sind nicht freigegeben</td></tr>\r\n</table>\r\n<p>\r\n<a name=\"2\"> </a><br><a href=\"#1\">[ Montag ]</a> | <b>27.1. Dienstag</b> | <a href=\"#3\">[ Mittwoch ]</a> | <a href=\"#4\">[ Donnerstag ]</a> | <a href=\"#5\">[ Freitag ]</a><p>\r\n<table class=\"subst\" >\r\n<tr><td align=\"center\" colspan=\"17\" >Vertretungen sind nicht freigegeben</td></tr>\r\n</table>\r\n<p>\r\n<a name=\"3\"> </a><br><a href=\"#1\">[ Montag ]</a> | <a href=\"#2\">[ Dienstag ]</a> | <b>28.1. Mittwoch</b> | <a href=\"#4\">[ Donnerstag ]</a> | <a href=\"#5\">[ Freitag ]</a><p>\r\n<table class=\"subst\" >\r\n<tr><td align=\"center\" colspan=\"17\" >Vertretungen sind nicht freigegeben</td></tr>\r\n</table>\r\n<p>\r\n<a name=\"4\"> </a><br><a href=\"#1\">[ Montag ]</a> | <a href=\"#2\">[ Dienstag ]</a> | <a href=\"#3\">[ Mittwoch ]</a> | <b>29.1. Donnerstag</b> | <a href=\"#5\">[ Freitag ]</a><p>\r\n<table class=\"subst\" >\r\n<tr><td align=\"center\" colspan=\"17\" >Vertretungen sind nicht freigegeben</td></tr>\r\n</table>\r\n<p>\r\n<a name=\"5\"> </a><br><a href=\"#1\">[ Montag ]</a> | <a href=\"#2\">[ Dienstag ]</a> | <a href=\"#3\">[ Mittwoch ]</a> | <a href=\"#4\">[ Donnerstag ]</a> | <b>30.1. Freitag</b><p>\r\n<p>\r\n<table class=\"subst\" >\r\n<tr class='list'><th class=\"list\" align=\"center\">Art</th><th class=\"list\" align=\"center\">Datum</th><th class=\"list\" align=\"center\">Stunde</th><th class=\"list\" align=\"center\">Vertreter</th><th class=\"list\" align=\"center\">Fach</th><th class=\"list\" align=\"center\">(Fach)</th><th class=\"list\" align=\"center\">Raum</th><th class=\"list\" align=\"center\">Klasse(n)</th><th class=\"list\" align=\"center\">(Lehrer)</th><th class=\"list\" align=\"center\">(Klasse(n))</th><th class=\"list\" align=\"center\">(Raum)</th><th class=\"list\" align=\"center\">Vertr. von</th><th class=\"list\" align=\"center\">(Le.) nach</th><th class=\"list\" align=\"center\">Vertretungs-Text</th><th class=\"list\" align=\"center\">Entfall</th><th class=\"list\" align=\"center\">Mitbetreuung</th><th class=\"list\" align=\"center\">Kopplung.</th></tr>\r\n<tr class='list odd'><td class=\"list\" align=\"center\">Entfall</td><td class=\"list\" align=\"center\">30.1.</td><td class=\"list\" align=\"center\">3</td><td class=\"list\" align=\"center\">---</td><td class=\"list\" align=\"center\">---</td><td class=\"list\" align=\"center\">ER</td><td class=\"list\" align=\"center\">---</td><td class=\"list\" align=\"center\">E1A, E1B, E1C, E1D, E1E, E1F</td><td class=\"list\" align=\"center\">KR</td><td class=\"list\" align=\"center\">E1A, E1B, E1C, E1D, E1E, E1F</td><td class=\"list\" align=\"center\">C25</td><td class=\"list\"> </td><td class=\"list\" align=\"center\">Entfall</td><td class=\"list\"> </td><td class=\"list\" align=\"center\">x</td><td class=\"list\" align=\"center\"> </td><td class=\"list\" align=\"center\"> </td></tr>\r\n<tr class='list even'><td class=\"list\" align=\"center\">Entfall</td><td class=\"list\" align=\"center\">30.1.</td><td class=\"list\" align=\"center\">3</td><td class=\"list\" align=\"center\">---</td><td class=\"list\" align=\"center\">---</td><td class=\"list\" align=\"center\">ER</td><td class=\"list\" align=\"center\">---</td><td class=\"list\" align=\"center\">E1A, E1B, E1C, E1D, E1E, E1F</td><td class=\"list\" align=\"center\">HU</td><td class=\"list\" align=\"center\">E1A, E1B, E1C, E1D, E1E, E1F</td><td class=\"list\" align=\"center\">C24</td><td class=\"list\"> </td><td class=\"list\" align=\"center\">Entfall für Lehrer</td><td class=\"list\"> </td><td class=\"list\" align=\"center\">x</td><td class=\"list\" align=\"center\"> </td><td class=\"list\" align=\"center\"> </td></tr>\r\n<tr class='list odd'><td class=\"list\" align=\"center\">Entfall</td><td class=\"list\" align=\"center\">30.1.</td><td class=\"list\" align=\"center\">3</td><td class=\"list\" align=\"center\">---</td><td class=\"list\" align=\"center\">---</td><td class=\"list\" align=\"center\">ER</td><td class=\"list\" align=\"center\">---</td><td class=\"list\" align=\"center\">E1A, E1B, E1C, E1D, E1E, E1F</td><td class=\"list\" align=\"center\">SP</td><td class=\"list\" align=\"center\">E1A, E1B, E1C, E1D, E1E, E1F</td><td class=\"list\" align=\"center\">C26</td><td class=\"list\"> </td><td class=\"list\" align=\"center\">Entfall für Lehrer</td><td class=\"list\"> </td><td class=\"list\" align=\"center\">x</td><td class=\"list\" align=\"center\"> </td><td class=\"list\" align=\"center\"> </td></tr>\r\n<tr class='list even'><td class=\"list\" align=\"center\">Entfall</td><td class=\"list\" align=\"center\">30.1.</td><td class=\"list\" align=\"center\">3</td><td class=\"list\" align=\"center\">---</td><td class=\"list\" align=\"center\">---</td><td class=\"list\" align=\"center\">KR</td><td class=\"list\" align=\"center\">---</td><td class=\"list\" align=\"center\">E1A, E1B, E1C, E1D, E1E, E1F</td><td class=\"list\" align=\"center\">HAR</td><td class=\"list\" align=\"center\">E1A, E1B, E1C, E1D, E1E, E1F</td><td class=\"list\" align=\"center\">C27</td><td class=\"list\"> </td><td class=\"list\" align=\"center\">Entfall für Lehrer</td><td class=\"list\"> </td><td class=\"list\" align=\"center\">x</td><td class=\"list\" align=\"center\"> </td><td class=\"list\" align=\"center\"> </td></tr>\r\n<tr class='list odd'><td class=\"list\" align=\"center\">Entfall</td><td class=\"list\" align=\"center\">30.1.</td><td class=\"list\" align=\"center\">3</td><td class=\"list\" align=\"center\">---</td><td class=\"list\" align=\"center\">---</td><td class=\"list\" align=\"center\">KR</td><td class=\"list\" align=\"center\">---</td><td class=\"list\" align=\"center\">E1A, E1B, E1C, E1D, E1E, E1F</td><td class=\"list\" align=\"center\">PA</td><td class=\"list\" align=\"center\">E1A, E1B, E1C, E1D, E1E, E1F</td><td class=\"list\" align=\"center\">C29</td><td class=\"list\"> </td><td class=\"list\" align=\"center\">Entfall für Lehrer</td><td class=\"list\"> </td><td class=\"list\" align=\"center\">x</td><td class=\"list\" align=\"center\"> </td><td class=\"list\" align=\"center\"> </td></tr>\r\n<tr class='list even'><td class=\"list\" align=\"center\">Entfall</td><td class=\"list\" align=\"center\">30.1.</td><td class=\"list\" align=\"center\">3</td><td class=\"list\" align=\"center\">---</td><td class=\"list\" align=\"center\">---</td><td class=\"list\" align=\"center\">ET</td><td class=\"list\" align=\"center\">---</td><td class=\"list\" align=\"center\">E1A, E1B, E1C, E1D, E1E, E1F</td><td class=\"list\" align=\"center\">BA</td><td class=\"list\" align=\"center\">E1A, E1B, E1C, E1D, E1E, E1F</td><td class=\"list\" align=\"center\">C17</td><td class=\"list\"> </td><td class=\"list\" align=\"center\">Entfall für Lehrer</td><td class=\"list\"> </td><td class=\"list\" align=\"center\">x</td><td class=\"list\" align=\"center\"> </td><td class=\"list\" align=\"center\"> </td></tr>\r\n<tr class='list odd'><td class=\"list\" align=\"center\">Entfall</td><td class=\"list\" align=\"center\">30.1.</td><td class=\"list\" align=\"center\">3</td><td class=\"list\" align=\"center\">---</td><td class=\"list\" align=\"center\">---</td><td class=\"list\" align=\"center\">ET</td><td class=\"list\" align=\"center\">---</td><td class=\"list\" align=\"center\">E1A, E1B, E1C, E1D, E1E, E1F</td><td class=\"list\" align=\"center\">NI</td><td class=\"list\" align=\"center\">E1A, E1B, E1C, E1D, E1E, E1F</td><td class=\"list\" align=\"center\">E13</td><td class=\"list\"> </td><td class=\"list\" align=\"center\">Entfall für Lehrer</td><td class=\"list\"> </td><td class=\"list\" align=\"center\">x</td><td class=\"list\" align=\"center\"> </td><td class=\"list\" align=\"center\"> </td></tr>\r\n<tr class='list even'><td class=\"list\" align=\"center\">Sondereins.</td><td class=\"list\" align=\"center\">30.1.</td><td class=\"list\" align=\"center\">3</td><td class=\"list\" align=\"center\">GS</td><td class=\"list\" align=\"center\">KLALE</td><td class=\"list\"> </td><td class=\"list\" align=\"center\">C23</td><td class=\"list\" align=\"center\">E1B</td><td class=\"list\"> </td><td class=\"list\"> </td><td class=\"list\"> </td><td class=\"list\"> </td><td class=\"list\"> </td><td class=\"list\"> </td><td class=\"list\"> </td><td class=\"list\"> </td><td class=\"list\" align=\"center\">1</td></tr>\r\n</table>\r\n<p>\r\n</div></font><font size=\"3\" face=\"Arial\">\r\nPeriode8   ++ 2014/15-I ++   PLAN-14-15-I\r\n</font></CENTER>\r\n</body>\r\n</html>\r\n\r\n"; 
+                }
+#endif
+            string comp = res.Replace(" ", string.Empty);
 			//TO-DO: Parse VPlan
-			lastD = false;
+			//lastD = false;
 			if (!silent)
 				del();
 			int needleCount = getNewsBoxesLength(comp);
-			int stringcnt = VConfig.expectedDayNum + needleCount;
+			stringcnt = VConfig.expectedDayNum + needleCount;
 			string[] raw = getDayArray (comp, stringcnt);
 			initPaser ();
 			foreach (var item in raw)
@@ -341,17 +373,27 @@ namespace UntisExp
 		}
 		private void news_DownloadStringCompleted(string res)
 		{
+#if DEBUG
+            //Nur zum testen, ob zweite Woche geladen wird, da zum Halbjahr klassen geändert wurden und heute am Fr. noch Do. da ist.
+
+            //ToDo: Anschließend löschen!!!!!!
+            if (DateTime.Now < new DateTime(2015, 2, 2))
+            {
+                res = "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML//EN\">\r\n<html>\r\n<head>\r\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\"><meta http-equiv=\"expires\" content=\"0\"><meta name=\"keywords\" content=\"Stundenplan, timetable\">\r\n<meta name=\"GENERATOR\" content=\"Untis 2013\">\r\n<title>Untis 2013  STUNDENPLAN 14/15  CHRIST.-WIRTH-SCHULE USINGEN  1</title>\r\n<style type=\"text/css\">\r\na {color:#000000;}\r\n</style>\r\n<link rel=\"stylesheet\" href=\"../../untisinfo.css\" type=\"text/css\">\r\n</head>\r\n<body bgcolor=\"#FFFFFF\">\r\n<CENTER><font size=\"3\" face=\"Arial\">\r\n<BR><h2>GS/WM</h2><p><div id=\"vertretung\">\r\n<a name=\"1\"> </a><br><b>26.1. Montag</b> | <a href=\"#2\">[ Dienstag ]</a> | <a href=\"#3\">[ Mittwoch ]</a> | <a href=\"#4\">[ Donnerstag ]</a> | <a href=\"#5\">[ Freitag ]</a><p>\r\n<table class=\"subst\" >\r\n<tr><td align=\"center\" colspan=\"17\" >Vertretungen sind nicht freigegeben</td></tr>\r\n</table>\r\n<p>\r\n<a name=\"2\"> </a><br><a href=\"#1\">[ Montag ]</a> | <b>27.1. Dienstag</b> | <a href=\"#3\">[ Mittwoch ]</a> | <a href=\"#4\">[ Donnerstag ]</a> | <a href=\"#5\">[ Freitag ]</a><p>\r\n<table class=\"subst\" >\r\n<tr><td align=\"center\" colspan=\"17\" >Vertretungen sind nicht freigegeben</td></tr>\r\n</table>\r\n<p>\r\n<a name=\"3\"> </a><br><a href=\"#1\">[ Montag ]</a> | <a href=\"#2\">[ Dienstag ]</a> | <b>28.1. Mittwoch</b> | <a href=\"#4\">[ Donnerstag ]</a> | <a href=\"#5\">[ Freitag ]</a><p>\r\n<table class=\"subst\" >\r\n<tr><td align=\"center\" colspan=\"17\" >Vertretungen sind nicht freigegeben</td></tr>\r\n</table>\r\n<p>\r\n<a name=\"4\"> </a><br><a href=\"#1\">[ Montag ]</a> | <a href=\"#2\">[ Dienstag ]</a> | <a href=\"#3\">[ Mittwoch ]</a> | <b>29.1. Donnerstag</b> | <a href=\"#5\">[ Freitag ]</a><p>\r\n<table class=\"subst\" >\r\n<tr><td align=\"center\" colspan=\"17\" >Vertretungen sind nicht freigegeben</td></tr>\r\n</table>\r\n<p>\r\n<a name=\"5\"> </a><br><a href=\"#1\">[ Montag ]</a> | <a href=\"#2\">[ Dienstag ]</a> | <a href=\"#3\">[ Mittwoch ]</a> | <a href=\"#4\">[ Donnerstag ]</a> | <b>30.1. Freitag</b><p>\r\n<p>\r\n<table class=\"subst\" >\r\n<tr class='list'><th class=\"list\" align=\"center\">Art</th><th class=\"list\" align=\"center\">Datum</th><th class=\"list\" align=\"center\">Stunde</th><th class=\"list\" align=\"center\">Vertreter</th><th class=\"list\" align=\"center\">Fach</th><th class=\"list\" align=\"center\">(Fach)</th><th class=\"list\" align=\"center\">Raum</th><th class=\"list\" align=\"center\">Klasse(n)</th><th class=\"list\" align=\"center\">(Lehrer)</th><th class=\"list\" align=\"center\">(Klasse(n))</th><th class=\"list\" align=\"center\">(Raum)</th><th class=\"list\" align=\"center\">Vertr. von</th><th class=\"list\" align=\"center\">(Le.) nach</th><th class=\"list\" align=\"center\">Vertretungs-Text</th><th class=\"list\" align=\"center\">Entfall</th><th class=\"list\" align=\"center\">Mitbetreuung</th><th class=\"list\" align=\"center\">Kopplung.</th></tr>\r\n<tr class='list odd'><td class=\"list\" align=\"center\">Entfall</td><td class=\"list\" align=\"center\">30.1.</td><td class=\"list\" align=\"center\">3</td><td class=\"list\" align=\"center\">---</td><td class=\"list\" align=\"center\">---</td><td class=\"list\" align=\"center\">ER</td><td class=\"list\" align=\"center\">---</td><td class=\"list\" align=\"center\">E1A, E1B, E1C, E1D, E1E, E1F</td><td class=\"list\" align=\"center\">KR</td><td class=\"list\" align=\"center\">E1A, E1B, E1C, E1D, E1E, E1F</td><td class=\"list\" align=\"center\">C25</td><td class=\"list\"> </td><td class=\"list\" align=\"center\">Entfall</td><td class=\"list\"> </td><td class=\"list\" align=\"center\">x</td><td class=\"list\" align=\"center\"> </td><td class=\"list\" align=\"center\"> </td></tr>\r\n<tr class='list even'><td class=\"list\" align=\"center\">Entfall</td><td class=\"list\" align=\"center\">30.1.</td><td class=\"list\" align=\"center\">3</td><td class=\"list\" align=\"center\">---</td><td class=\"list\" align=\"center\">---</td><td class=\"list\" align=\"center\">ER</td><td class=\"list\" align=\"center\">---</td><td class=\"list\" align=\"center\">E1A, E1B, E1C, E1D, E1E, E1F</td><td class=\"list\" align=\"center\">HU</td><td class=\"list\" align=\"center\">E1A, E1B, E1C, E1D, E1E, E1F</td><td class=\"list\" align=\"center\">C24</td><td class=\"list\"> </td><td class=\"list\" align=\"center\">Entfall für Lehrer</td><td class=\"list\"> </td><td class=\"list\" align=\"center\">x</td><td class=\"list\" align=\"center\"> </td><td class=\"list\" align=\"center\"> </td></tr>\r\n<tr class='list odd'><td class=\"list\" align=\"center\">Entfall</td><td class=\"list\" align=\"center\">30.1.</td><td class=\"list\" align=\"center\">3</td><td class=\"list\" align=\"center\">---</td><td class=\"list\" align=\"center\">---</td><td class=\"list\" align=\"center\">ER</td><td class=\"list\" align=\"center\">---</td><td class=\"list\" align=\"center\">E1A, E1B, E1C, E1D, E1E, E1F</td><td class=\"list\" align=\"center\">SP</td><td class=\"list\" align=\"center\">E1A, E1B, E1C, E1D, E1E, E1F</td><td class=\"list\" align=\"center\">C26</td><td class=\"list\"> </td><td class=\"list\" align=\"center\">Entfall für Lehrer</td><td class=\"list\"> </td><td class=\"list\" align=\"center\">x</td><td class=\"list\" align=\"center\"> </td><td class=\"list\" align=\"center\"> </td></tr>\r\n<tr class='list even'><td class=\"list\" align=\"center\">Entfall</td><td class=\"list\" align=\"center\">30.1.</td><td class=\"list\" align=\"center\">3</td><td class=\"list\" align=\"center\">---</td><td class=\"list\" align=\"center\">---</td><td class=\"list\" align=\"center\">KR</td><td class=\"list\" align=\"center\">---</td><td class=\"list\" align=\"center\">E1A, E1B, E1C, E1D, E1E, E1F</td><td class=\"list\" align=\"center\">HAR</td><td class=\"list\" align=\"center\">E1A, E1B, E1C, E1D, E1E, E1F</td><td class=\"list\" align=\"center\">C27</td><td class=\"list\"> </td><td class=\"list\" align=\"center\">Entfall für Lehrer</td><td class=\"list\"> </td><td class=\"list\" align=\"center\">x</td><td class=\"list\" align=\"center\"> </td><td class=\"list\" align=\"center\"> </td></tr>\r\n<tr class='list odd'><td class=\"list\" align=\"center\">Entfall</td><td class=\"list\" align=\"center\">30.1.</td><td class=\"list\" align=\"center\">3</td><td class=\"list\" align=\"center\">---</td><td class=\"list\" align=\"center\">---</td><td class=\"list\" align=\"center\">KR</td><td class=\"list\" align=\"center\">---</td><td class=\"list\" align=\"center\">E1A, E1B, E1C, E1D, E1E, E1F</td><td class=\"list\" align=\"center\">PA</td><td class=\"list\" align=\"center\">E1A, E1B, E1C, E1D, E1E, E1F</td><td class=\"list\" align=\"center\">C29</td><td class=\"list\"> </td><td class=\"list\" align=\"center\">Entfall für Lehrer</td><td class=\"list\"> </td><td class=\"list\" align=\"center\">x</td><td class=\"list\" align=\"center\"> </td><td class=\"list\" align=\"center\"> </td></tr>\r\n<tr class='list even'><td class=\"list\" align=\"center\">Entfall</td><td class=\"list\" align=\"center\">30.1.</td><td class=\"list\" align=\"center\">3</td><td class=\"list\" align=\"center\">---</td><td class=\"list\" align=\"center\">---</td><td class=\"list\" align=\"center\">ET</td><td class=\"list\" align=\"center\">---</td><td class=\"list\" align=\"center\">E1A, E1B, E1C, E1D, E1E, E1F</td><td class=\"list\" align=\"center\">BA</td><td class=\"list\" align=\"center\">E1A, E1B, E1C, E1D, E1E, E1F</td><td class=\"list\" align=\"center\">C17</td><td class=\"list\"> </td><td class=\"list\" align=\"center\">Entfall für Lehrer</td><td class=\"list\"> </td><td class=\"list\" align=\"center\">x</td><td class=\"list\" align=\"center\"> </td><td class=\"list\" align=\"center\"> </td></tr>\r\n<tr class='list odd'><td class=\"list\" align=\"center\">Entfall</td><td class=\"list\" align=\"center\">30.1.</td><td class=\"list\" align=\"center\">3</td><td class=\"list\" align=\"center\">---</td><td class=\"list\" align=\"center\">---</td><td class=\"list\" align=\"center\">ET</td><td class=\"list\" align=\"center\">---</td><td class=\"list\" align=\"center\">E1A, E1B, E1C, E1D, E1E, E1F</td><td class=\"list\" align=\"center\">NI</td><td class=\"list\" align=\"center\">E1A, E1B, E1C, E1D, E1E, E1F</td><td class=\"list\" align=\"center\">E13</td><td class=\"list\"> </td><td class=\"list\" align=\"center\">Entfall für Lehrer</td><td class=\"list\"> </td><td class=\"list\" align=\"center\">x</td><td class=\"list\" align=\"center\"> </td><td class=\"list\" align=\"center\"> </td></tr>\r\n<tr class='list even'><td class=\"list\" align=\"center\">Sondereins.</td><td class=\"list\" align=\"center\">30.1.</td><td class=\"list\" align=\"center\">3</td><td class=\"list\" align=\"center\">GS</td><td class=\"list\" align=\"center\">KLALE</td><td class=\"list\"> </td><td class=\"list\" align=\"center\">C23</td><td class=\"list\" align=\"center\">E1B</td><td class=\"list\"> </td><td class=\"list\"> </td><td class=\"list\"> </td><td class=\"list\"> </td><td class=\"list\"> </td><td class=\"list\"> </td><td class=\"list\"> </td><td class=\"list\"> </td><td class=\"list\" align=\"center\">1</td></tr>\r\n</table>\r\n<p>\r\n</div></font><font size=\"3\" face=\"Arial\">\r\nPeriode8   ++ 2014/15-I ++   PLAN-14-15-I\r\n</font></CENTER>\r\n</body>\r\n</html>\r\n\r\n";
+            }
+#endif
 			string comp = res.Replace (" ", string.Empty);
 			//TO-DO: Parse VPlan
-			lastD = false;
+			//lastD = false;
 			int needleCount = getNewsBoxesLength(comp);
-			int stringcnt = VConfig.expectedDayNum + needleCount;
+			stringcnt = VConfig.expectedDayNum + needleCount;
 			string[] raw = getDayArray (comp, stringcnt);
 			initPaser ();
 			foreach (var item in raw)
 			{
 				processRow (item, Activity.getNews);
 			}
+            if(news.Content!=null||news.Summary!=null)
 			addTheNews (news);
 		}
         private void timesNext_DownloadStringCompleted(String res)
@@ -366,7 +408,7 @@ namespace UntisExp
                 }
                 //TO-DO: Parse VPlan
 				int needleCount = getNewsBoxesLength(comp);
-				int stringcnt = VConfig.expectedDayNum + needleCount;
+				stringcnt = VConfig.expectedDayNum + needleCount;
 				string[] raw = getDayArray (comp, stringcnt);
 				initPaser();
                 foreach (var item in raw)
