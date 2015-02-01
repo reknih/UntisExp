@@ -75,7 +75,8 @@ namespace UntisExp
 						try {
                             var response = (HttpWebResponse)((HttpWebRequest)iar.AsyncState).EndGetResponse(iar);
 							responseAction(response);
-						} catch{
+						} catch (Exception e) {
+							if (e.HResult != -2147467261 && e.HResult != -2146233086)
 							defAlert(VConfig.noPageErrTtl, VConfig.noPageErrTxt, VConfig.noPageErrBtn);
 						}
 					}), request);
