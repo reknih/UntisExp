@@ -61,8 +61,11 @@ namespace UntisExp
 			lessonAbbr.Add ("LA2", "Latein");
 			lessonAbbr.Add ("LA", "Latein");
 			lessonAbbr.Add ("IT", "Italiensich");
-			lessonAbbr.Add ("WU", "Wahlunterricht");
-			} catch {
+            lessonAbbr.Add("WU", "Wahlunterricht");
+            lessonAbbr.Add("KLALE", "Klassenlehrerstunde");
+            }
+            catch
+            {
 			}
 		}
 	}
