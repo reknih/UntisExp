@@ -207,8 +207,14 @@ namespace UntisExp
                             //news box should not be a day so count days here
                             daysRec++;
                         }
-						if (activity == Activity.getNews && news.Summary != null) {
-							news.Summary += ", ";
+						if (activity == Activity.getNews ) {
+                            if (news.Summary != null)
+                            {
+                                news.Summary += ", ";
+                            }
+                            DateTime date = getDateFromDay(iOuter, Activity.ParseFirstSchedule);
+                            string dateName = new System.Globalization.CultureInfo("de-DE").DateTimeFormat.GetDayName(date.DayOfWeek);
+                            news.Summary += Helpers.AddSpaces(dateName + ", " + date.Day + "."+date.Month+":\n");
 						}
 						string w;
 						data = new Data();
@@ -232,6 +238,10 @@ namespace UntisExp
 						}
 						i++;
 					}
+                    if (i == 0)
+                    {
+                        iOuter--;
+                    }
                 }
                 else 
                 {
@@ -239,20 +249,8 @@ namespace UntisExp
                     if (!silent)
                     {
                         //Adds Date
-                        DateTime date = DateTime.Now;
-                        while (date.DayOfWeek != DayOfWeek.Monday)
-                        {
-                            if (activity == Activity.ParseFirstSchedule)
-                            {
-                                date = date.AddDays(-1);
-                            }
-                            else
-                            {
-                                date = date.AddDays(1);
-                            }
-                        }
-                        date = date.AddDays(iOuter);
-                        v1.Add(new Data(date));
+                        
+                        v1.Add(new Data(getDateFromDay(iOuter,activity)));
                         //Adds no events message
                         v1.Add(new Data());
 
@@ -267,6 +265,24 @@ namespace UntisExp
 				doNot = true;
 			}
 		}
+
+        //retuns the date Object from the day of week (0=mo,1=tu...)
+        protected DateTime getDateFromDay(int day, Activity activity)
+        {
+            DateTime date = DateTime.Now;
+            while (date.DayOfWeek != DayOfWeek.Monday)
+            {
+                if (activity == Activity.ParseFirstSchedule)
+                {
+                    date = date.AddDays(-1);
+                }
+                else
+                {
+                    date = date.AddDays(1);
+                }
+            }
+            return date.AddDays(day);
+        }
 
 		protected string prepareScheduleItem(object input)
 		{
