@@ -78,7 +78,6 @@ namespace UntisExp
 			Head = false;
 			Fach = faecherSchreib(Fach);
 			AltFach = faecherSchreib(AltFach);
-            Regex emptycheck = new Regex(@"^\s*$");
 			if (!Helpers.IsEmpty(EntfallStr))
 			{
 				Entfall = true;

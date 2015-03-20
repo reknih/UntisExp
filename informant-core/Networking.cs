@@ -10,15 +10,19 @@ namespace UntisExp
         public static Action<String> defCallback;
         public static Action<Stream> defStreamCallback;
         public static Action<string, string, string> defAlert;
-		public static void DownloadData(string url, Action<String> callback, Action<string, string, string> alertmet, bool alerting = false, string aHead = "", string aBody = "", string aBtn = "")
+		public static void DownloadData(string url, Action<String> callback, Action<string, string, string> alertmet = null, Action retrnOnError = null, string aHead = "", string aBody = "", string aBtn = "")
 		{
 			defCallback = callback;
-			defAlert = alertmet;
+			bool alerting = false;
+			if (alertmet != null) {
+				alerting = true;
+				defAlert = alertmet;
+			}
             
 			try
 			{
 				var request = (HttpWebRequest)WebRequest.Create(url);
-				DoWithResponse(request,alerting, (response) =>
+				DoWithResponse(request,alerting,retrnOnError, (response) =>
 					{
 						string body;
 						if (url.IndexOf(VConfig.url) != -1) {
@@ -66,7 +70,7 @@ namespace UntisExp
             }
         }
 
-		public static void DoWithResponse(HttpWebRequest request,bool alerting, Action<HttpWebResponse> responseAction)
+		public static void DoWithResponse(HttpWebRequest request,bool alerting,Action onError, Action<HttpWebResponse> responseAction)
 		{
 			Action wrapperAction = () =>
 			{
@@ -75,9 +79,11 @@ namespace UntisExp
 						try {
                             var response = (HttpWebResponse)((HttpWebRequest)iar.AsyncState).EndGetResponse(iar);
 							responseAction(response);
-						} catch{
+						} catch (Exception e) {			
+							if (onError != null)
+								onError();
                             if(alerting)
-							defAlert(VConfig.noPageErrTtl, VConfig.noPageErrTxt, VConfig.noPageErrBtn);
+								defAlert(VConfig.noPageErrTtl, VConfig.noPageErrTxt, VConfig.noPageErrBtn);
 						}
 					}), request);
 			};
