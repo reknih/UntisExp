@@ -244,7 +244,7 @@ namespace UntisExp
 						}
 						i++;
 					}
-                    if (i == 0)
+					if ((i == 0 && activity != Activity.getNews) || (i > 0 && activity == Activity.getNews))
                     {
                         iOuter--;
                     }
