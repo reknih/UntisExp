@@ -20,7 +20,9 @@ namespace UntisExp
 		private Action<News> addTheNews;
         private Action<List<Group>> refreshSet;
 
-		// Collections of retreived data
+		/// <summary>
+		/// Collections of retreived <see cref="UntisExp.Data"/>
+		/// </summary>
         private List<Data> globData;
 
 		/// <summary>
@@ -38,6 +40,12 @@ namespace UntisExp
 		/// </summary>
         private int mode = 5;
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="UntisExp.Fetcher"/> class which is pre-equipped for background operation. Will surpress all rows which do not contain a timetable element, e.g. the date row. Useful for background services.
+		/// </summary>
+		/// <param name="Stop">Callback for the case that the fetching failed. Useful to stop the background service</param>
+		/// <param name="_refeshAll">Callback function that will be called once the <see cref="UntisExp.Fetcher.getTimes"/> function and all of its callbacks are finished</param>
+		/// <param name="_mode">The mode of operation: MODE 0: Nur heute, MODE 1: Nur Morgen, MODE 2: Beide, MODE 5: Alles</param>
         public Fetcher(Action Stop, Action<List<Data>> _refeshAll, int _mode)
         {
             alert = delegate(string a, string b, string c) { Stop(); };
@@ -73,6 +81,12 @@ namespace UntisExp
             refreshSet = _refeshAll;
         }
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="UntisExp.Fetcher"/> class which will instantly checks for news in the schedule
+		/// </summary>
+		/// <param name="_refreshOne">Callback for returning one element</param>
+		/// <param name="group">Which group to query for. It is kind of the same for all numbers, most of the time. Default is <c>5</c></param>
+		/// <param name="week">Week to query news for. For debugging purposes. Will default to <c>-1</c> which means that the current schedule will be read.</param>
 		public Fetcher(Action<News> _refreshOne, int group = 5, int week = -1)
 		{
 			addTheNews = _refreshOne;
@@ -89,6 +103,11 @@ namespace UntisExp
         {
 			Networking.DownloadData (VConfig.url + VConfig.pathToNavbar, groups_DownloadStringCompleted, alert, null, VConfig.groupIErrorTtl, VConfig.groupIErrorTxt, VConfig.groupIErrorBtn);
         }
+
+		/// <summary>
+		/// Will parse the site for groups and call <see cref="UntisExp.Fetcher.refreshSet"/> once finished
+		/// </summary>
+		/// <param name="res">The HTML string</param>
         private void groups_DownloadStringCompleted(String res)
         {
             try
@@ -159,16 +178,30 @@ namespace UntisExp
 			}
 		}
 
+		/// <summary>
+		/// Will be called if subsequent downloads of <see cref="UntisExp.Fetcher.getTimes"/> fail. Uses <see cref="UntisExp.Fetcher.refreshAll"/> callback to write previous elements to the front-end
+		/// </summary>
 		protected void abort () {
 			refreshAll (globData);
 		}
 
+		/// <summary>
+		/// Counts how many news boxes are present in the WebUntis schedule
+		/// </summary>
+		/// <returns>The number of the newsboxes.</returns>
+		/// <param name="input">The WebUntis HTML string</param>
 		protected int getNewsBoxesLength(string input) {
 			string haystack = input;
 			string needle = VConfig.titleOfMsgBox.Replace(" ", string.Empty);
 			return (haystack.Length - input.Replace(needle, "").Length) / needle.Length;
 		}
 
+		/// <summary>
+		/// Splits the WebUntis site into a array of day tables
+		/// </summary>
+		/// <returns>An array of the <c>string<c/>s representing a table of a day</returns>
+		/// <param name="input">The WebUntis HTML string</param>
+		/// <param name="tables">How many tables to search for</param>
 		protected string [] getDayArray(string input, int tables)
 		{
 			string[] result = new string[tables];
@@ -180,6 +213,15 @@ namespace UntisExp
 			return result;
 		}
 
+		/// <summary>
+		/// Given a string representing a table of a day in WebUntis' HTML, <see cref="UntisExp.Fetcher.processRow"/> will return an object including the <see cref="UntisExp.Data"/> representations of each schedule value
+		/// </summary>
+		/// <returns>Object containing the current progress of parsing and the last <see cref="UntisExp.Data"/>-objects that were parsed</returns>
+		/// <param name="item">The HTML string representing the table of a day</param>
+		/// <param name="iOuter">The progress through the day tables</param>
+		/// <param name="daysAndNewsBoxes">The number of news tables in the week</param>
+		/// <param name="passDontImmediatelyRefresh">If appropriate, this value will be passed to <see cref="UntisExp.InterstitialFetching.dontImmediatelyRefresh"/>.</param>
+		/// <param name="activity">The action which should be performed.</param>
 		protected InterstitialFetching processRow(string item, int iOuter, int daysAndNewsBoxes, bool passDontImmediatelyRefresh, Activity activity = Activity.ParseFirstSchedule)
 		{
 			string it = item;
@@ -280,7 +322,12 @@ namespace UntisExp
 			return result;
 		}
 
-        //retuns the date Object from the day of week (0=mo,1=tu...)
+        /// <summary>
+		/// Will get a day object out of an int
+        /// </summary>
+		/// <returns>The date object for the day of week (0=mo,1=tu...)</returns>
+        /// <param name="day">Value representing the wished day </param>
+        /// <param name="activity">Activity.</param>
         protected DateTime getDateFromDay(int day, Activity activity)
         {
             DateTime date = DateTime.Now;
