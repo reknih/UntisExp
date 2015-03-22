@@ -9,29 +9,33 @@ using System.Text.RegularExpressions;
 namespace UntisExp
 {
     /// <summary>
-    /// This class provides methods for getting the info rom the site
+    /// This class provides methods for getting the info from WebUntis
     /// </summary>
     public class Fetcher
     {
-        private Action del;
+		// Actions to be called back on lifetime events
+		private Action clearView;
         private Action<String, String, String> alert;
         private Action<List<Data>> refreshAll;
 		private Action<News> addTheNews;
         private Action<List<Group>> refreshSet;
+
+		// Collections of retreived data
         private List<Data> globData;
-		protected int iOuter;
-		protected int stringcnt;
-		//protected bool lastD;
-		protected int daysRec;
+
+		/// <summary>
+		/// Group to query WebUntis for
+		/// </summary>
 		protected int Group;
-		protected int iInner;
-		protected Data data;
-		protected News news;
-		protected List<Data> v1;
-		protected bool doNot;
+
+		/// <summary>
+		/// Whether the method alerts if it fails or not
+		/// </summary>
         private bool silent;
-		protected int i;
-        // MODE 0: Nur heute, MODE 1: Nur Morgen, MODE 2: Beide, MODE 5: Alles
+
+		/// <summary>
+		/// MODE 0: Nur heute, MODE 1: Nur Morgen, MODE 2: Beide, MODE 5: Alles
+		/// </summary>
         private int mode = 5;
 
         public Fetcher(Action Stop, Action<List<Data>> _refeshAll, int _mode)
@@ -52,7 +56,7 @@ namespace UntisExp
         /// <param name="_refreshSet">Callback function for updating the view with a List of group entries.</param>
         public Fetcher(Action _del, Action<String, String, String> _alert, Action<List<Data>> _refeshAll, Action<Data> _refreshOne, Action<List<Group>> _refreshSet=null)
         {
-            del = _del;
+            clearView = _del;
             alert = _alert;
             refreshAll = _refeshAll;
             refreshSet = _refreshSet;
@@ -106,12 +110,7 @@ namespace UntisExp
                 refreshSet(groupObj);
             }
             catch
-            {
-//                if (silent != true)
-//                {
-//                }
-                //alert("ERROR", + e.Message + " " + e.StackTrace, "");
-            }
+            {}
         }
         
         /// <summary>
@@ -181,19 +180,24 @@ namespace UntisExp
 			return result;
 		}
 
-		protected void processRow(string item, Activity activity = Activity.ParseFirstSchedule)
+		protected InterstitialFetching processRow(string item, int iOuter, int daysAndNewsBoxes, bool passDontImmediatelyRefresh, Activity activity = Activity.ParseFirstSchedule)
 		{
 			string it = item;
+			List<Data> v1 = new List<Data> ();
+			InterstitialFetching result = new InterstitialFetching();
+			result.dontImmediatelyRefresh = passDontImmediatelyRefresh;
+			int daysRec = 0;
 			if (item.IndexOf(VConfig.searchNoAccess) == -1)
 			{
-                //if (iOuter == (stringcnt - 1))
-                //    lastD = true;
 				it = item.Replace("&nbsp;", String.Empty);
 				MatchCollection mc;
 				string searchInFront;
-				if (activity == Activity.getNews) {
+				News news = null;
+				if (activity == Activity.getNews)
+				{
 					searchInFront = "<tr>";
-					if (news == null) {
+					if (news == null)
+					{
 						news = new News ();
 						news.Image = "http://centrallink.de/sr/Blackboard.png";
 						news.Source = new Uri (VConfig.url);
@@ -203,11 +207,11 @@ namespace UntisExp
 				}
 				if ((item.IndexOf(VConfig.noEventsText.Replace(" ", string.Empty)) == -1)||activity==Activity.getNews)
 				{
-					i = 0;
+					int iterations = 0;
 					it = it.Substring(it.IndexOf("</tr>") + 5, it.Length - it.IndexOf("</tr>") - 5);
 					while (it.IndexOf(searchInFront) != -1)
 					{
-                        if (i == 0)
+                        if (iterations == 0)
                         {
                             //news box should not be a day so count days here
                             daysRec++;
@@ -222,19 +226,21 @@ namespace UntisExp
                             news.Summary += Helpers.AddSpaces(dateName + ", " + date.Day + "."+date.Month+":\n");
 						}
 						string w;
-						data = new Data();
+						Data data = new Data();
 						w = it.Substring(it.IndexOf(searchInFront));
 						w = w.Substring(0, w.IndexOf("</tr>"));
 						it = it.Substring(it.IndexOf("</tr>") + 5, it.Length - it.IndexOf("</tr>") - 5);
 						mc = VConfig.cellSearch.Matches(w);
-						iInner = 0;
+						int webColumn = 0;
 						foreach (var thing in mc)
 						{
 							string compute = prepareScheduleItem (thing);
 							if (activity != Activity.getNews) {
-								proceedScheduleItem (compute);
+								data = proceedScheduleItem (compute, data, webColumn, iterations, v1);
+								webColumn++;
 							} else {
-								proceedNewsItem (compute);
+								news = proceedNewsItem (compute, news);
+								result.parsedNews = news;
 							}
 						}
 						if (activity != Activity.getNews) {
@@ -242,9 +248,9 @@ namespace UntisExp
 							if ((mode == 1 && daysRec == 2)|| (mode!= 1 && mode != 0) || (mode == 0 && daysRec == 1))
 							v1.Add(data);
 						}
-						i++;
+						iterations++;
 					}
-					if ((i == 0 && activity != Activity.getNews) || (i > 0 && activity == Activity.getNews))
+					if ((iterations == 0 && activity != Activity.getNews) || (iterations > 0 && activity == Activity.getNews))
                     {
                         iOuter--;
                     }
@@ -263,12 +269,15 @@ namespace UntisExp
                 }
 			}
 			iOuter++;
-			if (iOuter == stringcnt && (daysRec == 1) && mode != 0 && activity == Activity.ParseFirstSchedule)
+			if (iOuter == daysAndNewsBoxes && (daysRec == 1) && mode != 0 && activity == Activity.ParseFirstSchedule)
 			{
 				getTimes(Group, Activity.ParseSecondSchedule);
 				globData = v1;
-				doNot = true;
+				result.dontImmediatelyRefresh = true;
 			}
+			result.outerLoopCursor = iOuter;
+			result.parsedRows = v1;
+			return result;
 		}
 
         //retuns the date Object from the day of week (0=mo,1=tu...)
@@ -295,18 +304,20 @@ namespace UntisExp
 			return thingy.Substring(thingy.IndexOf(">") + 1,thingy.LastIndexOf("<")-thingy.IndexOf(">")-1);
 		}
 
-		protected void proceedNewsItem (string thingy) {
-			news.Title = "Vom Vertretungsplan:";
-			news.Summary += Helpers.AddSpaces(thingy);
-			news.Content = news.Summary;
+		protected News proceedNewsItem (string thingy, News scheduleNews) {
+			scheduleNews.Title = "Vom Vertretungsplan:";
+			scheduleNews.Summary += Helpers.AddSpaces(thingy);
+			scheduleNews.Content = scheduleNews.Summary;
+			return scheduleNews;
 		}
 
-		protected void proceedScheduleItem (string thingy) {
-			switch (iInner)
+		protected Data proceedScheduleItem (string thingy, Data individualEntry, int webColumn, int iteration, ICollection<Data> rowsData) {
+			
+			switch (webColumn)
 			{
 			case 0:
 				if (thingy == VConfig.specialEvtAb)
-				{ data.Veranstaltung = true; }
+				{ individualEntry.Veranstaltung = true; }
 				break;
 			case 1:
 				int day = Convert.ToInt16(thingy.Substring(0, thingy.IndexOf(".")));
@@ -315,54 +326,46 @@ namespace UntisExp
 				int month = Convert.ToInt16(dayStr);
 				int year = DateTime.Now.Year;
 				DateTime dt = new DateTime(year, month, day);
-				data.Date = dt;
-				if (i == 0 && !silent)
+				individualEntry.Date = dt;
+				if (iteration == 0 && !silent)
 				{
-					v1.Add(new Data(dt));
+					rowsData.Add(new Data(dt));
 				}
 				break;
 			case 2:
-				data.Stunde = thingy;
+				individualEntry.Stunde = thingy;
 				break;
 			case 3:
-				data.Vertreter = thingy;
+				individualEntry.Vertreter = thingy;
 				break;
 			case 4:
-				data.Fach = thingy;
+				individualEntry.Fach = thingy;
 				break;
 			case 5:
-				data.AltFach = thingy;
+				individualEntry.AltFach = thingy;
 				break;
 			case 6:
-				data.Raum = thingy;
+				individualEntry.Raum = thingy;
 				break;
 			case 7:
-				data.Klasse = thingy;
+				individualEntry.Klasse = thingy;
 				break;
 			case 8:
-				data.Lehrer = thingy;
+				individualEntry.Lehrer = thingy;
 				break;
 			case 13:
-				data.Notiz = thingy;
+				individualEntry.Notiz = thingy;
 				break;
 			case 14:
-				data.EntfallStr = thingy;
+				individualEntry.EntfallStr = thingy;
 				break;
 			case 15:
-				data.MitbeStr = thingy;
+				individualEntry.MitbeStr = thingy;
 				break;
 			default:
 				break;
 			}
-			iInner++;
-		}
-
-		protected void initPaser(bool two = false)
-		{
-			v1 = new List<Data>();
-			iOuter = 0;
-			daysRec = 0;
-			doNot = false;
+			return individualEntry;
 		}
 
 		private void times_DownloadStringCompleted(string res)
@@ -370,21 +373,23 @@ namespace UntisExp
             if (res == "") { return; }
 
             string comp = res.Replace(" ", string.Empty);
+			List<Data> resultCollection = new List<Data> ();
 			//TO-DO: Parse VPlan
 			//lastD = false;
 			if (!silent)
-				del();
+				clearView();
 			int needleCount = getNewsBoxesLength(comp);
-			stringcnt = VConfig.expectedDayNum + needleCount;
-			string[] raw = getDayArray (comp, stringcnt);
-			initPaser ();
+			int daysAndNewsBoxes = VConfig.expectedDayNum + needleCount;
+			string[] raw = getDayArray (comp, daysAndNewsBoxes);
+			InterstitialFetching preliminaryResult = new InterstitialFetching();
 			foreach (var item in raw)
 			{
-				processRow (item);
+				preliminaryResult = processRow (item, preliminaryResult.outerLoopCursor, daysAndNewsBoxes, preliminaryResult.dontImmediatelyRefresh);
+				resultCollection.AddRange (preliminaryResult.parsedRows);
 			}
-			if (doNot != true)
+			if (preliminaryResult.dontImmediatelyRefresh != true)
 			{
-				refreshAll(v1);
+				refreshAll(resultCollection);
 			}
 		}
 		private void news_DownloadStringCompleted(string res)
@@ -394,15 +399,15 @@ namespace UntisExp
 			//TO-DO: Parse VPlan
 			//lastD = false;
 			int needleCount = getNewsBoxesLength(comp);
-			stringcnt = VConfig.expectedDayNum + needleCount;
-			string[] raw = getDayArray (comp, stringcnt);
-			initPaser ();
+			int daysAndNewsBoxes = VConfig.expectedDayNum + needleCount;
+			string[] raw = getDayArray (comp, daysAndNewsBoxes);
+			InterstitialFetching preliminaryResult = new InterstitialFetching();
 			foreach (var item in raw)
 			{
-				processRow (item, Activity.getNews);
+				preliminaryResult = processRow (item, preliminaryResult.outerLoopCursor, daysAndNewsBoxes, preliminaryResult.dontImmediatelyRefresh, Activity.getNews);
 			}
-            if(news.Content!=null||news.Summary!=null)
-			addTheNews (news);
+			if(preliminaryResult.parsedNews.Content!=null||preliminaryResult.parsedNews.Summary!=null)
+				addTheNews (preliminaryResult.parsedNews);
 		}
         private void timesNext_DownloadStringCompleted(String res)
         {
@@ -422,14 +427,15 @@ namespace UntisExp
                 }
                 //TO-DO: Parse VPlan
 				int needleCount = getNewsBoxesLength(comp);
-				stringcnt = VConfig.expectedDayNum + needleCount;
-				string[] raw = getDayArray (comp, stringcnt);
-				initPaser();
-                foreach (var item in raw)
-                {
-					processRow (item, Activity.ParseSecondSchedule);
-                }
-				globData.AddRange(v1);
+				int daysAndNewsBoxes = VConfig.expectedDayNum + needleCount;
+				string[] raw = getDayArray (comp, daysAndNewsBoxes);
+				InterstitialFetching preliminaryResult = new InterstitialFetching();
+				foreach (var item in raw)
+				{
+					preliminaryResult = processRow (item, preliminaryResult.outerLoopCursor, daysAndNewsBoxes, preliminaryResult.dontImmediatelyRefresh, Activity.ParseSecondSchedule);
+				}
+
+				globData.AddRange(preliminaryResult.parsedRows);
                 refreshAll(globData);
             }
             catch
