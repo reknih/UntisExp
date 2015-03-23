@@ -255,7 +255,7 @@ namespace UntisExp
 					{
                         if (iterations == 0)
                         {
-                            //news box should not be a day so count days here
+                            // news box should not be a day so we count days here
                             daysRec++;
                         }
 						if (activity == Activity.getNews ) {
@@ -281,7 +281,7 @@ namespace UntisExp
 								data = proceedScheduleItem (compute, data, webColumn, iterations, v1);
 								webColumn++;
 							} else {
-								news = proceedNewsItem (compute, news);
+								news = processNewsItem (compute, news);
 								result.parsedNews = news;
 							}
 						}
@@ -325,9 +325,9 @@ namespace UntisExp
         /// <summary>
 		/// Will get a day object out of an int
         /// </summary>
-		/// <returns>The date object for the day of week (0=mo,1=tu...)</returns>
-        /// <param name="day">Value representing the wished day </param>
-        /// <param name="activity">Activity.</param>
+		/// <returns>The date object for the day of week</returns>
+		/// <param name="day">Value representing the wished day (0=mo,1=tu...)</param>
+        /// <param name="activity">Which activity to perform</param>
         protected DateTime getDateFromDay(int day, Activity activity)
         {
             DateTime date = DateTime.Now;
@@ -344,14 +344,14 @@ namespace UntisExp
             }
             return date.AddDays(day);
         }
-
+			
 		protected string prepareScheduleItem(object input)
 		{
 			string thingy = input.ToString();
 			return thingy.Substring(thingy.IndexOf(">") + 1,thingy.LastIndexOf("<")-thingy.IndexOf(">")-1);
 		}
 
-		protected News proceedNewsItem (string thingy, News scheduleNews) {
+		protected News processNewsItem (string thingy, News scheduleNews) {
 			scheduleNews.Title = "Vom Vertretungsplan:";
 			scheduleNews.Summary += Helpers.AddSpaces(thingy);
 			scheduleNews.Content = scheduleNews.Summary;
@@ -452,9 +452,9 @@ namespace UntisExp
 			foreach (var item in raw)
 			{
 				preliminaryResult = processRow (item, preliminaryResult.outerLoopCursor, daysAndNewsBoxes, preliminaryResult.dontImmediatelyRefresh, Activity.getNews);
+				if(preliminaryResult.parsedNews.Content!=null||preliminaryResult.parsedNews.Summary!=null)
+					addTheNews (preliminaryResult.parsedNews);
 			}
-			if(preliminaryResult.parsedNews.Content!=null||preliminaryResult.parsedNews.Summary!=null)
-				addTheNews (preliminaryResult.parsedNews);
 		}
         private void timesNext_DownloadStringCompleted(String res)
         {
@@ -472,6 +472,7 @@ namespace UntisExp
                     refreshAll(globData);
                     return;
                 }
+				List<Data> resultCollection = new List<Data> ();
                 //TO-DO: Parse VPlan
 				int needleCount = getNewsBoxesLength(comp);
 				int daysAndNewsBoxes = VConfig.expectedDayNum + needleCount;
@@ -480,9 +481,10 @@ namespace UntisExp
 				foreach (var item in raw)
 				{
 					preliminaryResult = processRow (item, preliminaryResult.outerLoopCursor, daysAndNewsBoxes, preliminaryResult.dontImmediatelyRefresh, Activity.ParseSecondSchedule);
+					resultCollection.AddRange (preliminaryResult.parsedRows);
 				}
 
-				globData.AddRange(preliminaryResult.parsedRows);
+				globData.AddRange(resultCollection);
                 refreshAll(globData);
             }
             catch
