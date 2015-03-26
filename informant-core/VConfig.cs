@@ -9,7 +9,7 @@ namespace UntisExp
 	/// </summary>
 	public static class VConfig
 	{
-        public static string url            = "http://www.vp.cws-usingen.de/stupla/Schueler/";
+        public static string url            = "http://vp.cws-usingen.de/Schueler/";
         public static string feed           = "http://srdercws.wordpress.com/feed/";
         public static string pathToNavbar   = "frames/navbar.htm";
 		public static string groupIErrorTtl = "Dumm, dumm, dumm.";
@@ -21,17 +21,17 @@ namespace UntisExp
 		public static string titleOfMsgBox  = "Nachrichten zum Tag";
 		public static string noEventsText   = "Keine Vertretungen";
 		public static string searchNoAccess = "freigegeben";
-		public static Regex cellSearch      = new Regex("<t{1}d{1}.*?>.*?</td>");
+		public static Regex  cellSearch      = new Regex("<t{1}d{1}.*?>.*?</td>");
 		public static string specialEvtAb   = "Veranst.";
 		public static Dictionary<string, string> lessonAbbr = new Dictionary<string, string>();
 		public static string noPageErrTtl   = "Du bist nicht schuld";
-		public static string noPageErrTxt   = "Die Vertretungsplanseite gibt's noch nicht. Ich vermute, es sind Ferien.";
+		public static string noPageErrTxt   = "Die Vertretungsplanseite wurde nicht gefunden.";
 		public static string noPageErrBtn   = "Na hoffentlich!";
         public static string unknownErrTtl  = "Houston, wir haben ein Problem.";
-		public static string unknownErrTxt  = "Und ich hoffte, das das nie von jemandem gelesen wird: Unbekannter Fehler!";
-        public static string unknownErrBtn  = "Träume sind Schäumes";
-        public static string[] successJokes = new string [] {"Und fertig!", "Heute schon Bertie gesehen?", "Sacrebleu", "Arrriba!", "Dein Tag könnte sich soeben verbessert haben"};
-        public static int expectedDayNum = 5;
+		public static string unknownErrTxt  = "Und ich hoffte, dass das nie von jemandem gelesen wird: Unbekannter Fehler!";
+        public static string unknownErrBtn  = "Si, Si";
+        public static string[] successJokes = new string [] {"Und fertig!", "Heute schon Bertie gesehen?", "Sacrebleu", "Arrriba!", "Dein Tag könnte sich soeben verbessert haben", "Käsekuchen"};
+        public static int    expectedDayNum = 5;
 
 		public static void Populate () {
 			try {
@@ -43,6 +43,7 @@ namespace UntisExp
 			lessonAbbr.Add ("KR", "Kath. Religion");
 			lessonAbbr.Add ("MA", "Mathe");
 			lessonAbbr.Add ("BIO", "Bio");
+            lessonAbbr.Add ("BI", "Bio");
 			lessonAbbr.Add ("CH", "Chemie");
 			lessonAbbr.Add ("PH", "Physik");
 			lessonAbbr.Add ("POWI", "PoWi");
@@ -60,8 +61,11 @@ namespace UntisExp
 			lessonAbbr.Add ("LA2", "Latein");
 			lessonAbbr.Add ("LA", "Latein");
 			lessonAbbr.Add ("IT", "Italiensich");
-			lessonAbbr.Add ("WU", "Wahlunterricht");
-			} catch {
+            lessonAbbr.Add("WU", "Wahlunterricht");
+            lessonAbbr.Add("KLALE", "Klassenlehrerstunde");
+            }
+            catch
+            {
 			}
 		}
 	}

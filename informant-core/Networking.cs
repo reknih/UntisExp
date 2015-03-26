@@ -10,15 +10,19 @@ namespace UntisExp
         public static Action<String> defCallback;
         public static Action<Stream> defStreamCallback;
         public static Action<string, string, string> defAlert;
-		public static void DownloadData(string url, Action<String> callback, Action<string, string, string> alertmet, bool alerting = false, string aHead = "", string aBody = "", string aBtn = "")
+		public static void DownloadData(string url, Action<String> callback, Action<string, string, string> alertmet = null, Action retrnOnError = null, string aHead = "", string aBody = "", string aBtn = "")
 		{
 			defCallback = callback;
-			defAlert = alertmet;
+			bool alerting = false;
+			if (alertmet != null) {
+				alerting = true;
+				defAlert = alertmet;
+			}
             
 			try
 			{
 				var request = (HttpWebRequest)WebRequest.Create(url);
-				DoWithResponse(request, (response) =>
+				DoWithResponse(request,alerting,retrnOnError, (response) =>
 					{
 						string body;
 						if (url.IndexOf(VConfig.url) != -1) {
@@ -39,9 +43,9 @@ namespace UntisExp
 			catch
 			{
 				try
-				{
+				{ 
 					var request = (HttpWebRequest)WebRequest.Create(url);
-					request.BeginGetResponse(new AsyncCallback(FinishRequest), request);
+					request.BeginGetResponse(new AsyncCallback(FinishRequest), new object[] {request, alerting});
 				}
 				catch
 				{
@@ -66,7 +70,7 @@ namespace UntisExp
             }
         }
 
-		public static void DoWithResponse(HttpWebRequest request, Action<HttpWebResponse> responseAction)
+		public static void DoWithResponse(HttpWebRequest request,bool alerting,Action onError, Action<HttpWebResponse> responseAction)
 		{
 			Action wrapperAction = () =>
 			{
@@ -75,8 +79,11 @@ namespace UntisExp
 						try {
                             var response = (HttpWebResponse)((HttpWebRequest)iar.AsyncState).EndGetResponse(iar);
 							responseAction(response);
-						} catch{
-							defAlert(VConfig.noPageErrTtl, VConfig.noPageErrTxt, VConfig.noPageErrBtn);
+						} catch (Exception e) {			
+							if (onError != null)
+								onError();
+                            if(alerting)
+								defAlert(VConfig.noPageErrTtl, VConfig.noPageErrTxt, VConfig.noPageErrBtn);
 						}
 					}), request);
 			};
@@ -88,10 +95,11 @@ namespace UntisExp
 		}
 		public static string GetBody(IAsyncResult result)
 		{
+            Object[] param = (Object[])result.AsyncState;
             string body = "";
             try
             {
-                HttpWebResponse response = (result.AsyncState as HttpWebRequest).EndGetResponse(result) as HttpWebResponse;
+                HttpWebResponse response = (param[0] as HttpWebRequest).EndGetResponse(result) as HttpWebResponse;
                 Stream receiveStream = response.GetResponseStream();
                 StreamReader readStream = new StreamReader(receiveStream, Encoding.GetEncoding("ISO-8859-1"));
                 body = readStream.ReadToEnd();
@@ -105,14 +113,16 @@ namespace UntisExp
 
             }
             catch {
-                defAlert(VConfig.noPageErrTtl, VConfig.noPageErrTxt, VConfig.noPageErrBtn);
+                if ((bool)param[1])
+                {
+                    defAlert(VConfig.noPageErrTtl, VConfig.noPageErrTxt, VConfig.noPageErrBtn);
+                }
             }
 			return body;
 		}
         public static void FinishRequest(IAsyncResult result)
         {
             string body = GetBody(result);
-            if (body != "")
                 defCallback(body);
         }
         public static void FinishStreamRequest(IAsyncResult result)

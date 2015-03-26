@@ -32,12 +32,15 @@ namespace UntisExp
 			Result = Regex.Replace(Result, "(\\.(?=\\S)|:(?=\\S))(.)", "$1 $2");
 			return Result;
 		}
-//        public static string getRandomArrayItem(string [] array) {
-//            var rand = new Random();
-//            int pos = rand.Next(array.Length);
-//            return array[pos];
-//        }
-        /*public static int[] getTodayTomorrowNum (List<Data> source) {
+#if WINDOWS_PHONE
+        public static string getRandomArrayItem(string [] array) {
+            var rand = new Random();
+            int pos = rand.Next(array.Length);
+            return array[pos];
+        }
+#endif
+#if WINDOWS_APP
+        public static int[] getTodayTomorrowNum (List<Data> source) {
             List<int> headIndexes = new List<int>();
             int currIndex = 0;
             foreach (var item in source)
@@ -74,7 +77,8 @@ namespace UntisExp
                     break;
             }
             return new int[] { listlist[0].Count, listlist[1].Count };
-        }*/
+        }
+#endif
 		public static bool IsEmpty(string s)
 		{
 			Regex emptycheck = new Regex(@"^\s*$");

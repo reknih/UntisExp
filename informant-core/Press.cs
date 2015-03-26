@@ -15,7 +15,9 @@ namespace UntisExp
         XNamespace namespaces = XNamespace.Get("http://purl.org/rss/1.0/modules/content/");
         XNamespace medians = XNamespace.Get("http://search.yahoo.com/mrss/");
         Regex r = new Regex("<.*?>");
-       // Action<List<News>> newscallback;
+#if (WINDOWS || WINDOWS_PHONE)
+        Action<List<News>> newscallback;
+#endif
 		public Press ()
 		{
 		}
@@ -40,24 +42,25 @@ namespace UntisExp
             });
             return gathered;
         }
-//        public void getCalledBackForNews(Action<List<News>> _newscallback)
-//        {
-//            newscallback = _newscallback;
-//            Networking.DownloadLegacyStream(VConfig.feed, newsStreamCallback);
-//        }
-//        public void newsStreamCallback(Stream newsstream) {
-//            var doc = XDocument.Load(newsstream);
-//            var articles = from article in doc.Descendants("item")
-//                           select article;
-//            var gathered = new List<News>();
-//            foreach (XElement articlet in articles)
-//            {
-//                var writing = processXML(articlet, doc);
-//                gathered.Add(writing);
-//            }
-//            newscallback(gathered);
-//        }
-
+#if (WINDOWS || WINDOWS_PHONE)
+        public void getCalledBackForNews(Action<List<News>> _newscallback)
+        {
+            newscallback = _newscallback;
+            Networking.DownloadLegacyStream(VConfig.feed, newsStreamCallback);
+        }
+        public void newsStreamCallback(Stream newsstream) {
+            var doc = XDocument.Load(newsstream);
+            var articles = from article in doc.Descendants("item")
+                           select article;
+            var gathered = new List<News>();
+            foreach (XElement articlet in articles)
+            {
+                var writing = processXML(articlet, doc);
+                gathered.Add(writing);
+            }
+            newscallback(gathered);
+        }
+#endif
 
         protected News processXML(XElement articlet, XDocument doc)
         {
