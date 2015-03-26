@@ -261,7 +261,7 @@ namespace UntisExp
 						if (activity == Activity.getNews ) {
                             if (news.Summary != null)
                             {
-                                news.Summary += ", ";
+                                news.Summary += "\n\n";
                             }
                             DateTime date = getDateFromDay(iOuter, Activity.ParseFirstSchedule);
                             string dateName = new System.Globalization.CultureInfo("de-DE").DateTimeFormat.GetDayName(date.DayOfWeek);
@@ -452,7 +452,7 @@ namespace UntisExp
 			foreach (var item in raw)
 			{
 				preliminaryResult = processRow (item, preliminaryResult.outerLoopCursor, daysAndNewsBoxes, preliminaryResult.dontImmediatelyRefresh, Activity.getNews);
-				if(preliminaryResult.parsedNews.Content!=null||preliminaryResult.parsedNews.Summary!=null)
+				if(preliminaryResult.parsedNews!=null &&(preliminaryResult.parsedNews.Content!=null||preliminaryResult.parsedNews.Summary!=null))
 					addTheNews (preliminaryResult.parsedNews);
 			}
 		}
