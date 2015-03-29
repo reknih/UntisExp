@@ -1,6 +1,8 @@
 The ultimate Untis fetcher lib
 =================================
 
+[![Build Status](https://travis-ci.org/reknih/UntisExp.svg?branch=master)](https://travis-ci.org/reknih/UntisExp)
+
 Your education facility uses Untis for creating schedules and enabled webaccess? Then this is your library. Use it to fetch the events for specific groups from the web interface.
 
 How to use it
