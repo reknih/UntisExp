@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Globalization;
 
 namespace UntisExp
@@ -30,7 +28,7 @@ namespace UntisExp
 		{
 			Head = true;
             DateHeader = true;
-			Line1 = date.ToString("dddd", new System.Globalization.CultureInfo("de-DE")) + ", " + Convert.ToString(date.Day) + "." + Convert.ToString(date.Month);
+			Line1 = date.ToString("dddd", new CultureInfo("de-DE")) + ", " + Convert.ToString(date.Day) + "." + Convert.ToString(date.Month);
 			Line2 = "";
 			VConfig.Populate ();
 		}
@@ -96,43 +94,73 @@ namespace UntisExp
 				Mitbetreung = false;
                // PrintMitbet = "Nein";
 			}
-			Line1 = Stunde + ". Std: " + Fach;
+		    if (!Helpers.IsEmpty(Fach))
+		    {
+		        Line1 = Stunde + ". Std: " + Fach;
+		    }
+		    else
+		    {
+		        Line1 = Stunde + ". Std: " + AltFach;
+		    }
 
-			if (Entfall == true)
+		    if (Entfall)
 			{
 				Line1 = Stunde + ". Std: " + AltFach;
-				Line2 = AltFach + " bei " + Lehrer + " entfällt. ";
+				Line2 = AltFach + " bei " + Lehrer + " entfällt.";
 			}
-			else if (Mitbetreung == true)
+			else if (Mitbetreung)
 			{
-				Line2 = Fach + " bei " + Lehrer + " wird durch " + Vertreter + " mitbetreut. | " + Raum;
+				Line2 = Fach + " bei " + Lehrer + " wird durch " + Vertreter + " mitbetreut.";
+			    if (Raum != null)
+			    {
+			        Line2 += " | " + Raum;
+			    }
 			}
-			else if (Veranstaltung == true)
+			else if (Veranstaltung)
 			{
 				Line1 = Stunde + ". Std: Veranstaltung";
-				if (Raum != "")
+			    Line2 = "";
+				if (!string.IsNullOrEmpty(Raum))
 				{
-					Line2 = "Raum: " + Raum + " | " + "Mit " + Lehrer + " und " + Klasse;
+					Line2 = "Raum: " + Raum + " | ";
 				}
-				else {
-					Line2 = "Mit " + Lehrer + " und " + Klasse;
-				}
+				Line2 += "Mit " + Lehrer;
+                if (!string.IsNullOrWhiteSpace(Klasse))
+                {
+                    Line2 += " und " + Klasse;
+                }
 			}
 			else if (Helpers.IsEmpty(Lehrer) && !Helpers.IsEmpty(Vertreter))
 			{
-				Line2 = "Bei " + Vertreter + " in " + Raum;
+			    Line2 = "Bei " + Vertreter;
+			    if (!string.IsNullOrEmpty(Raum))
+			    {
+                    Line2 += " in " + Raum;
+			    }
 			}
 			else if (Fach != AltFach)
 			{
 				Line2 = Fach + " bei " + Vertreter + " statt " + AltFach;
+                if (!string.IsNullOrEmpty(Raum))
+                {
+                    Line2 += " | " + Raum;
+                }
 			}
 			else if (Vertreter != Lehrer)
 			{
-				Line2 = Vertreter + " vertritt " + Lehrer + " | " + Raum;
+				Line2 = Vertreter + " vertritt " + Lehrer;
+                if (!string.IsNullOrEmpty(Raum))
+                {
+                    Line2 += " | " + Raum;
+                }
 			}
 			else
 			{
-				Line2 = "Raum: " + Raum + " | " + Lehrer;
+				Line2 = Lehrer;
+                if (!string.IsNullOrEmpty(Raum))
+                {
+                    Line2 += " | " + Raum;
+                }
 			}
 			if (!Helpers.IsEmpty(Notiz))
 			{
@@ -142,8 +170,9 @@ namespace UntisExp
 		}
 		private string faecherSchreib(string fach)
 		{
-			if (fach != null)
-				fach = fach.ToUpper();
+		    if (fach == null)
+		        return null;
+			fach = fach.ToUpper();
 			if (VConfig.lessonAbbr.ContainsKey (fach))
 				fach = VConfig.lessonAbbr [fach];
 			return fach;

@@ -220,14 +220,14 @@ namespace UntisExp
 		/// <param name="item">The HTML string representing the table of a day</param>
 		/// <param name="iOuter">The progress through the day tables</param>
 		/// <param name="daysAndNewsBoxes">The number of news tables in the week</param>
-		/// <param name="passDontImmediatelyRefresh">If appropriate, this value will be passed to <see cref="UntisExp.InterstitialFetching.dontImmediatelyRefresh"/>.</param>
+		/// <param name="passDontImmediatelyRefresh">If appropriate, this value will be passed to <see cref="InterstitialFetching.DontImmediatelyRefresh"/>.</param>
 		/// <param name="activity">The action which should be performed.</param>
 		protected InterstitialFetching processRow(string item, int iOuter, int daysAndNewsBoxes, bool passDontImmediatelyRefresh, Activity activity = Activity.ParseFirstSchedule)
 		{
 			string it = item;
 			List<Data> v1 = new List<Data> ();
 			InterstitialFetching result = new InterstitialFetching();
-			result.dontImmediatelyRefresh = passDontImmediatelyRefresh;
+			result.DontImmediatelyRefresh = passDontImmediatelyRefresh;
 			int daysRec = 0;
 			if (item.IndexOf(VConfig.searchNoAccess) == -1)
 			{
@@ -282,7 +282,7 @@ namespace UntisExp
 								webColumn++;
 							} else {
 								news = processNewsItem (compute, news);
-								result.parsedNews = news;
+								result.ParsedNews = news;
 							}
 						}
 						if (activity != Activity.getNews) {
@@ -315,10 +315,10 @@ namespace UntisExp
 			{
 				getTimes(Group, Activity.ParseSecondSchedule);
 				globData = v1;
-				result.dontImmediatelyRefresh = true;
+				result.DontImmediatelyRefresh = true;
 			}
-			result.outerLoopCursor = iOuter;
-			result.parsedRows = v1;
+			result.OuterLoopCursor = iOuter;
+			result.ParsedRows = v1;
 			return result;
 		}
 
@@ -431,10 +431,10 @@ namespace UntisExp
 			InterstitialFetching preliminaryResult = new InterstitialFetching();
 			foreach (var item in raw)
 			{
-				preliminaryResult = processRow (item, preliminaryResult.outerLoopCursor, daysAndNewsBoxes, preliminaryResult.dontImmediatelyRefresh);
-				resultCollection.AddRange (preliminaryResult.parsedRows);
+				preliminaryResult = processRow (item, preliminaryResult.OuterLoopCursor, daysAndNewsBoxes, preliminaryResult.DontImmediatelyRefresh);
+				resultCollection.AddRange (preliminaryResult.ParsedRows);
 			}
-			if (preliminaryResult.dontImmediatelyRefresh != true)
+			if (preliminaryResult.DontImmediatelyRefresh != true)
 			{
 				refreshAll(resultCollection);
 			}
@@ -451,9 +451,9 @@ namespace UntisExp
 			InterstitialFetching preliminaryResult = new InterstitialFetching();
 			foreach (var item in raw)
 			{
-				preliminaryResult = processRow (item, preliminaryResult.outerLoopCursor, daysAndNewsBoxes, preliminaryResult.dontImmediatelyRefresh, Activity.getNews);
-				if(preliminaryResult.parsedNews.Content!=null||preliminaryResult.parsedNews.Summary!=null)
-					addTheNews (preliminaryResult.parsedNews);
+				preliminaryResult = processRow (item, preliminaryResult.OuterLoopCursor, daysAndNewsBoxes, preliminaryResult.DontImmediatelyRefresh, Activity.getNews);
+				if(preliminaryResult.ParsedNews.Content!=null||preliminaryResult.ParsedNews.Summary!=null)
+					addTheNews (preliminaryResult.ParsedNews);
 			}
 		}
         private void timesNext_DownloadStringCompleted(String res)
@@ -480,8 +480,8 @@ namespace UntisExp
 				InterstitialFetching preliminaryResult = new InterstitialFetching();
 				foreach (var item in raw)
 				{
-					preliminaryResult = processRow (item, preliminaryResult.outerLoopCursor, daysAndNewsBoxes, preliminaryResult.dontImmediatelyRefresh, Activity.ParseSecondSchedule);
-					resultCollection.AddRange (preliminaryResult.parsedRows);
+					preliminaryResult = processRow (item, preliminaryResult.OuterLoopCursor, daysAndNewsBoxes, preliminaryResult.DontImmediatelyRefresh, Activity.ParseSecondSchedule);
+					resultCollection.AddRange (preliminaryResult.ParsedRows);
 				}
 
 				globData.AddRange(resultCollection);

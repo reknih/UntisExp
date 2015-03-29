@@ -1,21 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace UntisExp
 {
 	public class InterstitialFetching
 	{
-		public int outerLoopCursor = 0;
-		public List<Data> parsedRows;
-		public News parsedNews;
-		public bool dontImmediatelyRefresh = false;
+		public int OuterLoopCursor;
+		public List<Data> ParsedRows;
+		public News ParsedNews;
+		public bool DontImmediatelyRefresh;
 
-		public InterstitialFetching (int _outerLoopCursor, List<Data> _parsedRows)
+		public InterstitialFetching (int outerLoopCursor, List<Data> parsedRows)
 		{
-			outerLoopCursor = _outerLoopCursor;
-			parsedRows = _parsedRows;
+		    DontImmediatelyRefresh = false;
+		    OuterLoopCursor = outerLoopCursor;
+			ParsedRows = parsedRows;
 		}
-		public InterstitialFetching () {
+		public InterstitialFetching ()
+		{
+		    DontImmediatelyRefresh = false;
+		    OuterLoopCursor = 0;
 		}
 	}
 }
