@@ -44,7 +44,7 @@ namespace NUnitTests
         {
             Assert.IsFalse(Helpers.IsEmpty(" hgfdsfghjk "));
         }
-
+# if DEBUG
         [Test]
         public void IsRandomItemPartOfTheArray()
         {
@@ -96,5 +96,6 @@ namespace NUnitTests
             var exp = new[] { 0, 0 };
             Assert.AreEqual(exp, Helpers.getTodayTomorrowNum(a));
         }
+#endif
     }
 }
