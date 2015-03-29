@@ -34,7 +34,7 @@ namespace NUnitTests
         [Test]
         public void ToStringReturnsClassName()
         {
-            var sut = new Group(36, "Q3");
+            var sut = new Group (36, "Q3");
             Assert.AreEqual("Q3", sut.ToString());
         }
     }
