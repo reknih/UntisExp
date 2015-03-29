@@ -5,27 +5,23 @@ using System.Text.RegularExpressions;
 using System.IO;
 using System.Xml.Linq;
 using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace UntisExp
 {
 	public class Press
 	{
-        XNamespace namespaces = XNamespace.Get("http://purl.org/rss/1.0/modules/content/");
-        XNamespace medians = XNamespace.Get("http://search.yahoo.com/mrss/");
-        Regex r = new Regex("<.*?>");
-#if (WINDOWS || WINDOWS_PHONE)
-        Action<List<News>> newscallback;
+	    readonly XNamespace _namespaces = XNamespace.Get("http://purl.org/rss/1.0/modules/content/");
+	    readonly XNamespace _medians = XNamespace.Get("http://search.yahoo.com/mrss/");
+	    readonly Regex _r = new Regex("<.*?>");
+#if (WINDOWS || WINDOWS_PHONE || DEBUG)
+        Action<List<News>> _newscallback;
 #endif
-		public Press ()
-		{
-		}
         /// <summary>
         /// Gets news articles from the RSS feed specified in VConfig <seealso cref="VConfig"/>
         /// </summary>
         /// <returns>List of news articles (asynchronous)</returns>
-        public async Task<List<News>> getNews()
+        public async Task<List<News>> GetNews()
         {
             XDocument doc;
             var gathered = new List<News>();
@@ -36,33 +32,38 @@ namespace UntisExp
                                select article;
                 foreach (XElement articlet in articles)
                 {
-                    var writing = processXML(articlet, doc);
+                    var writing = ProcessXml(articlet);
                     gathered.Add(writing);
                 }
             });
             return gathered;
         }
-#if (WINDOWS || WINDOWS_PHONE)
-        public void getCalledBackForNews(Action<List<News>> _newscallback)
+#if (WINDOWS || WINDOWS_PHONE || DEBUG)
+        /// <summary>
+        /// Will callback with the news articles from the RSS feed specified in <seealso cref="VConfig"/> as an parameter
+        /// </summary>
+        /// <param name="newscallbackAction">The callback which is called after execution</param>
+        public void GetCalledBackForNews(Action<List<News>> newscallbackAction)
         {
-            newscallback = _newscallback;
-            Networking.DownloadLegacyStream(VConfig.feed, newsStreamCallback);
+            _newscallback = newscallbackAction;
+            Networking.DownloadLegacyStream(VConfig.feed, NewsStreamCallback);
         }
-        public void newsStreamCallback(Stream newsstream) {
+
+	    private void NewsStreamCallback(Stream newsstream) {
             var doc = XDocument.Load(newsstream);
             var articles = from article in doc.Descendants("item")
                            select article;
             var gathered = new List<News>();
             foreach (XElement articlet in articles)
             {
-                var writing = processXML(articlet, doc);
+                var writing = ProcessXml(articlet);
                 gathered.Add(writing);
             }
-            newscallback(gathered);
+            _newscallback(gathered);
         }
 #endif
 
-        protected News processXML(XElement articlet, XDocument doc)
+	    private News ProcessXml(XElement articlet)
         {
             var writing = new News();
             var titleQuery = from titles in articlet.Descendants("title")
@@ -71,7 +72,7 @@ namespace UntisExp
             string content;
             try
             {
-                var contQuery = from item in articlet.Descendants(namespaces + "encoded")
+                var contQuery = from item in articlet.Descendants(_namespaces + "encoded")
                                 select item.Value;
                 content = WebUtility.HtmlDecode(contQuery.First());
             }
@@ -81,50 +82,17 @@ namespace UntisExp
                                 select item.Value;
                 content = WebUtility.HtmlDecode(contQuery.First());
             }
-            writing.Content = r.Replace(content, "");
+            writing.Content = _r.Replace(content, "");
             var linkQuery = from link in articlet.Descendants("link")
                             select link.Value;
             writing.Source = new Uri(linkQuery.First());
             writing.Summary = Helpers.TruncateWithPreservation(writing.Content, 30);
-            var mediaQuery = from medias in articlet.Descendants(medians + "content")
+            var mediaQuery = from medias in articlet.Descendants(_medians + "content")
                              select medias.Attribute("url").Value;
             writing.Image = mediaQuery.ElementAtOrDefault(0);
             writing.Refresh();
             return writing;
         }
-
-		//protected void wrong(string aa, string bb, string cc) {}
-
-		/// <summary>
-		/// Remove HTML tags from string using char array.
-		/// </summary>
-//		protected string StripTagsCharArray(string source)
-//		{
-//			char[] array = new char[source.Length];
-//			int arrayIndex = 0;
-//			bool inside = false;
-//
-//			for (int i = 0; i < source.Length; i++)
-//			{
-//				char let = source[i];
-//				if (let == '<')
-//				{
-//					inside = true;
-//					continue;
-//				}
-//				if (let == '>')
-//				{
-//					inside = false;
-//					continue;
-//				}
-//				if (!inside)
-//				{
-//					array[arrayIndex] = let;
-//					arrayIndex++;
-//				}
-//			}
-//			return new string(array, 0, arrayIndex);
-//		}
 	}
 }
 

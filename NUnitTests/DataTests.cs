@@ -13,6 +13,7 @@ namespace NUnitTests
     public sealed class DataTests
     {
         [Test]
+        [Category("Constructors")]
         public void MakeHeading()
         {
             var s = "Jolla";
@@ -21,6 +22,7 @@ namespace NUnitTests
         }
 
         [Test]
+        [Category("Constructors")]
         public void MakeDateHeading()
         {
             var d = new DateTime(2017, 11, 13);
@@ -29,6 +31,7 @@ namespace NUnitTests
         }
 
         [Test]
+        [Category("Constructors")]
         public void MakeHeadingEmptySecond()
         {
             var s = "Jolla";
@@ -37,6 +40,7 @@ namespace NUnitTests
         }
 
         [Test]
+        [Category("Constructors")]
         public void MakeDateHeadingEmptySecond()
         {
             var d = new DateTime(2017, 11, 13);
@@ -45,6 +49,7 @@ namespace NUnitTests
         }
 
         [Test]
+        [Category("Constructors")]
         public void QuickInstanceInitializerWillFillLine1()
         {
             var sut = new Data("3-4", "DE", "CHR", "MD", "E21", "");
@@ -52,6 +57,7 @@ namespace NUnitTests
         }
 
         [Test]
+        [Category("Constructors")]
         public void QuickInstanceInitializerWillNotBeADate()
         {
             var sut = new Data("3-4", "DE", "CHR", "MD", "E21", "");
@@ -59,6 +65,7 @@ namespace NUnitTests
         }
 
         [Test]
+        [Category("Constructors")]
         public void NoExceptionOnEmpty()
         {
             var sut = new Data();

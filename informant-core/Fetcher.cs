@@ -267,9 +267,8 @@ namespace UntisExp
                             string dateName = new System.Globalization.CultureInfo("de-DE").DateTimeFormat.GetDayName(date.DayOfWeek);
                             news.Summary += Helpers.AddSpaces(dateName + ", " + date.Day + "."+date.Month+":\n");
 						}
-						string w;
-						Data data = new Data();
-						w = it.Substring(it.IndexOf(searchInFront));
+					    Data data = new Data();
+						string w = it.Substring(it.IndexOf(searchInFront));
 						w = w.Substring(0, w.IndexOf("</tr>"));
 						it = it.Substring(it.IndexOf("</tr>") + 5, it.Length - it.IndexOf("</tr>") - 5);
 						mc = VConfig.cellSearch.Matches(w);

@@ -17,20 +17,20 @@ namespace UntisExp
         /// <summary>
         /// Generates a prefilled news object
         /// </summary>
-        /// <param name="_ID">ID of the article. Can be 0</param>
-        /// <param name="_Title">Title of the article, for display</param>
-        /// <param name="_source">URI of article</param>
-        /// <param name="_summary">Short summary. Will be autofilled if "".</param>
-        /// <param name="_Image">URI of article's image (mandantory)</param>
-        /// <param name="_Content">Articles content</param>
-		public News(int _ID, string _Title, Uri _source, string _summary, string _Image, string _Content = "")
+        /// <param name="id">ID of the article. Can be 0</param>
+        /// <param name="title">Title of the article, for display</param>
+        /// <param name="source">URI of article</param>
+        /// <param name="summary">Short summary. Will be autofilled if "".</param>
+        /// <param name="image">URI of article's image (mandantory)</param>
+        /// <param name="content">Articles content</param>
+		public News(int id, string title, Uri source, string summary, string image, string content = "")
 		{
-			ID = _ID;
-			Title = _Title;
-			Source = _source;
-			Summary = _summary;
-			Image = _Image;
-			Content = _Content;
+			ID = id;
+			Title = title;
+			Source = source;
+			Summary = summary;
+			Image = image;
+			Content = content;
             Refresh();
 		}
 		public int ID { get; set; }
@@ -60,10 +60,14 @@ namespace UntisExp
         /// Generates Summary, if empty
         /// </summary>
         public void Refresh() {
-            if (Summary == "") {
+            if (string.IsNullOrEmpty(Summary) && !string.IsNullOrEmpty(Content)) {
                 Summary = Helpers.TruncateWithPreservation(Content, 50);
             }
-            if (Source.AbsoluteUri.IndexOf(VConfig.url) != -1)
+            if (Source == null)
+            {
+                return;
+            }
+            if (Source.AbsoluteUri.IndexOf(VConfig.url, StringComparison.Ordinal) != -1)
             {
                 SourcePrint = "CHRISTIAN-WIRTH-SCHULE";
             }

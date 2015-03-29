@@ -8,24 +8,28 @@ namespace NUnitTests
     {
 
         [Test]
+        [Category("Constructors")]
         public void NormalConstructorIdWillBeEmpty()
         {
             Assert.AreEqual(0, (new Group().ID));
         }
 
         [Test]
+        [Category("Constructors")]
         public void NormalConstructorNameWillBeEmpty()
         {
             Assert.AreEqual(null, (new Group().ClassName));
         }
 
         [Test]
+        [Category("Constructors")]
         public void PrefilledConstructorWillFillOutName()
         {
             Assert.AreEqual("Q2", (new Group(35, "Q2").ClassName));
         }
 
         [Test]
+        [Category("Constructors")]
         public void PrefilledConstructorWillFillOutId()
         {
             Assert.AreEqual(2, (new Group(2, "5A").ID));
