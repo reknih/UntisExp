@@ -8,7 +8,7 @@ namespace UntisExp
 	/// <summary>
 	/// This static class includes methods for interacting with the internet
 	/// </summary>
-	public static class Networking
+	public class Networking : INetworkAccessor
 	{
 
         /// <summary>
@@ -21,7 +21,7 @@ namespace UntisExp
         /// <param name="aHead">Optional. Standard error message head</param>
         /// <param name="aBody">Optional. Standard error message caption</param>
         /// <param name="aBtn">Optional. Standard error message button title</param>
-		public static void DownloadData(string url, Action<String> callback, Action<string, string, string> alertmet = null, Action returnOnError = null, string aHead = "", string aBody = "", string aBtn = "")
+		public void DownloadData(string url, Action<String> callback, Action<string, string, string> alertmet = null, Action returnOnError = null, string aHead = "", string aBody = "", string aBtn = "")
 		{
             bool alerting = alertmet != null;
 
@@ -73,7 +73,7 @@ namespace UntisExp
         /// <param name="aHead">Optional. Standard error message head</param>
         /// <param name="aBody">Optional. Standard error message caption</param>
         /// <param name="aBtn">Optional. Standard error message button title</param>
-        public static void DownloadLegacyStream(string url, Action<Stream> callback, Action<string, string, string> alertmet = null, bool alerting = false, string aHead = "", string aBody = "", string aBtn = "")
+        public void DownloadLegacyStream(string url, Action<Stream> callback, Action<string, string, string> alertmet = null, bool alerting = false, string aHead = "", string aBody = "", string aBtn = "")
         {
             try
             {
@@ -87,7 +87,7 @@ namespace UntisExp
             }
         }
 
-	    private static void DoWithResponse(HttpWebRequest request, bool alerting, Action onError, Action<string,string,string> alert, Action<HttpWebResponse> responseAction)
+	    private void DoWithResponse(HttpWebRequest request, bool alerting, Action onError, Action<string,string,string> alert, Action<HttpWebResponse> responseAction)
 		{
 			Action wrapperAction = () =>
 			{
@@ -111,7 +111,7 @@ namespace UntisExp
 			}, wrapperAction);
 		}
 
-	    private static string GetBody(Action<string,string,string> alert, IAsyncResult result)
+	    private string GetBody(Action<string,string,string> alert, IAsyncResult result)
 		{
             Object[] param = (Object[])result.AsyncState;
             string body = "";
@@ -150,13 +150,13 @@ namespace UntisExp
 			return body;
 		}
 
-	    private static void FinishRequest(Action<string> callback,Action<string,string,string> alert, IAsyncResult result)
+	    private void FinishRequest(Action<string> callback,Action<string,string,string> alert, IAsyncResult result)
         {
             string body = GetBody(alert, result);
                 callback(body);
         }
 
-	    private static void FinishStreamRequest(IAsyncResult result, Action<Stream> streamCallback, Action<string,string,string> alert)
+	    private void FinishStreamRequest(IAsyncResult result, Action<Stream> streamCallback, Action<string,string,string> alert)
 	    {
 	        HttpWebRequest request = result.AsyncState as HttpWebRequest;
 	        if (request != null)

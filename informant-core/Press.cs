@@ -9,14 +9,28 @@ using System.Threading.Tasks;
 
 namespace UntisExp
 {
+    /// <summary>
+    /// Is equipped with methods to fetch news objects from the RSS feed specified in 
+    /// </summary>
 	public class Press
 	{
 	    readonly XNamespace _namespaces = XNamespace.Get("http://purl.org/rss/1.0/modules/content/");
 	    readonly XNamespace _mediaNs = XNamespace.Get("http://search.yahoo.com/mrss/");
 	    readonly Regex _r = new Regex("<.*?>");
+	    private INetworkAccessor _networkAccessor;
 #if (WINDOWS || WINDOWS_PHONE || DEBUG)
         Action<List<News>> _newscallback;
 #endif
+
+        /// <summary>
+        /// Creates a new Press object
+        /// </summary>
+        /// <param name="networkAccessor">For testing purposes only. Will inject a <see cref="INetworkAccessor"/> into the class</param>
+	    public Press(INetworkAccessor networkAccessor = null)
+	    {
+	        if (networkAccessor == null) networkAccessor = new Networking();
+	        _networkAccessor = networkAccessor;
+	    }    
         /// <summary>
         /// Gets news articles from the RSS feed specified in VConfig <seealso cref="VConfig"/>
         /// </summary>
@@ -46,7 +60,7 @@ namespace UntisExp
         public void GetCalledBackForNews(Action<List<News>> newscallbackAction)
         {
             _newscallback = newscallbackAction;
-            Networking.DownloadLegacyStream(VConfig.feed, NewsStreamCallback);
+            _networkAccessor.DownloadLegacyStream(VConfig.feed, NewsStreamCallback);
         }
 
 	    private void NewsStreamCallback(Stream newsstream) {

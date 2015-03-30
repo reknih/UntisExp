@@ -1,0 +1,89 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="UntisExp.Data">
+    <Position X="5.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>YEAAAEAAAAAECIAAAgAAgAAAEAASQAQhAAAAwAAgAAA=</HashCode>
+      <FileName>Data.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UntisExp.Fetcher">
+    <Position X="4" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAAEABAAAAACAYAgAAAwAAAAAAICDQAAAAAAABACE=</HashCode>
+      <FileName>Fetcher.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UntisExp.Group">
+    <Position X="2.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAACAgAAEAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Group.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UntisExp.Helpers">
+    <Position X="0.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABAAAAAAAAAAAgAAAAAAAAAAAABAAAAAAAAAAAFAAA=</HashCode>
+      <FileName>Helpers.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UntisExp.InterstitialFetching">
+    <Position X="2.25" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAgAiAAEAAAAAAAAQAABAAAQgAAAIAAAAAAAAA=</HashCode>
+      <FileName>InterstitialFetching.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UntisExp.Networking">
+    <Position X="4" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAABAAAAAAAAAAABAEAAAAECAAAACAAAAAAAAAAAA=</HashCode>
+      <FileName>Networking.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="UntisExp.News">
+    <Position X="0.5" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACAAAAAAgBAgEAAAAAACAAAAAAAABAAAAAAAAAAAAA=</HashCode>
+      <FileName>News.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UntisExp.Press">
+    <Position X="2.25" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAACAAgAQAAAAABAAAAAAAAAAAABAiAQAABAAAA=</HashCode>
+      <FileName>Press.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UntisExp.VConfig">
+    <Position X="7.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAAgAAAAAAEBAAIgAACAAMCACwcAQAAAAAAAFEARAo=</HashCode>
+      <FileName>VConfig.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="UntisExp.ISettings">
+    <Position X="0.5" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAQAAAAAAAAA=</HashCode>
+      <FileName>ISettings.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="UntisExp.INetworkAccessor">
+    <Position X="5.75" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAECAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>INetworkAccessor.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Enum Name="UntisExp.Activity">
+    <Position X="0.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAQAAAAA=</HashCode>
+      <FileName>Activity.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

@@ -64,7 +64,7 @@ namespace NUnitTests
 
         [Test]
         [Category("Callback driven async methods")]
-        public async void CallbackOfPressMethodWillBeCalled()
+        public void CallbackOfPressMethodWillBeCalled()
         {
             bool calledBack = false;
             List<News> res = new List<News>();
