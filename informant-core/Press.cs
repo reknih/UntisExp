@@ -12,7 +12,7 @@ namespace UntisExp
 	public class Press
 	{
 	    readonly XNamespace _namespaces = XNamespace.Get("http://purl.org/rss/1.0/modules/content/");
-	    readonly XNamespace _medians = XNamespace.Get("http://search.yahoo.com/mrss/");
+	    readonly XNamespace _mediaNs = XNamespace.Get("http://search.yahoo.com/mrss/");
 	    readonly Regex _r = new Regex("<.*?>");
 #if (WINDOWS || WINDOWS_PHONE || DEBUG)
         Action<List<News>> _newscallback;
@@ -87,7 +87,7 @@ namespace UntisExp
                             select link.Value;
             writing.Source = new Uri(linkQuery.First());
             writing.Summary = Helpers.TruncateWithPreservation(writing.Content, 30);
-            var mediaQuery = from medias in articlet.Descendants(_medians + "content")
+            var mediaQuery = from medias in articlet.Descendants(_mediaNs + "content")
                              select medias.Attribute("url").Value;
             writing.Image = mediaQuery.ElementAtOrDefault(0);
             writing.Refresh();
