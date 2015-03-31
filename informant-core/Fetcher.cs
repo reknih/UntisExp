@@ -99,10 +99,9 @@ namespace UntisExp
 			_addTheNews = refreshOne;
 			_alert = delegate {
 			};
-			GetTimes (group, Activity.getNews, week);
             if (networkAccessor == null) networkAccessor = new Networking();
-            _networkAccessor = networkAccessor;
-
+                _networkAccessor = networkAccessor;
+			GetTimes (group, Activity.getNews, week);
 		}
 
 			
@@ -130,7 +129,7 @@ namespace UntisExp
                 raw = raw.Replace("\"", string.Empty);
                 raw = raw.Replace("\n", string.Empty);
                 string[] arr = raw.Split(',');
-                int i = 0;
+                int i = 1;
                 foreach (var item in arr)
                 {
                     groupObj.Add(new Group(i, item));

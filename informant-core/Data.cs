@@ -51,7 +51,7 @@ namespace UntisExp
 			Raum = raum;
 			Notiz = notiz;
 			VConfig.Populate ();
-			refresh();
+			Refresh();
             DateHeader = false;
 		}
 
@@ -71,7 +71,7 @@ namespace UntisExp
 		/// <summary>
 		/// To be called when poperties were changed. Spells the subjects out and determines the type of event
 		/// </summary>
-		public void refresh()
+		public Data Refresh()
 		{
 			Head = false;
 			Fach = faecherSchreib(Fach);
@@ -167,6 +167,7 @@ namespace UntisExp
 				Notiz = Helpers.AddSpaces (Notiz);
 				Line2 = Notiz + "; " + Line2;
 			}
+            return this;
 		}
 		private string faecherSchreib(string fach)
 		{
@@ -198,7 +199,6 @@ namespace UntisExp
 		public string MitbeStr { get; set; }
 
         public bool Mitbetreung { get; set; }
-      //  public string PrintMitbet { get; set; }
 
 		public bool Veranstaltung { get; set; }
 

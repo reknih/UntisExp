@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using NUnit.Framework;
 using UntisExp;
+using System.Web.Script.Serialization;
 
 namespace NUnitTests
 {
@@ -12,7 +13,7 @@ namespace NUnitTests
         [Test]
         [Category("Callback driven async methods")]
         [Category("Network dependant integration test")]
-        public void CallbackOfPressMethodWillBeCalled()
+        public void CallbackOfPFetcherMethodWillBeCalled()
         {
             bool calledBack = false;
             List<Data> res = new List<Data>();
@@ -54,6 +55,312 @@ namespace NUnitTests
             var sut = new Fetcher(() => { }, callback, 5, spy);
             sut.GetTimes(12, Activity.ParseSecondSchedule, 14);
             Assert.AreEqual("http://vp.cws-usingen.de/Schueler/15/w/w00012.htm", spy.CalledUri);
+        }
+
+        [Test]
+        [Category("Selftest")]
+        public void MockedNetworkInterfaceWillCallBack()
+        {
+            var sut = new MockedNetworkAccessor();
+            bool isCalled = false;
+            Action<string> callback = a =>
+            {
+                isCalled = true;
+            };
+            sut.DataToReturn = "Tests are awesome";
+            sut.DownloadData("http://abc.de", callback);
+            Assert.IsTrue(isCalled);
+        }
+
+        [Test]
+        [Category("Mocked dependencies")]
+        [Category("Integration test")]
+        public void WillOutputTheCollectionOfData()
+        {
+            var serializer = new JavaScriptSerializer();
+            List<Data> res = new List<Data>();
+            Action<List<Data>> callback = methodRet =>
+            {
+                res = methodRet;
+            };
+            var spy = new MockedNetworkAccessor
+            {
+                DataToReturn =
+                    "<!DOCTYPEHTMLPUBLIC\"-//IETF//DTDHTML//EN\">\n<html>\n<head>\n<metahttp-equiv=\"Content-Type\"content=\"text/html;charset=iso-8859-1\"><metahttp-equiv=\"expires\"content=\"0\"><metaname=\"keywords\"content=\"Stundenplan,timetable\">\n<metaname=\"GENERATOR\"content=\"Untis2013\">\n<title>Untis2013STUNDENPLAN14/15-IICHRIST.-WIRTH-SCHULEUSINGEN1</title>\n<styletype=\"text/css\">\na{color:#000000;}\n</style>\n<linkrel=\"stylesheet\"href=\"../../untisinfo.css\"type=\"text/css\">\n</head>\n<bodybgcolor=\"#FFFFFF\">\n<CENTER><fontsize=\"3\"face=\"Arial\">\n<BR><h2>LOH/LK</h2><p><divid=\"vertretung\">\n<aname=\"1\">&nbsp;</a><br><b>23.3.Montag</b>|<ahref=\"#2\">[Dienstag]</a>|<ahref=\"#3\">[Mittwoch]</a>|<ahref=\"#4\">[Donnerstag]</a>|<ahref=\"#5\">[Freitag]</a><p>\n<tableclass=\"subst\">\n<tr><tdalign=\"center\"colspan=\"17\">Vertretungensindnichtfreigegeben</td></tr>\n</table>\n<p>\n<aname=\"2\">&nbsp;</a><br><ahref=\"#1\">[Montag]</a>|<b>24.3.Dienstag</b>|<ahref=\"#3\">[Mittwoch]</a>|<ahref=\"#4\">[Donnerstag]</a>|<ahref=\"#5\">[Freitag]</a><p>\n<tableclass=\"subst\">\n<tr><tdalign=\"center\"colspan=\"17\">Vertretungensindnichtfreigegeben</td></tr>\n</table>\n<p>\n<aname=\"3\">&nbsp;</a><br><ahref=\"#1\">[Montag]</a>|<ahref=\"#2\">[Dienstag]</a>|<b>25.3.Mittwoch</b>|<ahref=\"#4\">[Donnerstag]</a>|<ahref=\"#5\">[Freitag]</a><p>\n<tableclass=\"subst\">\n<tr><tdalign=\"center\"colspan=\"17\">Vertretungensindnichtfreigegeben</td></tr>\n</table>\n<p>\n<aname=\"4\">&nbsp;</a><br><ahref=\"#1\">[Montag]</a>|<ahref=\"#2\">[Dienstag]</a>|<ahref=\"#3\">[Mittwoch]</a>|<b>26.3.Donnerstag</b>|<ahref=\"#5\">[Freitag]</a><p>\n<tableclass=\"subst\">\n<tr><tdalign=\"center\"colspan=\"17\">Vertretungensindnichtfreigegeben</td></tr>\n</table>\n<p>\n<aname=\"5\">&nbsp;</a><br><ahref=\"#1\">[Montag]</a>|<ahref=\"#2\">[Dienstag]</a>|<ahref=\"#3\">[Mittwoch]</a>|<ahref=\"#4\">[Donnerstag]</a>|<b>27.3.Freitag</b><p>\n<tableborder=\"3\"rules=\"all\"bgcolor=\"#F4F4F4\"cellpadding=\"3\"cellspacing=\"3\">\n<tr><thalign=\"center\"colspan=\"2\">NachrichtenzumTag</th></tr>\n<tr><td>Unterrichtsfrei&nbsp;</td><td>4-11Std.</td></tr>\n<tr><tdcolspan=\"2\">SCHÖNEFERIEN!!!</td></tr><br></table>\n<p>\n<tableclass=\"subst\">\n<trclass='list'><thclass=\"list\"align=\"center\">Art</th><thclass=\"list\"align=\"center\">Datum</th><thclass=\"list\"align=\"center\">Stunde</th><thclass=\"list\"align=\"center\">Vertreter</th><thclass=\"list\"align=\"center\">Fach</th><thclass=\"list\"align=\"center\">(Fach)</th><thclass=\"list\"align=\"center\">Raum</th><thclass=\"list\"align=\"center\">Klasse(n)</th><thclass=\"list\"align=\"center\">(Lehrer)</th><thclass=\"list\"align=\"center\">(Klasse(n))</th><thclass=\"list\"align=\"center\">(Raum)</th><thclass=\"list\"align=\"center\">Vertr.von</th><thclass=\"list\"align=\"center\">(Le.)nach</th><thclass=\"list\"align=\"center\">Vertretungs-Text</th><thclass=\"list\"align=\"center\">Entfall</th><thclass=\"list\"align=\"center\">Mitbetreuung</th><thclass=\"list\"align=\"center\">Kopplung.</th></tr>\n<trclass='listodd'><tdclass=\"list\"align=\"center\">Vertretung</td><tdclass=\"list\"align=\"center\">27.3.</td><tdclass=\"list\"align=\"center\">1</td><tdclass=\"list\"align=\"center\">scli</td><tdclass=\"list\"align=\"center\">EK</td><tdclass=\"list\"align=\"center\">EK</td><tdclass=\"list\"align=\"center\">E22</td><tdclass=\"list\"align=\"center\">6F</td><tdclass=\"list\"align=\"center\">ST</td><tdclass=\"list\"align=\"center\">6F</td><tdclass=\"list\"align=\"center\">E22</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td></tr>\n<trclass='listeven'><tdclass=\"list\"align=\"center\">Entfall</td><tdclass=\"list\"align=\"center\">27.3.</td><tdclass=\"list\"align=\"center\">3</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">ER</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">SP</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">E27</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\"align=\"center\">Entfall</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\"align=\"center\">x</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td></tr>\n<trclass='listodd'><tdclass=\"list\"align=\"center\">Entfall</td><tdclass=\"list\"align=\"center\">27.3.</td><tdclass=\"list\"align=\"center\">3</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">KR</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">PA</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">E34</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\"align=\"center\">x</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td></tr>\n<trclass='listeven'><tdclass=\"list\"align=\"center\">Entfall</td><tdclass=\"list\"align=\"center\">27.3.</td><tdclass=\"list\"align=\"center\">3</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">KR</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">HAR</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">E32</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\"align=\"center\">x</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td></tr>\n<trclass='listodd'><tdclass=\"list\"align=\"center\">Entfall</td><tdclass=\"list\"align=\"center\">27.3.</td><tdclass=\"list\"align=\"center\">3</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">ER</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">WA</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">E25</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\"align=\"center\">x</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td></tr>\n<trclass='listeven'><tdclass=\"list\"align=\"center\">Entfall</td><tdclass=\"list\"align=\"center\">27.3.</td><tdclass=\"list\"align=\"center\">3</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">ET</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">NI</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">E35</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\"align=\"center\">x</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td></tr>\n<trclass='listodd'><tdclass=\"list\"align=\"center\">Entfall</td><tdclass=\"list\"align=\"center\">27.3.</td><tdclass=\"list\"align=\"center\">3</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">ET</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">SPN</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">E12</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\"align=\"center\">x</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td></tr>\n<trclass='listeven'><tdclass=\"list\"align=\"center\">Entfall</td><tdclass=\"list\"align=\"center\">27.3.</td><tdclass=\"list\"align=\"center\">3</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">ER</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">HU</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">E26</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\"align=\"center\">x</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td></tr>\n<trclass='listodd'><tdclass=\"list\"align=\"center\">Raumvertretung</td><tdclass=\"list\"align=\"center\">27.3.</td><tdclass=\"list\"align=\"center\">3</td><tdclass=\"list\"align=\"center\">BD</td><tdclass=\"list\"align=\"center\">ER</td><tdclass=\"list\"align=\"center\">ER</td><tdclass=\"list\"align=\"center\">E25</td><tdclass=\"list\"align=\"center\">6E</td><tdclass=\"list\"align=\"center\">BD</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">E22</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td></tr>\n<trclass='listeven'><tdclass=\"list\"align=\"center\">Statt-Vertretung</td><tdclass=\"list\"align=\"center\">27.3.</td><tdclass=\"list\"align=\"center\">3</td><tdclass=\"list\"align=\"center\">BN</td><tdclass=\"list\"align=\"center\">FR</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\"align=\"center\">E22</td><tdclass=\"list\"align=\"center\">6F</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td></tr>\n</table>\n<p>\n</div></font><fontsize=\"3\"face=\"Arial\">\nPeriode5++2014/15-II++PLAN-14-15-II\n</font></CENTER>\n</body>\n</html>"
+            };
+            var sut = new Fetcher(() => { }, callback, 5, spy);
+            sut.GetTimes(12, Activity.ParseFirstSchedule, 14);
+            var exp = new List<Data>
+            {
+                new Data
+                {
+                    Stunde = "1",
+                    Date = new DateTime(2015, 3, 27),
+                    Vertreter = "scli",
+                    Fach = "EK",
+                    AltFach = "EK",
+                    Raum = "E22",
+                    Klasse = "6F",
+                    Lehrer = "ST",
+                    EntfallStr = "",
+                    MitbeStr = "",
+                    Notiz = "",
+                    Veranstaltung = false
+                }.Refresh(),
+                new Data
+                {
+                    Stunde = "3",
+                    Date = new DateTime(2015, 3, 27),
+                    Vertreter = "---",
+                    Fach = "---",
+                    AltFach = "ER",
+                    Raum = "---",
+                    Klasse = "6A,6B,6D,6E,6F,6C,6G",
+                    Lehrer = "SP",
+                    EntfallStr = "x",
+                    MitbeStr = "",
+                    Notiz = "",
+                    Veranstaltung = false
+                }.Refresh(),
+                new Data
+                {
+                    Stunde = "3",
+                    Date = new DateTime(2015, 3, 27),
+                    Vertreter = "---",
+                    Fach = "---",
+                    AltFach = "KR",
+                    Raum = "---",
+                    Klasse = "6A,6B,6D,6E,6F,6C,6G",
+                    Lehrer = "PA",
+                    EntfallStr = "x",
+                    MitbeStr = "",
+                    Notiz = "",
+                    Veranstaltung = false
+                }.Refresh(),
+                new Data
+                {
+                    Stunde = "3",
+                    Date = new DateTime(2015, 3, 27),
+                    Vertreter = "---",
+                    Fach = "---",
+                    AltFach = "KR",
+                    Raum = "---",
+                    Klasse = "6A,6B,6D,6E,6F,6C,6G",
+                    Lehrer = "HAR",
+                    EntfallStr = "x",
+                    MitbeStr = "",
+                    Notiz = "",
+                    Veranstaltung = false
+                }.Refresh(),
+                new Data
+                {
+                    Stunde = "3",
+                    Date = new DateTime(2015, 3, 27),
+                    Vertreter = "---",
+                    Fach = "---",
+                    AltFach = "ER",
+                    Raum = "---",
+                    Klasse = "6A,6B,6D,6E,6F,6C,6G",
+                    Lehrer = "WA",
+                    EntfallStr = "x",
+                    MitbeStr = "",
+                    Notiz = "",
+                    Veranstaltung = false
+                }.Refresh(),
+                new Data
+                {
+                    Stunde = "3",
+                    Date = new DateTime(2015, 3, 27),
+                    Vertreter = "---",
+                    Fach = "---",
+                    AltFach = "ET",
+                    Raum = "---",
+                    Klasse = "6A,6B,6D,6E,6F,6C,6G",
+                    Lehrer = "NI",
+                    EntfallStr = "x",
+                    MitbeStr = "",
+                    Notiz = "",
+                    Veranstaltung = false
+                }.Refresh(),
+                new Data
+                {
+                    Stunde = "3",
+                    Date = new DateTime(2015, 3, 27),
+                    Vertreter = "---",
+                    Fach = "---",
+                    AltFach = "ET",
+                    Raum = "---",
+                    Klasse = "6A,6B,6D,6E,6F,6C,6G",
+                    Lehrer = "SPN",
+                    EntfallStr = "x",
+                    MitbeStr = "",
+                    Notiz = "",
+                    Veranstaltung = false
+                }.Refresh(),
+                new Data
+                {
+                    Stunde = "3",
+                    Date = new DateTime(2015, 3, 27),
+                    Vertreter = "---",
+                    Fach = "---",
+                    AltFach = "ER",
+                    Raum = "---",
+                    Klasse = "6A,6B,6D,6E,6F,6C,6G",
+                    Lehrer = "HU",
+                    EntfallStr = "x",
+                    MitbeStr = "",
+                    Notiz = "",
+                    Veranstaltung = false
+                }.Refresh(),
+                new Data
+                {
+                    Stunde = "3",
+                    Date = new DateTime(2015, 3, 27),
+                    Vertreter = "BD",
+                    Fach = "ER",
+                    AltFach = "ER",
+                    Raum = "E25",
+                    Klasse = "6E",
+                    Lehrer = "BD",
+                    EntfallStr = "",
+                    MitbeStr = "",
+                    Notiz = "",
+                    Veranstaltung = false
+                }.Refresh(),
+                new Data
+                {
+                    Stunde = "3",
+                    Date = new DateTime(2015, 3, 27),
+                    Vertreter = "BN",
+                    Fach = "FR",
+                    AltFach = "",
+                    Raum = "E22",
+                    Klasse = "6F",
+                    Lehrer = "",
+                    EntfallStr = "",
+                    MitbeStr = "",
+                    Notiz = "",
+                    Veranstaltung = false
+                }.Refresh()
+            };
+            var comparableRes = serializer.Serialize(res);
+            var comparableExp = serializer.Serialize(exp);
+
+            Assert.AreEqual(comparableExp, comparableRes);
+        }
+
+        [Test]
+        [Category("Mocked dependencies")]
+        [Category("Integration test")]
+        public void WillOutputTheRightNews()
+        {
+            var serializer = new JavaScriptSerializer();
+            News res = new News();
+            Action<News> callback = methodRet =>
+            {
+                res = methodRet;
+            };
+            var spy = new MockedNetworkAccessor
+            {
+                DataToReturn =
+                    "<!DOCTYPEHTMLPUBLIC\"-//IETF//DTDHTML//EN\">\n<html>\n<head>\n<metahttp-equiv=\"Content-Type\"content=\"text/html;charset=iso-8859-1\"><metahttp-equiv=\"expires\"content=\"0\"><metaname=\"keywords\"content=\"Stundenplan,timetable\">\n<metaname=\"GENERATOR\"content=\"Untis2013\">\n<title>Untis2013STUNDENPLAN14/15-IICHRIST.-WIRTH-SCHULEUSINGEN1</title>\n<styletype=\"text/css\">\na{color:#000000;}\n</style>\n<linkrel=\"stylesheet\"href=\"../../untisinfo.css\"type=\"text/css\">\n</head>\n<bodybgcolor=\"#FFFFFF\">\n<CENTER><fontsize=\"3\"face=\"Arial\">\n<BR><h2>LOH/LK</h2><p><divid=\"vertretung\">\n<aname=\"1\">&nbsp;</a><br><b>23.3.Montag</b>|<ahref=\"#2\">[Dienstag]</a>|<ahref=\"#3\">[Mittwoch]</a>|<ahref=\"#4\">[Donnerstag]</a>|<ahref=\"#5\">[Freitag]</a><p>\n<tableclass=\"subst\">\n<tr><tdalign=\"center\"colspan=\"17\">Vertretungensindnichtfreigegeben</td></tr>\n</table>\n<p>\n<aname=\"2\">&nbsp;</a><br><ahref=\"#1\">[Montag]</a>|<b>24.3.Dienstag</b>|<ahref=\"#3\">[Mittwoch]</a>|<ahref=\"#4\">[Donnerstag]</a>|<ahref=\"#5\">[Freitag]</a><p>\n<tableclass=\"subst\">\n<tr><tdalign=\"center\"colspan=\"17\">Vertretungensindnichtfreigegeben</td></tr>\n</table>\n<p>\n<aname=\"3\">&nbsp;</a><br><ahref=\"#1\">[Montag]</a>|<ahref=\"#2\">[Dienstag]</a>|<b>25.3.Mittwoch</b>|<ahref=\"#4\">[Donnerstag]</a>|<ahref=\"#5\">[Freitag]</a><p>\n<tableclass=\"subst\">\n<tr><tdalign=\"center\"colspan=\"17\">Vertretungensindnichtfreigegeben</td></tr>\n</table>\n<p>\n<aname=\"4\">&nbsp;</a><br><ahref=\"#1\">[Montag]</a>|<ahref=\"#2\">[Dienstag]</a>|<ahref=\"#3\">[Mittwoch]</a>|<b>26.3.Donnerstag</b>|<ahref=\"#5\">[Freitag]</a><p>\n<tableclass=\"subst\">\n<tr><tdalign=\"center\"colspan=\"17\">Vertretungensindnichtfreigegeben</td></tr>\n</table>\n<p>\n<aname=\"5\">&nbsp;</a><br><ahref=\"#1\">[Montag]</a>|<ahref=\"#2\">[Dienstag]</a>|<ahref=\"#3\">[Mittwoch]</a>|<ahref=\"#4\">[Donnerstag]</a>|<b>27.3.Freitag</b><p>\n<tableborder=\"3\"rules=\"all\"bgcolor=\"#F4F4F4\"cellpadding=\"3\"cellspacing=\"3\">\n<tr><thalign=\"center\"colspan=\"2\">NachrichtenzumTag</th></tr>\n<tr><td>Unterrichtsfrei&nbsp;</td><td>4-11Std.</td></tr>\n<tr><tdcolspan=\"2\">SCHÖNEFERIEN!!!</td></tr><br></table>\n<p>\n<tableclass=\"subst\">\n<trclass='list'><thclass=\"list\"align=\"center\">Art</th><thclass=\"list\"align=\"center\">Datum</th><thclass=\"list\"align=\"center\">Stunde</th><thclass=\"list\"align=\"center\">Vertreter</th><thclass=\"list\"align=\"center\">Fach</th><thclass=\"list\"align=\"center\">(Fach)</th><thclass=\"list\"align=\"center\">Raum</th><thclass=\"list\"align=\"center\">Klasse(n)</th><thclass=\"list\"align=\"center\">(Lehrer)</th><thclass=\"list\"align=\"center\">(Klasse(n))</th><thclass=\"list\"align=\"center\">(Raum)</th><thclass=\"list\"align=\"center\">Vertr.von</th><thclass=\"list\"align=\"center\">(Le.)nach</th><thclass=\"list\"align=\"center\">Vertretungs-Text</th><thclass=\"list\"align=\"center\">Entfall</th><thclass=\"list\"align=\"center\">Mitbetreuung</th><thclass=\"list\"align=\"center\">Kopplung.</th></tr>\n<trclass='listodd'><tdclass=\"list\"align=\"center\">Vertretung</td><tdclass=\"list\"align=\"center\">27.3.</td><tdclass=\"list\"align=\"center\">1</td><tdclass=\"list\"align=\"center\">scli</td><tdclass=\"list\"align=\"center\">EK</td><tdclass=\"list\"align=\"center\">EK</td><tdclass=\"list\"align=\"center\">E22</td><tdclass=\"list\"align=\"center\">6F</td><tdclass=\"list\"align=\"center\">ST</td><tdclass=\"list\"align=\"center\">6F</td><tdclass=\"list\"align=\"center\">E22</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td></tr>\n<trclass='listeven'><tdclass=\"list\"align=\"center\">Entfall</td><tdclass=\"list\"align=\"center\">27.3.</td><tdclass=\"list\"align=\"center\">3</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">ER</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">SP</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">E27</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\"align=\"center\">Entfall</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\"align=\"center\">x</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td></tr>\n<trclass='listodd'><tdclass=\"list\"align=\"center\">Entfall</td><tdclass=\"list\"align=\"center\">27.3.</td><tdclass=\"list\"align=\"center\">3</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">KR</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">PA</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">E34</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\"align=\"center\">x</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td></tr>\n<trclass='listeven'><tdclass=\"list\"align=\"center\">Entfall</td><tdclass=\"list\"align=\"center\">27.3.</td><tdclass=\"list\"align=\"center\">3</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">KR</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">HAR</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">E32</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\"align=\"center\">x</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td></tr>\n<trclass='listodd'><tdclass=\"list\"align=\"center\">Entfall</td><tdclass=\"list\"align=\"center\">27.3.</td><tdclass=\"list\"align=\"center\">3</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">ER</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">WA</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">E25</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\"align=\"center\">x</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td></tr>\n<trclass='listeven'><tdclass=\"list\"align=\"center\">Entfall</td><tdclass=\"list\"align=\"center\">27.3.</td><tdclass=\"list\"align=\"center\">3</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">ET</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">NI</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">E35</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\"align=\"center\">x</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td></tr>\n<trclass='listodd'><tdclass=\"list\"align=\"center\">Entfall</td><tdclass=\"list\"align=\"center\">27.3.</td><tdclass=\"list\"align=\"center\">3</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">ET</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">SPN</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">E12</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\"align=\"center\">x</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td></tr>\n<trclass='listeven'><tdclass=\"list\"align=\"center\">Entfall</td><tdclass=\"list\"align=\"center\">27.3.</td><tdclass=\"list\"align=\"center\">3</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">ER</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">HU</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">E26</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\"align=\"center\">x</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td></tr>\n<trclass='listodd'><tdclass=\"list\"align=\"center\">Raumvertretung</td><tdclass=\"list\"align=\"center\">27.3.</td><tdclass=\"list\"align=\"center\">3</td><tdclass=\"list\"align=\"center\">BD</td><tdclass=\"list\"align=\"center\">ER</td><tdclass=\"list\"align=\"center\">ER</td><tdclass=\"list\"align=\"center\">E25</td><tdclass=\"list\"align=\"center\">6E</td><tdclass=\"list\"align=\"center\">BD</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">E22</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td></tr>\n<trclass='listeven'><tdclass=\"list\"align=\"center\">Statt-Vertretung</td><tdclass=\"list\"align=\"center\">27.3.</td><tdclass=\"list\"align=\"center\">3</td><tdclass=\"list\"align=\"center\">BN</td><tdclass=\"list\"align=\"center\">FR</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\"align=\"center\">E22</td><tdclass=\"list\"align=\"center\">6F</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td></tr>\n</table>\n<p>\n</div></font><fontsize=\"3\"face=\"Arial\">\nPeriode5++2014/15-II++PLAN-14-15-II\n</font></CENTER>\n</body>\n</html>"
+            };
+            var sut = new Fetcher(callback, 12, 14, spy);
+            var exp = new News { Title = "Vom Vertretungsplan:", Source = new Uri(VConfig.url), Image = "http://centrallink.de/sr/Blackboard.png", Summary = "Freitag, 3.4:\nUnterrichtsfrei 4- 1 1 Std.\n\nFreitag, 3.4:\nSCHÖNEFERIEN!!!", Content = "Freitag, 3.4:\nUnterrichtsfrei 4- 1 1 Std.\n\nFreitag, 3.4:\nSCHÖNEFERIEN!!!" };
+            var comparableRes = serializer.Serialize(res);
+            var comparableExp = serializer.Serialize(exp);
+
+            Assert.AreEqual(comparableExp, comparableRes);
+        }
+
+        [Test]
+        [Category("Mocked dependencies")]
+        [Category("Returns")]
+        public void WillReturnWithoutData()
+        {
+            Action<List<Data>> callback = methodRet =>
+            {
+            };
+            var spy = new MockedNetworkAccessor
+            {
+                DataToReturn = ""
+            };
+            var sut = new Fetcher(() => { }, callback, 5, spy);
+            sut.GetTimes(12, Activity.ParseFirstSchedule, 14);
+            Assert.DoesNotThrow(() => { sut.GetTimes(12, Activity.ParseFirstSchedule, 14); });
+        }
+
+        [Test]
+        [Category("Mocked dependencies")]
+        [Category("Integration test")]
+        public void GetGroupString()
+        {
+            var serializer = new JavaScriptSerializer();
+            var res = new List<Group>();
+            Action<List<Group>> callback = methodRet =>
+            {
+                res = methodRet;
+            };
+            var spy = new MockedNetworkAccessor
+            {
+                DataToReturn = "<html>\n<head>\n<meta http-equiv=\"expires\" content=\"0\">\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\">\n<meta name=\"GENERATOR\" content=\"gp-Untis 2013\">\n<title>Navigation</title>\n<script language=\"JavaScript\" src=\"../untisscripts.js\"></script>\n<link rel=\"stylesheet\" href=\"../untisinfo.css\" type=\"text/css\">\n\n<script LANGUAGE=\"JavaScript\">\nvar topDir = \"w\";\n\nfunction PopulateElementOption(Form, entries, flag)\n{\n var idx = 0;\n if (flag & 1)\n {\n   Form.element[0] = new Option(\"- Alle -\", 0);\n   idx++;\n }\n if (flag == 0 || flag & 2)\n {\n  for (i = 0; i < entries.length; i++, idx++)\n  {\n    Form.element[idx] = new Option(entries[i], i+1);\n  }\n }\n if (idx > 0)\n {\n	Form.element.selectedIndex = 0;\n	doDisplayTimetable(Form, topDir);\n }\n}\n\n var classes = [\"DRUCK\",\"5A\",\"5B\",\"5C\",\"5D\",\"5E\",\"6A\",\"6B\",\"6C\",\"6D\",\"6E\",\"6F\",\"6G\",\"7A1\",\"7A2\",\"7N1\",\"7N2\",\"7N3\",\"7N4\",\"8A1\",\"8A2\",\"8N1\",\"8N2\",\"8N3\",\"9A\",\"9D\",\"9B\",\"9C1\",\"9C2\",\"E2\",\"Q2\",\"Q4\",\"5\",\"6\",\"7\",\"8\",\"9\",\"abi-1\",\"abi-2\",\"abi-3\",\"abi-4\",\"abi-5\",\"abi-6\",\"abi-7\",\"abi-b\",\"abi-g\",\"8A\",\"DAF\"];\n var flcl = 2; var flte = 1;\nfunction ChangeStudentOptions(Form)\n{\n var type = Form.type[Form.type.selectedIndex].value;\n if (type != \"s\")\n    return;\n var nr = Form.classes[Form.classes.selectedIndex].value;\n Form.element.length = 0;\n var idx = 0;\n for (i = 0; i < students.length; i++)\n {\n   if (nr == 0 || studtable[i] == nr)\n   {\n      Form.element[idx] = new Option(students[i], i+1);\n      idx++;\n   }\n }\n	doDisplayTimetable(Form, topDir);\n}\n\nfunction ChangeElementOptions(Form)\n{\n setselclass(\"empty\");\n Form.element.length = 0;\n var type = Form.type[Form.type.selectedIndex].value;\n switch(type)\n {\n	case \"c\": PopulateElementOption(Form, classes, 0); break;\n	case \"w\": PopulateElementOption(Form, classes, flcl); break;\n	case \"t\": PopulateElementOption(Form, teachers, 0); break;\n	case \"v\": PopulateElementOption(Form, teachers, flte); break;\n	case \"r\": PopulateElementOption(Form, rooms, 0); break;\n	case \"f\": PopulateElementOption(Form, subjects, 0); break;\n	case \"g\": PopulateElementOption(Form, corridors, 0); break;\n	case \"s\": \n	{\n        setselclass(\"restore\");\n        PopulateElementOption(Form, students, 0); \n        break;\n    }\n }\n\n return;\n}\n\nfunction SelectElement(Form, name)\n{\n	var art = getParameter(parent.location.href, \"art\");\n	if (art != \"\")\n	{\n		for (var i = 0; i < Form.type.length; i++)\n		{\n			if (Form.type[i].value == art)\n			{\n				Form.type.selectedIndex = i;\n				break;\n			}\n		}\n	}\n	ChangeElementOptions(Form);\n	for (var i = 0; i < Form.element.length; i++)\n	{\n		if (Form.element[i].text == name)\n		{\n			Form.element.selectedIndex = i;\n			break;\n		}\n	}\n}\n\nfunction OnLoad(Form)\n{\n    setselclass(\"save\");\n    \n	var weeknr = WeekOfYear(new Date);\n	for (var i = 0; i < Form.week.options.length; i++)\n	{\n		if (Form.week.options[i].value == weeknr)\n			Form.week.options[i].selected = true;\n	}\n\n	var name = \"\";\n	try \n	{\n		name = getParameter(parent.location.href, \"name\");\n	}\n	catch (e) {};\n	if (name == \"\")\n	{\n		ChangeElementOptions(Form);\n		Form.element.selectedIndex = -1;\n		parent.main.location = \"../welcome.htm\";\n	}\n	else\n	{\n		SelectElement(Form, name);\n		doDisplayTimetable(Form, topDir);\n	}\n}\n\n</script>\n</head>\n\n<body class=\"nav\" onload=\"OnLoad(document.forms[0]);\">\n\n <table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"left\">\n\n  <tr bgcolor=\"#FFFFFF\">\n\n   <td>\n<form name=\"NavBar\" method=\"post\">\n\n    <table width=\"100%\" border=\"0\" cellspacing=\"2\" cellpadding=\"0\">\n\n     <!-- week selection -->\n     <td align=\"left\" class=\"tabelle\">\n      <span class=\"selection\">\n       <nobr>\n        Kalenderwoche<br>\n        <span class=\"absatz\">\n         &nbsp;<br>\n        </span>\n        <select name=\"week\" class=\"selectbox\" onChange=\"doDisplayTimetable(NavBar, topDir);\">\n<option value=\"13\">23.3.2015</option>\n<option value=\"14\">30.3.2015</option>\n<option value=\"15\">6.4.2015</option>\n<option value=\"16\">13.4.2015</option>\n        </select>\n       </nobr>\n      </span>\n     </td>\n\n     <!-- type selection -->\n     <td align=\"left\" class=\"tabelle\">\n      <span class=\"selection\">\n       <nobr>\n        Art<br>\n        <span class=\"absatz\">\n         &nbsp;<br>\n        </span>\n        <select name=\"type\" class=\"selectbox\" onChange=\"ChangeElementOptions(NavBar);\">\n<option value=\"w\">Ver-Kla</option>\n        </select>\n       </nobr>\n      </span>\n     </td>\n\n\n     <!-- element selection -->\n     <td align=\"left\" class=\"tabelle\">\n      <span class=\"selection\">\n       <nobr>\n        Element<br>\n        <span class=\"absatz\">\n         &nbsp;<br>\n        </span>\n        <select name=\"element\" class=\"selectbox\" onChange=\"doDisplayTimetable(NavBar, topDir);\">\n		<option value=\"1\">\n??_*\n		</option>\n        </select>\n       </nobr>\n      </span>\n     </td>\n\n  <td class=\"tabelle\" style=\"vertical-align: middle\">\n      <span class=\"selection\">\n       <nobr>\n		<a href=\"$\" onclick=\"return(doPrintTimetable(NavBar, topDir))\" ><img src=\"print.gif\" border=\"0\" /> Drucken</a>\n       </nobr>\n      </span>\n  </td>\n\n     <!--leeres Feld-->\n     <td width=\"100%\" class=\"tabelle\">\n     </td>\n\n\n     <!-- school info -->\n     <td align=\"right\" class=\"tabelle\">\n      <nobr>\n       <span class=\"schoolname\">\n        CHRIST.-WIRTH-SCHULE USINGEN<img src=\"punkt.gif\">D-61250, SCHLOSSPLATZ 1<br>\n       </span>\n       <span class=\"absatz\">\n        &nbsp;<br>\n       </span>\n       <span class=\"description\">\n        STUNDENPLAN 14/15-II<img src=\"punkt.gif\">13.04.2015<br>\n        Stand: 27.03.2015 07:59\n       </span>\n      </nobr>\n     </td>\n\n    </table>\n</form>\n\n   </td>\n\n  </tr>\n  \n </table>\n\n</body>\n</html>\n"
+            };
+            var sut = new Fetcher((a,b,c) => { }, callback, spy);
+            sut.GetClasses();
+
+            var exp = new List<Group>
+            {
+                new Group{ClassName = "DRUCK", ID = 1},
+                new Group{ClassName = "5A", ID = 2},
+                new Group{ClassName = "5B", ID = 3},
+                new Group{ClassName = "5C", ID = 4},
+                new Group{ClassName = "5D", ID = 5},
+                new Group{ClassName = "5E", ID = 6},
+                new Group{ClassName = "6A", ID = 7},
+                new Group{ClassName = "6B", ID = 8},
+                new Group{ClassName = "6C", ID = 9},
+                new Group{ClassName = "6D", ID = 10},
+                new Group{ClassName = "6E", ID = 11},
+                new Group{ClassName = "6F", ID = 12},
+                new Group{ClassName = "6G", ID = 13},
+                new Group{ClassName = "7A1", ID = 14},
+                new Group{ClassName = "7A2", ID = 15},
+                new Group{ClassName = "7N1", ID = 16},
+                new Group{ClassName = "7N2", ID = 17},
+                new Group{ClassName = "7N3", ID = 18},
+                new Group{ClassName = "7N4", ID = 19},
+                new Group{ClassName = "8A1", ID = 20},
+                new Group{ClassName = "8A2", ID = 21},
+                new Group{ClassName = "8N1", ID = 22},
+                new Group{ClassName = "8N2", ID = 23},
+                new Group{ClassName = "8N3", ID = 24},
+                new Group{ClassName = "9A", ID = 25},
+                new Group{ClassName = "9D", ID = 26},
+                new Group{ClassName = "9B", ID = 27},
+                new Group{ClassName = "9C1", ID = 28},
+                new Group{ClassName = "9C2", ID = 29},
+                new Group{ClassName = "E2", ID = 30},
+                new Group{ClassName = "Q2", ID = 31},
+                new Group{ClassName = "Q4", ID = 32},
+                new Group{ClassName = "5", ID = 33},
+                new Group{ClassName = "6", ID = 34},
+                new Group{ClassName = "7", ID = 35},
+                new Group{ClassName = "8", ID = 36},
+                new Group{ClassName = "9", ID = 37},
+                new Group{ClassName = "abi-1", ID = 38},
+                new Group{ClassName = "abi-2", ID = 39},
+                new Group{ClassName = "abi-3", ID = 40},
+                new Group{ClassName = "abi-4", ID = 41},
+                new Group{ClassName = "abi-5", ID = 42},
+                new Group{ClassName = "abi-6", ID = 43},
+                new Group{ClassName = "abi-7", ID = 44},
+                new Group{ClassName = "abi-b", ID = 45},
+                new Group{ClassName = "abi-g", ID = 46},
+                new Group{ClassName = "8A", ID = 47},
+                new Group{ClassName = "DAF", ID = 48}
+            };
+
+            Assert.AreEqual(serializer.Serialize(exp), serializer.Serialize(res));
         }
     }
 }

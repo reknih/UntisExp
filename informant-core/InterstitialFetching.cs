@@ -76,7 +76,7 @@ namespace UntisExp
                             }
                             DateTime date = GetDateFromDay(iOuter, Activity.ParseFirstSchedule);
                             string dateName = new CultureInfo("de-DE").DateTimeFormat.GetDayName(date.DayOfWeek);
-                            if (news != null) news.Summary += Helpers.AddSpaces(dateName + ", " + date.Day + "." + date.Month + ":\n");
+                            if (news != null) news.Summary += dateName + ", " + date.Day + "." + date.Month + ":\n";
                         }
                         Data data = new Data();
                         string w = it.Substring(it.IndexOf(searchInFront, StringComparison.Ordinal));
@@ -100,7 +100,7 @@ namespace UntisExp
                         }
                         if (activity != Activity.getNews)
                         {
-                            data.refresh();
+                            data.Refresh();
                             if ((mode == 1 && daysRec == 2) || (mode != 1 && mode != 0) || (mode == 0 && daysRec == 1))
                                 v1.Add(data);
                         }
