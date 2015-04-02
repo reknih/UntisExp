@@ -33,6 +33,8 @@ namespace UntisExp
         /// <returns>Object containing the current progress of parsing and the last <see cref="UntisExp.Data"/>-objects that were parsed</returns>
         /// <param name="item">The HTML string representing the table of a day</param>
         /// <param name="iOuter">The progress through the day tables</param>
+        /// <param name="mode">The background operations mode. See also <seealso cref="UntisExp.Fetcher"/></param>
+        /// <param name="silent">Whether the task will add headings</param>
         /// <param name="daysAndNewsBoxes">The number of news tables in the week</param>
         /// <param name="passDontImmediatelyRefresh">If appropriate, this value will be passed to <see cref="HasToGetSecondSchedule"/>.</param>
         /// <param name="activity">The action which should be performed.</param>
@@ -42,22 +44,22 @@ namespace UntisExp
             InterstitialFetching result = new InterstitialFetching();
             result.HasToGetSecondSchedule = passDontImmediatelyRefresh;
             int daysRec = 0;
-            if (item.IndexOf(VConfig.searchNoAccess, StringComparison.Ordinal) == -1)
+            if (item.IndexOf(VConfig.SearchNoAccess, StringComparison.Ordinal) == -1)
             {
                 string it = item.Replace("&nbsp;", String.Empty);
                 MatchCollection mc;
                 string searchInFront;
                 News news = null;
-                if (activity == Activity.getNews)
+                if (activity == Activity.GetNews)
                 {
                     searchInFront = "<tr>";
-                    news = new News { Image = "http://centrallink.de/sr/Blackboard.png", Source = new Uri(VConfig.url) };
+                    news = new News { Image = "http://centrallink.de/sr/Blackboard.png", Source = new Uri(VConfig.Url) };
                 }
                 else
                 {
                     searchInFront = "<trclass='list";
                 }
-                if ((item.IndexOf(VConfig.noEventsText.Replace(" ", string.Empty), StringComparison.Ordinal) == -1) || activity == Activity.getNews)
+                if ((item.IndexOf(VConfig.NoEventsText.Replace(" ", string.Empty), StringComparison.Ordinal) == -1) || activity == Activity.GetNews)
                 {
                     int iterations = 0;
                     it = it.Substring(it.IndexOf("</tr>", StringComparison.Ordinal) + 5, it.Length - it.IndexOf("</tr>", StringComparison.Ordinal) - 5);
@@ -68,7 +70,7 @@ namespace UntisExp
                             // news box should not be a day so we count days here
                             daysRec++;
                         }
-                        if (activity == Activity.getNews)
+                        if (activity == Activity.GetNews)
                         {
                             if (news != null && news.Summary != null)
                             {
@@ -82,12 +84,12 @@ namespace UntisExp
                         string w = it.Substring(it.IndexOf(searchInFront, StringComparison.Ordinal));
                         w = w.Substring(0, w.IndexOf("</tr>", StringComparison.Ordinal));
                         it = it.Substring(it.IndexOf("</tr>", StringComparison.Ordinal) + 5, it.Length - it.IndexOf("</tr>", StringComparison.Ordinal) - 5);
-                        mc = VConfig.cellSearch.Matches(w);
+                        mc = VConfig.CellSearch.Matches(w);
                         int webColumn = 0;
                         foreach (var thing in mc)
                         {
                             string compute = PrepareScheduleItem(thing);
-                            if (activity != Activity.getNews)
+                            if (activity != Activity.GetNews)
                             {
                                 data = ProceedScheduleItem(compute, data, webColumn, iterations, silent, v1);
                                 webColumn++;
@@ -98,7 +100,7 @@ namespace UntisExp
                                 result.ParsedNews = news;
                             }
                         }
-                        if (activity != Activity.getNews)
+                        if (activity != Activity.GetNews)
                         {
                             data.Refresh();
                             if ((mode == 1 && daysRec == 2) || (mode != 1 && mode != 0) || (mode == 0 && daysRec == 1))
@@ -106,7 +108,7 @@ namespace UntisExp
                         }
                         iterations++;
                     }
-                    if ((iterations == 0 && activity != Activity.getNews) || (iterations > 0 && activity == Activity.getNews))
+                    if ((iterations == 0 && activity != Activity.GetNews) || (iterations > 0 && activity == Activity.GetNews))
                     {
                         iOuter--;
                     }
@@ -120,7 +122,6 @@ namespace UntisExp
                         v1.Add(new Data(GetDateFromDay(iOuter, activity)));
                         //Adds no events message
                         v1.Add(new Data());
-
                     }
                 }
             }
@@ -154,8 +155,8 @@ namespace UntisExp
             switch (webColumn)
             {
                 case 0:
-                    if (thingy == VConfig.specialEvtAb)
-                    { individualEntry.Veranstaltung = true; }
+                    if (thingy == VConfig.SpecialEvtAb)
+                    { individualEntry.Event = true; }
                     break;
                 case 1:
                     int day = Convert.ToInt16(thingy.Substring(0, thingy.IndexOf(".", StringComparison.Ordinal)));
@@ -171,34 +172,34 @@ namespace UntisExp
                     }
                     break;
                 case 2:
-                    individualEntry.Stunde = thingy;
+                    individualEntry.Lesson = thingy;
                     break;
                 case 3:
-                    individualEntry.Vertreter = thingy;
+                    individualEntry.Cover = thingy;
                     break;
                 case 4:
-                    individualEntry.Fach = thingy;
+                    individualEntry.Subject = thingy;
                     break;
                 case 5:
-                    individualEntry.AltFach = thingy;
+                    individualEntry.OldSubject = thingy;
                     break;
                 case 6:
-                    individualEntry.Raum = thingy;
+                    individualEntry.Room = thingy;
                     break;
                 case 7:
-                    individualEntry.Klasse = thingy;
+                    individualEntry.Group = thingy;
                     break;
                 case 8:
-                    individualEntry.Lehrer = thingy;
+                    individualEntry.Teacher = thingy;
                     break;
                 case 13:
-                    individualEntry.Notiz = thingy;
+                    individualEntry.Notice = thingy;
                     break;
                 case 14:
-                    individualEntry.EntfallStr = thingy;
+                    individualEntry.OutageStr = thingy;
                     break;
                 case 15:
-                    individualEntry.MitbeStr = thingy;
+                    individualEntry.CareStr = thingy;
                     break;
             }
             return individualEntry;

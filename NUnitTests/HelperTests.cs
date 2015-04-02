@@ -49,7 +49,7 @@ namespace NUnitTests
         public void IsRandomItemPartOfTheArray()
         {
             var a = new [] {"Ging", "der", "Jockel", "Feuer", "holen"};
-            var res = Helpers.getRandomArrayItem(a);
+            var res = Helpers.GetRandomArrayItem(a);
             Assert.IsTrue(a.Contains(res));
         }
 
@@ -62,7 +62,7 @@ namespace NUnitTests
                 new Data("1", "", "", "", "", ""), new Data("3", "", "", "", "", ""), new Data("4", "", "", "", "", "")
             });
             var exp = new[] { 1, 3 };
-            var res = Helpers.getTodayTomorrowNum(a);
+            var res = Helpers.GetTodayTomorrowNum(a);
             Assert.AreEqual(exp, res);
         }
         [Test]
@@ -74,7 +74,7 @@ namespace NUnitTests
                 new Data("1", "", "", "", "", ""), new Data("3", "", "", "", "", ""), new Data("4", "", "", "", "", "")
             });
             var exp = new[] { 0, 3 };
-            Assert.AreEqual(exp, Helpers.getTodayTomorrowNum(a));
+            Assert.AreEqual(exp, Helpers.GetTodayTomorrowNum(a));
         }
         [Test]
         public void CountsTodayTomorrowArrayCorrectlyWithOnlyOneDay()
@@ -84,7 +84,7 @@ namespace NUnitTests
                 new Data(new DateTime(2015, 7, 20)), new Data("1", "", "", "", "", ""), new Data("3", "", "", "", "", ""), new Data("4", "", "", "", "", "")
             });
             var exp = new[] { 3, 0 };
-            Assert.AreEqual(exp, Helpers.getTodayTomorrowNum(a));
+            Assert.AreEqual(exp, Helpers.GetTodayTomorrowNum(a));
         }
         [Test]
         public void CountsTodayTomorrowArrayCorrectlyWithOnlyEmptyDays()
@@ -94,7 +94,7 @@ namespace NUnitTests
                 new Data(new DateTime(2015, 7, 20)),  new Data(new DateTime(2015, 7, 21))
             });
             var exp = new[] { 0, 0 };
-            Assert.AreEqual(exp, Helpers.getTodayTomorrowNum(a));
+            Assert.AreEqual(exp, Helpers.GetTodayTomorrowNum(a));
         }
 #endif
     }

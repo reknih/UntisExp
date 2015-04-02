@@ -94,153 +94,153 @@ namespace NUnitTests
             {
                 new Data
                 {
-                    Stunde = "1",
+                    Lesson = "1",
                     Date = new DateTime(2015, 3, 27),
-                    Vertreter = "scli",
-                    Fach = "EK",
-                    AltFach = "EK",
-                    Raum = "E22",
-                    Klasse = "6F",
-                    Lehrer = "ST",
-                    EntfallStr = "",
-                    MitbeStr = "",
-                    Notiz = "",
-                    Veranstaltung = false
+                    Cover = "scli",
+                    Subject = "EK",
+                    OldSubject = "EK",
+                    Room = "E22",
+                    Group = "6F",
+                    Teacher = "ST",
+                    OutageStr = "",
+                    CareStr = "",
+                    Notice = "",
+                    Event = false
                 }.Refresh(),
                 new Data
                 {
-                    Stunde = "3",
+                    Lesson = "3",
                     Date = new DateTime(2015, 3, 27),
-                    Vertreter = "---",
-                    Fach = "---",
-                    AltFach = "ER",
-                    Raum = "---",
-                    Klasse = "6A,6B,6D,6E,6F,6C,6G",
-                    Lehrer = "SP",
-                    EntfallStr = "x",
-                    MitbeStr = "",
-                    Notiz = "",
-                    Veranstaltung = false
+                    Cover = "---",
+                    Subject = "---",
+                    OldSubject = "ER",
+                    Room = "---",
+                    Group = "6A,6B,6D,6E,6F,6C,6G",
+                    Teacher = "SP",
+                    OutageStr = "x",
+                    CareStr = "",
+                    Notice = "",
+                    Event = false
                 }.Refresh(),
                 new Data
                 {
-                    Stunde = "3",
+                    Lesson = "3",
                     Date = new DateTime(2015, 3, 27),
-                    Vertreter = "---",
-                    Fach = "---",
-                    AltFach = "KR",
-                    Raum = "---",
-                    Klasse = "6A,6B,6D,6E,6F,6C,6G",
-                    Lehrer = "PA",
-                    EntfallStr = "x",
-                    MitbeStr = "",
-                    Notiz = "",
-                    Veranstaltung = false
+                    Cover = "---",
+                    Subject = "---",
+                    OldSubject = "KR",
+                    Room = "---",
+                    Group = "6A,6B,6D,6E,6F,6C,6G",
+                    Teacher = "PA",
+                    OutageStr = "x",
+                    CareStr = "",
+                    Notice = "",
+                    Event = false
                 }.Refresh(),
                 new Data
                 {
-                    Stunde = "3",
+                    Lesson = "3",
                     Date = new DateTime(2015, 3, 27),
-                    Vertreter = "---",
-                    Fach = "---",
-                    AltFach = "KR",
-                    Raum = "---",
-                    Klasse = "6A,6B,6D,6E,6F,6C,6G",
-                    Lehrer = "HAR",
-                    EntfallStr = "x",
-                    MitbeStr = "",
-                    Notiz = "",
-                    Veranstaltung = false
+                    Cover = "---",
+                    Subject = "---",
+                    OldSubject = "KR",
+                    Room = "---",
+                    Group = "6A,6B,6D,6E,6F,6C,6G",
+                    Teacher = "HAR",
+                    OutageStr = "x",
+                    CareStr = "",
+                    Notice = "",
+                    Event = false
                 }.Refresh(),
                 new Data
                 {
-                    Stunde = "3",
+                    Lesson = "3",
                     Date = new DateTime(2015, 3, 27),
-                    Vertreter = "---",
-                    Fach = "---",
-                    AltFach = "ER",
-                    Raum = "---",
-                    Klasse = "6A,6B,6D,6E,6F,6C,6G",
-                    Lehrer = "WA",
-                    EntfallStr = "x",
-                    MitbeStr = "",
-                    Notiz = "",
-                    Veranstaltung = false
+                    Cover = "---",
+                    Subject = "---",
+                    OldSubject = "ER",
+                    Room = "---",
+                    Group = "6A,6B,6D,6E,6F,6C,6G",
+                    Teacher = "WA",
+                    OutageStr = "x",
+                    CareStr = "",
+                    Notice = "",
+                    Event = false
                 }.Refresh(),
                 new Data
                 {
-                    Stunde = "3",
+                    Lesson = "3",
                     Date = new DateTime(2015, 3, 27),
-                    Vertreter = "---",
-                    Fach = "---",
-                    AltFach = "ET",
-                    Raum = "---",
-                    Klasse = "6A,6B,6D,6E,6F,6C,6G",
-                    Lehrer = "NI",
-                    EntfallStr = "x",
-                    MitbeStr = "",
-                    Notiz = "",
-                    Veranstaltung = false
+                    Cover = "---",
+                    Subject = "---",
+                    OldSubject = "ET",
+                    Room = "---",
+                    Group = "6A,6B,6D,6E,6F,6C,6G",
+                    Teacher = "NI",
+                    OutageStr = "x",
+                    CareStr = "",
+                    Notice = "",
+                    Event = false
                 }.Refresh(),
                 new Data
                 {
-                    Stunde = "3",
+                    Lesson = "3",
                     Date = new DateTime(2015, 3, 27),
-                    Vertreter = "---",
-                    Fach = "---",
-                    AltFach = "ET",
-                    Raum = "---",
-                    Klasse = "6A,6B,6D,6E,6F,6C,6G",
-                    Lehrer = "SPN",
-                    EntfallStr = "x",
-                    MitbeStr = "",
-                    Notiz = "",
-                    Veranstaltung = false
+                    Cover = "---",
+                    Subject = "---",
+                    OldSubject = "ET",
+                    Room = "---",
+                    Group = "6A,6B,6D,6E,6F,6C,6G",
+                    Teacher = "SPN",
+                    OutageStr = "x",
+                    CareStr = "",
+                    Notice = "",
+                    Event = false
                 }.Refresh(),
                 new Data
                 {
-                    Stunde = "3",
+                    Lesson = "3",
                     Date = new DateTime(2015, 3, 27),
-                    Vertreter = "---",
-                    Fach = "---",
-                    AltFach = "ER",
-                    Raum = "---",
-                    Klasse = "6A,6B,6D,6E,6F,6C,6G",
-                    Lehrer = "HU",
-                    EntfallStr = "x",
-                    MitbeStr = "",
-                    Notiz = "",
-                    Veranstaltung = false
+                    Cover = "---",
+                    Subject = "---",
+                    OldSubject = "ER",
+                    Room = "---",
+                    Group = "6A,6B,6D,6E,6F,6C,6G",
+                    Teacher = "HU",
+                    OutageStr = "x",
+                    CareStr = "",
+                    Notice = "",
+                    Event = false
                 }.Refresh(),
                 new Data
                 {
-                    Stunde = "3",
+                    Lesson = "3",
                     Date = new DateTime(2015, 3, 27),
-                    Vertreter = "BD",
-                    Fach = "ER",
-                    AltFach = "ER",
-                    Raum = "E25",
-                    Klasse = "6E",
-                    Lehrer = "BD",
-                    EntfallStr = "",
-                    MitbeStr = "",
-                    Notiz = "",
-                    Veranstaltung = false
+                    Cover = "BD",
+                    Subject = "ER",
+                    OldSubject = "ER",
+                    Room = "E25",
+                    Group = "6E",
+                    Teacher = "BD",
+                    OutageStr = "",
+                    CareStr = "",
+                    Notice = "",
+                    Event = false
                 }.Refresh(),
                 new Data
                 {
-                    Stunde = "3",
+                    Lesson = "3",
                     Date = new DateTime(2015, 3, 27),
-                    Vertreter = "BN",
-                    Fach = "FR",
-                    AltFach = "",
-                    Raum = "E22",
-                    Klasse = "6F",
-                    Lehrer = "",
-                    EntfallStr = "",
-                    MitbeStr = "",
-                    Notiz = "",
-                    Veranstaltung = false
+                    Cover = "BN",
+                    Subject = "FR",
+                    OldSubject = "",
+                    Room = "E22",
+                    Group = "6F",
+                    Teacher = "",
+                    OutageStr = "",
+                    CareStr = "",
+                    Notice = "",
+                    Event = false
                 }.Refresh()
             };
             var comparableRes = serializer.Serialize(res);
@@ -266,7 +266,7 @@ namespace NUnitTests
                     "<!DOCTYPEHTMLPUBLIC\"-//IETF//DTDHTML//EN\">\n<html>\n<head>\n<metahttp-equiv=\"Content-Type\"content=\"text/html;charset=iso-8859-1\"><metahttp-equiv=\"expires\"content=\"0\"><metaname=\"keywords\"content=\"Stundenplan,timetable\">\n<metaname=\"GENERATOR\"content=\"Untis2013\">\n<title>Untis2013STUNDENPLAN14/15-IICHRIST.-WIRTH-SCHULEUSINGEN1</title>\n<styletype=\"text/css\">\na{color:#000000;}\n</style>\n<linkrel=\"stylesheet\"href=\"../../untisinfo.css\"type=\"text/css\">\n</head>\n<bodybgcolor=\"#FFFFFF\">\n<CENTER><fontsize=\"3\"face=\"Arial\">\n<BR><h2>LOH/LK</h2><p><divid=\"vertretung\">\n<aname=\"1\">&nbsp;</a><br><b>23.3.Montag</b>|<ahref=\"#2\">[Dienstag]</a>|<ahref=\"#3\">[Mittwoch]</a>|<ahref=\"#4\">[Donnerstag]</a>|<ahref=\"#5\">[Freitag]</a><p>\n<tableclass=\"subst\">\n<tr><tdalign=\"center\"colspan=\"17\">Vertretungensindnichtfreigegeben</td></tr>\n</table>\n<p>\n<aname=\"2\">&nbsp;</a><br><ahref=\"#1\">[Montag]</a>|<b>24.3.Dienstag</b>|<ahref=\"#3\">[Mittwoch]</a>|<ahref=\"#4\">[Donnerstag]</a>|<ahref=\"#5\">[Freitag]</a><p>\n<tableclass=\"subst\">\n<tr><tdalign=\"center\"colspan=\"17\">Vertretungensindnichtfreigegeben</td></tr>\n</table>\n<p>\n<aname=\"3\">&nbsp;</a><br><ahref=\"#1\">[Montag]</a>|<ahref=\"#2\">[Dienstag]</a>|<b>25.3.Mittwoch</b>|<ahref=\"#4\">[Donnerstag]</a>|<ahref=\"#5\">[Freitag]</a><p>\n<tableclass=\"subst\">\n<tr><tdalign=\"center\"colspan=\"17\">Vertretungensindnichtfreigegeben</td></tr>\n</table>\n<p>\n<aname=\"4\">&nbsp;</a><br><ahref=\"#1\">[Montag]</a>|<ahref=\"#2\">[Dienstag]</a>|<ahref=\"#3\">[Mittwoch]</a>|<b>26.3.Donnerstag</b>|<ahref=\"#5\">[Freitag]</a><p>\n<tableclass=\"subst\">\n<tr><tdalign=\"center\"colspan=\"17\">Vertretungensindnichtfreigegeben</td></tr>\n</table>\n<p>\n<aname=\"5\">&nbsp;</a><br><ahref=\"#1\">[Montag]</a>|<ahref=\"#2\">[Dienstag]</a>|<ahref=\"#3\">[Mittwoch]</a>|<ahref=\"#4\">[Donnerstag]</a>|<b>27.3.Freitag</b><p>\n<tableborder=\"3\"rules=\"all\"bgcolor=\"#F4F4F4\"cellpadding=\"3\"cellspacing=\"3\">\n<tr><thalign=\"center\"colspan=\"2\">NachrichtenzumTag</th></tr>\n<tr><td>Unterrichtsfrei&nbsp;</td><td>4-11Std.</td></tr>\n<tr><tdcolspan=\"2\">SCHÖNEFERIEN!!!</td></tr><br></table>\n<p>\n<tableclass=\"subst\">\n<trclass='list'><thclass=\"list\"align=\"center\">Art</th><thclass=\"list\"align=\"center\">Datum</th><thclass=\"list\"align=\"center\">Stunde</th><thclass=\"list\"align=\"center\">Vertreter</th><thclass=\"list\"align=\"center\">Fach</th><thclass=\"list\"align=\"center\">(Fach)</th><thclass=\"list\"align=\"center\">Raum</th><thclass=\"list\"align=\"center\">Klasse(n)</th><thclass=\"list\"align=\"center\">(Lehrer)</th><thclass=\"list\"align=\"center\">(Klasse(n))</th><thclass=\"list\"align=\"center\">(Raum)</th><thclass=\"list\"align=\"center\">Vertr.von</th><thclass=\"list\"align=\"center\">(Le.)nach</th><thclass=\"list\"align=\"center\">Vertretungs-Text</th><thclass=\"list\"align=\"center\">Entfall</th><thclass=\"list\"align=\"center\">Mitbetreuung</th><thclass=\"list\"align=\"center\">Kopplung.</th></tr>\n<trclass='listodd'><tdclass=\"list\"align=\"center\">Vertretung</td><tdclass=\"list\"align=\"center\">27.3.</td><tdclass=\"list\"align=\"center\">1</td><tdclass=\"list\"align=\"center\">scli</td><tdclass=\"list\"align=\"center\">EK</td><tdclass=\"list\"align=\"center\">EK</td><tdclass=\"list\"align=\"center\">E22</td><tdclass=\"list\"align=\"center\">6F</td><tdclass=\"list\"align=\"center\">ST</td><tdclass=\"list\"align=\"center\">6F</td><tdclass=\"list\"align=\"center\">E22</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td></tr>\n<trclass='listeven'><tdclass=\"list\"align=\"center\">Entfall</td><tdclass=\"list\"align=\"center\">27.3.</td><tdclass=\"list\"align=\"center\">3</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">ER</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">SP</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">E27</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\"align=\"center\">Entfall</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\"align=\"center\">x</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td></tr>\n<trclass='listodd'><tdclass=\"list\"align=\"center\">Entfall</td><tdclass=\"list\"align=\"center\">27.3.</td><tdclass=\"list\"align=\"center\">3</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">KR</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">PA</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">E34</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\"align=\"center\">x</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td></tr>\n<trclass='listeven'><tdclass=\"list\"align=\"center\">Entfall</td><tdclass=\"list\"align=\"center\">27.3.</td><tdclass=\"list\"align=\"center\">3</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">KR</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">HAR</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">E32</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\"align=\"center\">x</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td></tr>\n<trclass='listodd'><tdclass=\"list\"align=\"center\">Entfall</td><tdclass=\"list\"align=\"center\">27.3.</td><tdclass=\"list\"align=\"center\">3</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">ER</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">WA</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">E25</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\"align=\"center\">x</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td></tr>\n<trclass='listeven'><tdclass=\"list\"align=\"center\">Entfall</td><tdclass=\"list\"align=\"center\">27.3.</td><tdclass=\"list\"align=\"center\">3</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">ET</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">NI</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">E35</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\"align=\"center\">x</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td></tr>\n<trclass='listodd'><tdclass=\"list\"align=\"center\">Entfall</td><tdclass=\"list\"align=\"center\">27.3.</td><tdclass=\"list\"align=\"center\">3</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">ET</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">SPN</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">E12</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\"align=\"center\">x</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td></tr>\n<trclass='listeven'><tdclass=\"list\"align=\"center\">Entfall</td><tdclass=\"list\"align=\"center\">27.3.</td><tdclass=\"list\"align=\"center\">3</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">ER</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">HU</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">E26</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\"align=\"center\">x</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td></tr>\n<trclass='listodd'><tdclass=\"list\"align=\"center\">Raumvertretung</td><tdclass=\"list\"align=\"center\">27.3.</td><tdclass=\"list\"align=\"center\">3</td><tdclass=\"list\"align=\"center\">BD</td><tdclass=\"list\"align=\"center\">ER</td><tdclass=\"list\"align=\"center\">ER</td><tdclass=\"list\"align=\"center\">E25</td><tdclass=\"list\"align=\"center\">6E</td><tdclass=\"list\"align=\"center\">BD</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">E22</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td></tr>\n<trclass='listeven'><tdclass=\"list\"align=\"center\">Statt-Vertretung</td><tdclass=\"list\"align=\"center\">27.3.</td><tdclass=\"list\"align=\"center\">3</td><tdclass=\"list\"align=\"center\">BN</td><tdclass=\"list\"align=\"center\">FR</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\"align=\"center\">E22</td><tdclass=\"list\"align=\"center\">6F</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td></tr>\n</table>\n<p>\n</div></font><fontsize=\"3\"face=\"Arial\">\nPeriode5++2014/15-II++PLAN-14-15-II\n</font></CENTER>\n</body>\n</html>"
             };
             var sut = new Fetcher(callback, 12, 14, spy);
-            var exp = new News { Title = "Vom Vertretungsplan:", Source = new Uri(VConfig.url), Image = "http://centrallink.de/sr/Blackboard.png", Summary = "Freitag, 3.4:\nUnterrichtsfrei 4- 1 1 Std.\n\nFreitag, 3.4:\nSCHÖNEFERIEN!!!", Content = "Freitag, 3.4:\nUnterrichtsfrei 4- 1 1 Std.\n\nFreitag, 3.4:\nSCHÖNEFERIEN!!!" };
+            var exp = new News { Title = "Vom Vertretungsplan:", Source = new Uri(VConfig.Url), Image = "http://centrallink.de/sr/Blackboard.png", Summary = "Freitag, 3.4:\nUnterrichtsfrei 4- 1 1 Std.\n\nFreitag, 3.4:\nSCHÖNEFERIEN!!!", Content = "Freitag, 3.4:\nUnterrichtsfrei 4- 1 1 Std.\n\nFreitag, 3.4:\nSCHÖNEFERIEN!!!" };
             var comparableRes = serializer.Serialize(res);
             var comparableExp = serializer.Serialize(exp);
 

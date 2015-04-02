@@ -31,7 +31,7 @@ namespace UntisExp
 				DoWithResponse(request,alerting,returnOnError,alertmet, response =>
 					{
 						string body;
-						if (url.IndexOf(VConfig.url, StringComparison.Ordinal) != -1) {
+						if (url.IndexOf(VConfig.Url, StringComparison.Ordinal) != -1) {
 							body = new StreamReader(response.GetResponseStream(), Encoding.GetEncoding("ISO-8859-1")).ReadToEnd();
 						} else {
 							body = new StreamReader(response.GetResponseStream(), Encoding.UTF8).ReadToEnd();
@@ -100,7 +100,7 @@ namespace UntisExp
 				        if (onError != null)
 				            onError();
 				        if(alerting)
-				            alert(VConfig.noPageErrTtl, VConfig.noPageErrTxt, VConfig.noPageErrBtn);
+				            alert(VConfig.NoPageErrTtl, VConfig.NoPageErrTxt, VConfig.NoPageErrBtn);
 				    }
 				}, request);
 			};
@@ -129,7 +129,7 @@ namespace UntisExp
                     }
                     else
                     {
-                        if (alert != null) alert(VConfig.unknownErrTtl, VConfig.unknownErrTxt, VConfig.unknownErrBtn);
+                        if (alert != null) alert(VConfig.UnknownErrTtl, VConfig.UnknownErrTxt, VConfig.UnknownErrBtn);
                     }
                 }
                 try
@@ -144,7 +144,7 @@ namespace UntisExp
             catch {
                 if ((bool)param[1])
                 {
-                    alert(VConfig.noPageErrTtl, VConfig.noPageErrTxt, VConfig.noPageErrBtn);
+                    alert(VConfig.NoPageErrTtl, VConfig.NoPageErrTxt, VConfig.NoPageErrBtn);
                 }
             }
 			return body;
@@ -169,12 +169,12 @@ namespace UntisExp
 	            }
 	            else
 	            {
-	                if (alert != null) alert(VConfig.unknownErrTtl, VConfig.unknownErrTxt, VConfig.unknownErrBtn);
+	                if (alert != null) alert(VConfig.UnknownErrTtl, VConfig.UnknownErrTxt, VConfig.UnknownErrBtn);
 	            }
 	        }
 	        else
 	        {
-                if (alert != null) alert(VConfig.unknownErrTtl, VConfig.unknownErrTxt, VConfig.unknownErrBtn);
+                if (alert != null) alert(VConfig.UnknownErrTtl, VConfig.UnknownErrTxt, VConfig.UnknownErrBtn);
 	        }
 	    }
 	}

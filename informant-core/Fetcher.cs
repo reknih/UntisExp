@@ -101,7 +101,7 @@ namespace UntisExp
 			};
             if (networkAccessor == null) networkAccessor = new Networking();
                 _networkAccessor = networkAccessor;
-			GetTimes (group, Activity.getNews, week);
+			GetTimes (group, Activity.GetNews, week);
 		}
 
 			
@@ -110,7 +110,7 @@ namespace UntisExp
         /// </summary>
         public void GetClasses()
         {
-			_networkAccessor.DownloadData (VConfig.url + VConfig.pathToNavbar, groups_DownloadStringCompleted, _alert, null, VConfig.groupIErrorTtl, VConfig.groupIErrorTxt, VConfig.groupIErrorBtn);
+			_networkAccessor.DownloadData (VConfig.Url + VConfig.PathToNavbar, groups_DownloadStringCompleted, _alert, null, VConfig.GroupIErrorTtl, VConfig.GroupIErrorTxt, VConfig.GroupIErrorBtn);
         }
 
 		/// <summary>
@@ -178,13 +178,13 @@ namespace UntisExp
                 weekStr = Convert.ToString(week);
             }
 
-			var nav = VConfig.url + weekStr + "/w/" + groupStr + ".htm";
+			var nav = VConfig.Url + weekStr + "/w/" + groupStr + ".htm";
 			if (activity == Activity.ParseSecondSchedule) {
                 _networkAccessor.DownloadData(nav, timesNext_DownloadStringCompleted, _alert, Abort);
 			} else if (activity == Activity.ParseFirstSchedule) {
-                _networkAccessor.DownloadData(nav, times_DownloadStringCompleted, _alert, null, VConfig.eventIErrorTtl, VConfig.eventIErrorTxt, VConfig.eventIErrorBtn);
-			} else if (activity == Activity.getNews) {
-                _networkAccessor.DownloadData(nav, news_DownloadStringCompleted, _alert, null, VConfig.eventIErrorTtl, VConfig.eventIErrorTxt, VConfig.eventIErrorBtn);
+                _networkAccessor.DownloadData(nav, times_DownloadStringCompleted, _alert, null, VConfig.EventIErrorTtl, VConfig.EventIErrorTxt, VConfig.EventIErrorBtn);
+			} else if (activity == Activity.GetNews) {
+                _networkAccessor.DownloadData(nav, news_DownloadStringCompleted, _alert, null, VConfig.EventIErrorTtl, VConfig.EventIErrorTxt, VConfig.EventIErrorBtn);
 			}
 		}
 
@@ -202,7 +202,7 @@ namespace UntisExp
 		/// <param name="input">The WebUntis HTML string</param>
 		private int GetNewsBoxesLength(string input) {
 			string haystack = input;
-			string needle = VConfig.titleOfMsgBox.Replace(" ", string.Empty);
+			string needle = VConfig.TitleOfMsgBox.Replace(" ", string.Empty);
 			return (haystack.Length - input.Replace(needle, "").Length) / needle.Length;
 		}
 
@@ -234,7 +234,7 @@ namespace UntisExp
 			if (!_silent)
 				_clearView();
 			int needleCount = GetNewsBoxesLength(comp);
-			int daysAndNewsBoxes = VConfig.expectedDayNum + needleCount;
+			int daysAndNewsBoxes = VConfig.ExpectedDayNum + needleCount;
 			string[] raw = GetDayArray (comp, daysAndNewsBoxes);
 			InterstitialFetching preliminaryResult = new InterstitialFetching();
 			foreach (var item in raw)
@@ -259,12 +259,12 @@ namespace UntisExp
 			//TO-DO: Parse VPlan
 			//lastD = false;
 			int needleCount = GetNewsBoxesLength(comp);
-			int daysAndNewsBoxes = VConfig.expectedDayNum + needleCount;
+			int daysAndNewsBoxes = VConfig.ExpectedDayNum + needleCount;
 			string[] raw = GetDayArray (comp, daysAndNewsBoxes);
 			InterstitialFetching preliminaryResult = new InterstitialFetching();
 			foreach (var item in raw)
 			{
-				preliminaryResult = InterstitialFetching.ProcessRow (item, preliminaryResult.OuterLoopCursor, daysAndNewsBoxes, _mode, _silent, preliminaryResult.HasToGetSecondSchedule, Activity.getNews);
+				preliminaryResult = InterstitialFetching.ProcessRow (item, preliminaryResult.OuterLoopCursor, daysAndNewsBoxes, _mode, _silent, preliminaryResult.HasToGetSecondSchedule, Activity.GetNews);
 				if(preliminaryResult.ParsedNews!=null &&(preliminaryResult.ParsedNews.Content!=null||preliminaryResult.ParsedNews.Summary!=null))
 					_addTheNews (preliminaryResult.ParsedNews);
 			}
@@ -288,7 +288,7 @@ namespace UntisExp
 				List<Data> resultCollection = new List<Data> ();
                 //TO-DO: Parse VPlan
 				int needleCount = GetNewsBoxesLength(comp);
-				int daysAndNewsBoxes = VConfig.expectedDayNum + needleCount;
+				int daysAndNewsBoxes = VConfig.ExpectedDayNum + needleCount;
 				string[] raw = GetDayArray (comp, daysAndNewsBoxes);
 				InterstitialFetching preliminaryResult = new InterstitialFetching();
 				foreach (var item in raw)

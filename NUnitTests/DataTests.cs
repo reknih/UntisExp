@@ -75,23 +75,23 @@ namespace NUnitTests
         [Test]
         public void WillConvertCancelledStringToState()
         {
-            var sut = new Data { EntfallStr = " x " };
+            var sut = new Data { OutageStr = " x " };
             sut.Refresh();
-            Assert.IsTrue(sut.Entfall);
+            Assert.IsTrue(sut.Outage);
         }
 
         [Test]
         public void WillConvertCocareStringToState()
         {
-            var sut = new Data { MitbeStr = " x " };
+            var sut = new Data { CareStr = " x " };
             sut.Refresh();
-            Assert.IsTrue(sut.Mitbetreung);
+            Assert.IsTrue(sut.Cared);
         }
 
         [Test]
         public void FirstRowGenerationFromMinimalData()
         {
-            var sut = new Data {AltFach = "DE", Stunde = "3"};
+            var sut = new Data {OldSubject = "DE", Lesson = "3"};
             sut.Refresh();
             Assert.AreEqual("3. Std: Deutsch", sut.Line1);
         }
@@ -99,7 +99,7 @@ namespace NUnitTests
         [Test]
         public void SecondRowGenerationCancelledLesson()
         {
-            var sut = new Data { AltFach = "PH", EntfallStr = " x ", Lehrer = "BL" };
+            var sut = new Data { OldSubject = "PH", OutageStr = " x ", Teacher = "BL" };
             sut.Refresh();
             Assert.AreEqual("Physik bei BL entfällt.", sut.Line2);
         }
@@ -107,7 +107,7 @@ namespace NUnitTests
         [Test]
         public void SecondRowGenerationOtherLesson()
         {
-            var sut = new Data { AltFach = "MA", Fach = "EN", Lehrer = "HC", Vertreter = "MUE" };
+            var sut = new Data { OldSubject = "MA", Subject = "EN", Teacher = "HC", Cover = "MUE" };
             sut.Refresh();
             Assert.AreEqual("Englisch bei MUE statt Mathe", sut.Line2);
         }
@@ -115,7 +115,7 @@ namespace NUnitTests
         [Test]
         public void SecondRowGenerationOnlyNewTeacher()
         {
-            var sut = new Data { Fach = "KU", Vertreter = "WH" };
+            var sut = new Data { Subject = "KU", Cover = "WH" };
             sut.Refresh();
             Assert.AreEqual("Bei WH", sut.Line2);
         }
@@ -123,7 +123,7 @@ namespace NUnitTests
         [Test]
         public void SecondRowGenerationOnlyNewTeacherWithRoom()
         {
-            var sut = new Data { Fach = "KU", Vertreter = "WH", Raum = "112" };
+            var sut = new Data { Subject = "KU", Cover = "WH", Room = "112" };
             sut.Refresh();
             Assert.AreEqual("Bei WH in 112", sut.Line2);
         }
@@ -131,7 +131,7 @@ namespace NUnitTests
         [Test]
         public void SecondRowGenerationOtherTeacher()
         {
-            var sut = new Data { AltFach="IN", Fach = "IN", Vertreter = "BLAU", Lehrer = "ZR"};
+            var sut = new Data { OldSubject="IN", Subject = "IN", Cover = "BLAU", Teacher = "ZR"};
             sut.Refresh();
             Assert.AreEqual("BLAU vertritt ZR", sut.Line2);
         }
@@ -139,7 +139,7 @@ namespace NUnitTests
         [Test]
         public void SecondRowGenerationOtherTeacherWithRoom()
         {
-            var sut = new Data { AltFach = "IN", Fach = "IN", Vertreter = "BLAU", Lehrer = "ZR", Raum = "D33" };
+            var sut = new Data { OldSubject = "IN", Subject = "IN", Cover = "BLAU", Teacher = "ZR", Room = "D33" };
             sut.Refresh();
             Assert.AreEqual("BLAU vertritt ZR | D33", sut.Line2);
         }
@@ -147,7 +147,7 @@ namespace NUnitTests
         [Test]
         public void SecondRowGenerationOtherRoom()
         {
-            var sut = new Data { AltFach = "CH", Fach = "CH", Vertreter = "KS", Lehrer = "KS", Raum = "D35" };
+            var sut = new Data { OldSubject = "CH", Subject = "CH", Cover = "KS", Teacher = "KS", Room = "D35" };
             sut.Refresh();
             Assert.AreEqual("KS | D35", sut.Line2);
         }
@@ -155,7 +155,7 @@ namespace NUnitTests
         [Test]
         public void SecondRowGenerationMinData()
         {
-            var sut = new Data { AltFach = "CH", Fach = "CH", Vertreter = "KS", Lehrer = "KS"};
+            var sut = new Data { OldSubject = "CH", Subject = "CH", Cover = "KS", Teacher = "KS"};
             sut.Refresh();
             Assert.AreEqual("KS", sut.Line2);
         }
@@ -163,7 +163,7 @@ namespace NUnitTests
         [Test]
         public void SecondRowGenerationOtherLessonWithRoom()
         {
-            var sut = new Data { AltFach = "MA", Fach = "EN", Lehrer = "HC", Vertreter = "MUE", Raum = "C17"};
+            var sut = new Data { OldSubject = "MA", Subject = "EN", Teacher = "HC", Cover = "MUE", Room = "C17"};
             sut.Refresh();
             Assert.AreEqual("Englisch bei MUE statt Mathe | C17", sut.Line2);
         }
@@ -171,7 +171,7 @@ namespace NUnitTests
         [Test]
         public void SecondRowGenerationCocare()
         {
-            var sut = new Data { Fach = "MU", MitbeStr = " x ", Lehrer = "LK", Vertreter = "LOH"};
+            var sut = new Data { Subject = "MU", CareStr = " x ", Teacher = "LK", Cover = "LOH"};
             sut.Refresh();
             Assert.AreEqual("Musik bei LK wird durch LOH mitbetreut.", sut.Line2);
         }
@@ -179,7 +179,7 @@ namespace NUnitTests
         [Test]
         public void SecondRowGenerationCocareWithRoom()
         {
-            var sut = new Data { Fach = "MU", MitbeStr = " x ", Lehrer = "LK", Vertreter = "LOH", Raum = "316"};
+            var sut = new Data { Subject = "MU", CareStr = " x ", Teacher = "LK", Cover = "LOH", Room = "316"};
             sut.Refresh();
             Assert.AreEqual("Musik bei LK wird durch LOH mitbetreut. | 316", sut.Line2);
         }
@@ -187,7 +187,7 @@ namespace NUnitTests
         [Test]
         public void SecondRowGenerationEvent()
         {
-            var sut = new Data { Fach = "DS", Veranstaltung = true, Lehrer = "ME", Raum = "BUE", Notiz = "PeoplesTheater" };
+            var sut = new Data { Subject = "DS", Event = true, Teacher = "ME", Room = "BUE", Notice = "PeoplesTheater" };
             sut.Refresh();
             Assert.AreEqual("Peoples Theater; Raum: BUE | Mit ME", sut.Line2);
         }
@@ -195,7 +195,7 @@ namespace NUnitTests
         [Test]
         public void SecondRowGenerationEventWithGroup()
         {
-            var sut = new Data { Fach = "DS", Veranstaltung = true, Lehrer = "ME", Raum = "BUE", Notiz = "PeoplesTheater", Klasse = "7A1, 7A2, 7N1"};
+            var sut = new Data { Subject = "DS", Event = true, Teacher = "ME", Room = "BUE", Notice = "PeoplesTheater", Group = "7A1, 7A2, 7N1"};
             sut.Refresh();
             Assert.AreEqual("Peoples Theater; Raum: BUE | Mit ME und 7A1, 7A2, 7N1", sut.Line2);
         }

@@ -26,11 +26,22 @@ namespace UntisExp
 			ClassName = name;
 		}
 
+        /// <summary>
+        /// The name of the group
+        /// </summary>
 		public string ClassName { get; set; }
+
+        /// <summary>
+        /// Gets a string representation of the object
+        /// </summary>
+        /// <returns>The groups name</returns>
 		public override string ToString()
 		{
 			return ClassName;
 		}
+        /// <summary>
+        /// Running number of the group on the website
+        /// </summary>
 		public int ID { get; set; }
 	}
 }

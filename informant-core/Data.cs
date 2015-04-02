@@ -15,7 +15,7 @@ namespace UntisExp
 		{
 			Line1 = "Keine Vertretungen.";
 			Line2 = "";
-			Veranstaltung = false;
+			Event = false;
             DateHeader = false;
 			Head = true;
 			VConfig.Populate ();
@@ -37,19 +37,19 @@ namespace UntisExp
 		/// Creates a Data object with some fields prefilled
 		/// </summary>
 		/// <param name="std">Time, preformatted</param>
-		/// <param name="fach">Subject</param>
-		/// <param name="lehr">Old teacher</param>
-		/// <param name="vertr">New teacher</param>
-		/// <param name="raum">Room.</param>
-		/// <param name="notiz">Note</param>
-		public Data(string std, string fach, string lehr, string vertr, string raum, string notiz)
+		/// <param name="subject">Subject</param>
+		/// <param name="teacher">Old teacher</param>
+		/// <param name="cover">New teacher</param>
+		/// <param name="room">Room.</param>
+		/// <param name="notice">Note</param>
+		public Data(string std, string subject, string teacher, string cover, string room, string notice)
 		{
-			Fach = fach;
-			Lehrer = lehr;
-			Vertreter = vertr;
-			Stunde = std;
-			Raum = raum;
-			Notiz = notiz;
+			Subject = subject;
+			Teacher = teacher;
+			Cover = cover;
+			Lesson = std;
+			Room = room;
+			Notice = notice;
 			VConfig.Populate ();
 			Refresh();
             DateHeader = false;
@@ -74,98 +74,98 @@ namespace UntisExp
 		public Data Refresh()
 		{
 			Head = false;
-			Fach = faecherSchreib(Fach);
-			AltFach = faecherSchreib(AltFach);
-			if (!Helpers.IsEmpty(EntfallStr))
+			Subject = faecherSchreib(Subject);
+			OldSubject = faecherSchreib(OldSubject);
+			if (!Helpers.IsEmpty(OutageStr))
 			{
-				Entfall = true;
+				Outage = true;
 			}
 			else
 			{
-				Entfall = false;
+				Outage = false;
 			}
-			if (!Helpers.IsEmpty(MitbeStr))
+			if (!Helpers.IsEmpty(CareStr))
 			{
-				Mitbetreung = true;
+				Cared = true;
               //  PrintMitbet = "Ja";
 			}
 			else
 			{
-				Mitbetreung = false;
+				Cared = false;
                // PrintMitbet = "Nein";
 			}
-		    if (!Helpers.IsEmpty(Fach))
+		    if (!Helpers.IsEmpty(Subject))
 		    {
-		        Line1 = Stunde + ". Std: " + Fach;
+		        Line1 = Lesson + ". Std: " + Subject;
 		    }
 		    else
 		    {
-		        Line1 = Stunde + ". Std: " + AltFach;
+		        Line1 = Lesson + ". Std: " + OldSubject;
 		    }
 
-		    if (Entfall)
+		    if (Outage)
 			{
-				Line1 = Stunde + ". Std: " + AltFach;
-				Line2 = AltFach + " bei " + Lehrer + " entfällt.";
+				Line1 = Lesson + ". Std: " + OldSubject;
+				Line2 = OldSubject + " bei " + Teacher + " entfällt.";
 			}
-			else if (Mitbetreung)
+			else if (Cared)
 			{
-				Line2 = Fach + " bei " + Lehrer + " wird durch " + Vertreter + " mitbetreut.";
-			    if (Raum != null)
+				Line2 = Subject + " bei " + Teacher + " wird durch " + Cover + " mitbetreut.";
+			    if (Room != null)
 			    {
-			        Line2 += " | " + Raum;
+			        Line2 += " | " + Room;
 			    }
 			}
-			else if (Veranstaltung)
+			else if (Event)
 			{
-				Line1 = Stunde + ". Std: Veranstaltung";
+				Line1 = Lesson + ". Std: Veranstaltung";
 			    Line2 = "";
-				if (!string.IsNullOrEmpty(Raum))
+				if (!string.IsNullOrEmpty(Room))
 				{
-					Line2 = "Raum: " + Raum + " | ";
+					Line2 = "Raum: " + Room + " | ";
 				}
-				Line2 += "Mit " + Lehrer;
-                if (!string.IsNullOrWhiteSpace(Klasse))
+				Line2 += "Mit " + Teacher;
+                if (!string.IsNullOrWhiteSpace(Group))
                 {
-                    Line2 += " und " + Klasse;
+                    Line2 += " und " + Group;
                 }
 			}
-			else if (Helpers.IsEmpty(Lehrer) && !Helpers.IsEmpty(Vertreter))
+			else if (Helpers.IsEmpty(Teacher) && !Helpers.IsEmpty(Cover))
 			{
-			    Line2 = "Bei " + Vertreter;
-			    if (!string.IsNullOrEmpty(Raum))
+			    Line2 = "Bei " + Cover;
+			    if (!string.IsNullOrEmpty(Room))
 			    {
-                    Line2 += " in " + Raum;
+                    Line2 += " in " + Room;
 			    }
 			}
-			else if (Fach != AltFach)
+			else if (Subject != OldSubject)
 			{
-				Line2 = Fach + " bei " + Vertreter + " statt " + AltFach;
-                if (!string.IsNullOrEmpty(Raum))
+				Line2 = Subject + " bei " + Cover + " statt " + OldSubject;
+                if (!string.IsNullOrEmpty(Room))
                 {
-                    Line2 += " | " + Raum;
+                    Line2 += " | " + Room;
                 }
 			}
-			else if (Vertreter != Lehrer)
+			else if (Cover != Teacher)
 			{
-				Line2 = Vertreter + " vertritt " + Lehrer;
-                if (!string.IsNullOrEmpty(Raum))
+				Line2 = Cover + " vertritt " + Teacher;
+                if (!string.IsNullOrEmpty(Room))
                 {
-                    Line2 += " | " + Raum;
+                    Line2 += " | " + Room;
                 }
 			}
 			else
 			{
-				Line2 = Lehrer;
-                if (!string.IsNullOrEmpty(Raum))
+				Line2 = Teacher;
+                if (!string.IsNullOrEmpty(Room))
                 {
-                    Line2 += " | " + Raum;
+                    Line2 += " | " + Room;
                 }
 			}
-			if (!Helpers.IsEmpty(Notiz))
+			if (!Helpers.IsEmpty(Notice))
 			{
-				Notiz = Helpers.AddSpaces (Notiz);
-				Line2 = Notiz + "; " + Line2;
+				Notice = Helpers.AddSpaces (Notice);
+				Line2 = Notice + "; " + Line2;
 			}
             return this;
 		}
@@ -174,44 +174,99 @@ namespace UntisExp
 		    if (fach == null)
 		        return null;
 			fach = fach.ToUpper();
-			if (VConfig.lessonAbbr.ContainsKey (fach))
-				fach = VConfig.lessonAbbr [fach];
+			if (VConfig.LessonAbbr.ContainsKey (fach))
+				fach = VConfig.LessonAbbr [fach];
 			return fach;
 		}
-		public string Fach { get; set; }
 
-		public string AltFach { get; set; }
+        /// <summary>
+        /// Which new subject is on the schedule
+        /// </summary>
+		public string Subject { get; set; }
 
-		public string Stunde { get; set; }
+        /// <summary>
+        /// The subject that was originally scheduled for this lesson
+        /// </summary>
+		public string OldSubject { get; set; }
 
-		public string Lehrer { get; set; }
+        /// <summary>
+        /// The time for the lesson
+        /// </summary>
+		public string Lesson { get; set; }
 
-		public string Vertreter { get; set; }
+        /// <summary>
+        /// The previously scheduled teacher
+        /// </summary>
+		public string Teacher { get; set; }
 
-		public string Notiz { get; set; }
+        /// <summary>
+        /// The cover for the old teacher
+        /// </summary>
+		public string Cover { get; set; }
 
-		public string Raum { get; set; }
+        /// <summary>
+        /// Schedule notices for the lesson
+        /// </summary>
+		public string Notice { get; set; }
 
-		public string EntfallStr { get; set; }
+        /// <summary>
+        /// The room for the lesson
+        /// </summary>
+		public string Room { get; set; }
 
-		public bool Entfall { get; set; }
+        /// <summary>
+        /// The presentation of the outage on the website
+        /// </summary>
+		public string OutageStr { get; set; }
 
-		public string MitbeStr { get; set; }
+        /// <summary>
+        /// Whether the lesson will be held or not
+        /// </summary>
+		public bool Outage { get; set; }
 
-        public bool Mitbetreung { get; set; }
+        /// <summary>
+        /// The presentation of the care state of the lesson on the website
+        /// </summary>
+		public string CareStr { get; set; }
 
-		public bool Veranstaltung { get; set; }
+        /// <summary>
+        /// Whether a teacher of another class will look after the lesson's attendees
+        /// </summary>
+        public bool Cared { get; set; }
 
+        /// <summary>
+        /// Whether the lesson is replaced with an special event
+        /// </summary>
+		public bool Event { get; set; }
+
+        /// <summary>
+        /// Presentation of the content, first line
+        /// </summary>
 		public string Line1 { get; set; }
 
-		public string Klasse { get; set; }
+        /// <summary>
+        /// The name of the group to which the rescheduling applies
+        /// </summary>
+		public string Group { get; set; }
 
+        /// <summary>
+        /// Presentation of the content, details
+        /// </summary>
 		public string Line2 { get; set; }
 
+        /// <summary>
+        /// The date of the rescheduled lesson
+        /// </summary>
 		public DateTime Date { get; set; }
 
+        /// <summary>
+        /// Whether this object is an heading
+        /// </summary>
 		public bool Head { get; set; }
 
+        /// <summary>
+        /// Whether this object is an heading containing a date
+        /// </summary>
         public bool DateHeader { get; set; }
 	}
 }

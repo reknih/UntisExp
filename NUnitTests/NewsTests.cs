@@ -39,7 +39,7 @@ namespace NUnitTests
         [Category("Self refreshing objects")]
         public void SourceWillBeSpelledOutFromUrl1()
         {
-            var sut = new News { Source = new Uri(VConfig.url) };
+            var sut = new News { Source = new Uri(VConfig.Url) };
             sut.Refresh();
             Assert.AreEqual("CHRISTIAN-WIRTH-SCHULE", sut.SourcePrint);
         }

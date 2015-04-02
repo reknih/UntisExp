@@ -33,6 +33,9 @@ namespace UntisExp
 			Content = content;
             Refresh();
 		}
+        /// <summary>
+        /// A number
+        /// </summary>
 		public int ID { get; set; }
         /// <summary>
         /// Human-readable title of the article
@@ -42,6 +45,9 @@ namespace UntisExp
         /// Website of it
         /// </summary>
 		public Uri Source { get; set; }
+        /// <summary>
+        /// A on-screen representation of the <see cref="News.Source"/> URI
+        /// </summary>
         public string SourcePrint { get; set; }
         /// <summary>
         /// Short excerpt or similar. Will be created automatically if not given
@@ -67,7 +73,7 @@ namespace UntisExp
             {
                 return;
             }
-            if (Source.AbsoluteUri.IndexOf(VConfig.url, StringComparison.Ordinal) != -1)
+            if (Source.AbsoluteUri.IndexOf(VConfig.Url, StringComparison.Ordinal) != -1)
             {
                 SourcePrint = "CHRISTIAN-WIRTH-SCHULE";
             }

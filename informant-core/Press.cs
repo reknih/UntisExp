@@ -41,7 +41,7 @@ namespace UntisExp
             var gathered = new List<News>();
             await Task.Run(() =>
             {
-                doc = XDocument.Load(VConfig.feed);
+                doc = XDocument.Load(VConfig.Feed);
                 var articles = from article in doc.Descendants("item")
                                select article;
                 foreach (XElement articlet in articles)
@@ -60,7 +60,7 @@ namespace UntisExp
         public void GetCalledBackForNews(Action<List<News>> newscallbackAction)
         {
             _newscallback = newscallbackAction;
-            _networkAccessor.DownloadLegacyStream(VConfig.feed, NewsStreamCallback);
+            _networkAccessor.DownloadLegacyStream(VConfig.Feed, NewsStreamCallback);
         }
 
 	    private void NewsStreamCallback(Stream newsstream) {
