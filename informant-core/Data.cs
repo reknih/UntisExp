@@ -6,7 +6,7 @@ namespace UntisExp
 	/// <summary>
 	/// Object wich can hold either headings or info for an schedule update
 	/// </summary>
-	public class Data
+	public class Data : IComparable
 	{
 		/// <summary>
 		/// Creates an empty Data-object. Fill it via the properties, then call refresh on that instance. If no changes were made, the object has an empty state. (No events for that day.)
@@ -177,6 +177,45 @@ namespace UntisExp
 			if (VConfig.LessonAbbr.ContainsKey (fach))
 				fach = VConfig.LessonAbbr [fach];
 			return fach;
+		}
+
+		/// <summary>
+		/// Compares one <see cref="Data"/> object to another one
+		/// </summary>
+		/// <returns>Whether this object is greater (1), same (0) or less than the parameter</returns>
+		/// <param name="obj">Object to compare against</param>
+		public int CompareTo (object obj)
+		{
+			if (obj == null) 
+				return 1;
+			
+			Data otherObject = obj as Data;
+
+			if (string.IsNullOrEmpty (otherObject.Lesson) || string.IsNullOrEmpty (this.Lesson))
+				return 0;
+
+			int itsFirst = int.Parse(otherObject.Lesson.Substring (0, 1));
+			int myFirst = int.Parse (this.Lesson.Substring (0, 1));
+
+			if (itsFirst < myFirst)
+				return 1;
+			if (itsFirst > myFirst)
+				return -1;
+			if (otherObject.Lesson.Length < this.Lesson.Length)
+				return -1;
+			if (otherObject.Lesson.Length < this.Lesson.Length)
+				return 1;
+			
+			if (this.Lesson.Length == 3) {
+				int itsSec = int.Parse(otherObject.Lesson.Substring (2, 1));
+				int mySec = int.Parse (this.Lesson.Substring (2, 1));
+				if (itsSec < mySec)
+					return 1;
+				if (itsSec > mySec)
+					return -1;
+			}
+
+			return 0;
 		}
 
         /// <summary>

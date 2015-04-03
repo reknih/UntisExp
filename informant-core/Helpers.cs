@@ -58,7 +58,7 @@ namespace UntisExp
             return array[pos];
         }
 #endif
-#if WINDOWS_APP || DEBUG
+
         /// <summary>
         /// Will get how much entries for today and how much for another day are in a set of <see cref="UntisExp.Data"/> objects
         /// </summary>
@@ -107,7 +107,11 @@ namespace UntisExp
             }
             return new[] { listlist[0].Count, listlist[1].Count };
         }
-#endif
+
+		public List<List<Data>> getSortableLists() {
+			
+		}
+
         /// <summary>
         /// Checks whether a string is empty
         /// </summary>
