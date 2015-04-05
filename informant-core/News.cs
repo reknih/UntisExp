@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Net;
 
 namespace UntisExp
 {
@@ -25,7 +24,7 @@ namespace UntisExp
         /// <param name="content">Articles content</param>
 		public News(int id, string title, Uri source, string summary, string image, string content = "")
 		{
-			ID = id;
+			Id = id;
 			Title = title;
 			Source = source;
 			Summary = summary;
@@ -36,7 +35,9 @@ namespace UntisExp
         /// <summary>
         /// A number
         /// </summary>
-		public int ID { get; set; }
+        // ReSharper disable once MemberCanBePrivate.Global
+        // ReSharper disable once UnusedAutoPropertyAccessor.Global
+		public int Id { get; set; }
         /// <summary>
         /// Human-readable title of the article
         /// </summary>
@@ -44,11 +45,12 @@ namespace UntisExp
         /// <summary>
         /// Website of it
         /// </summary>
+        // ReSharper disable once MemberCanBePrivate.Global
 		public Uri Source { get; set; }
         /// <summary>
         /// A on-screen representation of the <see cref="News.Source"/> URI
         /// </summary>
-        public string SourcePrint { get; set; }
+        public string SourcePrint { get; private set; }
         /// <summary>
         /// Short excerpt or similar. Will be created automatically if not given
         /// </summary>
@@ -56,6 +58,7 @@ namespace UntisExp
         /// <summary>
         /// URI for article's image. Mandantory for visual rendering in most cases
         /// </summary>
+        // ReSharper disable once UnusedAutoPropertyAccessor.Global
 		public string Image { get; set; }
         /// <summary>
         /// No comment.
@@ -73,14 +76,7 @@ namespace UntisExp
             {
                 return;
             }
-            if (Source.AbsoluteUri.IndexOf(VConfig.Url, StringComparison.Ordinal) != -1)
-            {
-                SourcePrint = "CHRISTIAN-WIRTH-SCHULE";
-            }
-            else
-            {
-                SourcePrint = "SR-BLOG";
-            }
+            SourcePrint = Source.AbsoluteUri.IndexOf(VConfig.Url, StringComparison.Ordinal) != -1 ? "CHRISTIAN-WIRTH-SCHULE" : "SR-BLOG";
         }
 	}
 }

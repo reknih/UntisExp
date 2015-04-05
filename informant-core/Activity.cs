@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace UntisExp
+﻿namespace UntisExp
 {
     /// <summary>
     /// Helps <see cref="UntisExp.Fetcher">-related methods to keep track of what they're doing</see>

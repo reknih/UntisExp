@@ -28,14 +28,9 @@ namespace UntisExp
             try
 			{
 				var request = (HttpWebRequest)WebRequest.Create(url);
-				DoWithResponse(request,alerting,returnOnError,alertmet, response =>
+				DoWithResponse(request, alerting, returnOnError, alertmet, response =>
 					{
-						string body;
-						if (url.IndexOf(VConfig.Url, StringComparison.Ordinal) != -1) {
-							body = new StreamReader(response.GetResponseStream(), Encoding.GetEncoding("ISO-8859-1")).ReadToEnd();
-						} else {
-							body = new StreamReader(response.GetResponseStream(), Encoding.UTF8).ReadToEnd();
-						}
+					    var body = url.IndexOf(VConfig.Url, StringComparison.Ordinal) != -1 ? new StreamReader(response.GetResponseStream(), Encoding.GetEncoding("ISO-8859-1")).ReadToEnd() : new StreamReader(response.GetResponseStream(), Encoding.UTF8).ReadToEnd();
                         try
                         {
                             body = WebUtility.HtmlDecode(body);

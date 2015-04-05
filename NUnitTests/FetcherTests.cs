@@ -13,14 +13,14 @@ namespace NUnitTests
         [Test]
         [Category("Callback driven async methods")]
         [Category("Network dependant integration test")]
-        public void CallbackOfPFetcherMethodWillBeCalled()
+        public void CallbackOfFetcherMethodWillBeCalled()
         {
             bool calledBack = false;
             List<Data> res = new List<Data>();
-            Action<List<Data>> callback = _res =>
+            Action<List<Data>> callback = locRes =>
             {
                 calledBack = true;
-                res = _res;
+                res = locRes;
             };
             var sut = new Fetcher(() => { }, (a, b, c) => { }, callback);
             sut.GetTimes(12, Activity.ParseFirstSchedule, 13);
@@ -32,6 +32,28 @@ namespace NUnitTests
         }
 
         [Test]
+        [Category("Callback driven async methods")]
+        [Category("Network dependant integration test")]
+        public void CallbackOfMultipleFetchingMethodWillBeCalled()
+        {
+            bool calledBack = false;
+            List<Data> res = new List<Data>();
+            Action<List<Data>> callback = locRes =>
+            {
+                calledBack = true;
+                res = locRes;
+            };
+            var sut = new Fetcher(() => { }, (a, b, c) => { }, callback);
+            sut.GetMultipleGroupTimes(new[] {12, 38, 6, 7}, 13);
+            for (int i = 0; (i < 30) && !calledBack; i++)
+            {
+                Thread.Sleep(1000);
+            }
+            Assert.IsTrue(res.Count > 1);
+        }
+
+
+        [Test]
         [Category("Mocked dependencies")]
         public void WillConstructRightUrlString()
         {
@@ -39,7 +61,7 @@ namespace NUnitTests
             {
             };
             var spy = new MockedNetworkAccessor();
-            var sut = new Fetcher(() => { }, (a, b, c) => { }, callback, d => { }, l => { }, spy);
+            var sut = new Fetcher(() => { }, (a, b, c) => { }, callback, l => { }, spy);
             sut.GetTimes(12, Activity.ParseFirstSchedule, 13);
             Assert.AreEqual("http://vp.cws-usingen.de/Schueler/13/w/w00012.htm", spy.CalledUri);
         }
@@ -265,7 +287,8 @@ namespace NUnitTests
                 DataToReturn =
                     "<!DOCTYPEHTMLPUBLIC\"-//IETF//DTDHTML//EN\">\n<html>\n<head>\n<metahttp-equiv=\"Content-Type\"content=\"text/html;charset=iso-8859-1\"><metahttp-equiv=\"expires\"content=\"0\"><metaname=\"keywords\"content=\"Stundenplan,timetable\">\n<metaname=\"GENERATOR\"content=\"Untis2013\">\n<title>Untis2013STUNDENPLAN14/15-IICHRIST.-WIRTH-SCHULEUSINGEN1</title>\n<styletype=\"text/css\">\na{color:#000000;}\n</style>\n<linkrel=\"stylesheet\"href=\"../../untisinfo.css\"type=\"text/css\">\n</head>\n<bodybgcolor=\"#FFFFFF\">\n<CENTER><fontsize=\"3\"face=\"Arial\">\n<BR><h2>LOH/LK</h2><p><divid=\"vertretung\">\n<aname=\"1\">&nbsp;</a><br><b>23.3.Montag</b>|<ahref=\"#2\">[Dienstag]</a>|<ahref=\"#3\">[Mittwoch]</a>|<ahref=\"#4\">[Donnerstag]</a>|<ahref=\"#5\">[Freitag]</a><p>\n<tableclass=\"subst\">\n<tr><tdalign=\"center\"colspan=\"17\">Vertretungensindnichtfreigegeben</td></tr>\n</table>\n<p>\n<aname=\"2\">&nbsp;</a><br><ahref=\"#1\">[Montag]</a>|<b>24.3.Dienstag</b>|<ahref=\"#3\">[Mittwoch]</a>|<ahref=\"#4\">[Donnerstag]</a>|<ahref=\"#5\">[Freitag]</a><p>\n<tableclass=\"subst\">\n<tr><tdalign=\"center\"colspan=\"17\">Vertretungensindnichtfreigegeben</td></tr>\n</table>\n<p>\n<aname=\"3\">&nbsp;</a><br><ahref=\"#1\">[Montag]</a>|<ahref=\"#2\">[Dienstag]</a>|<b>25.3.Mittwoch</b>|<ahref=\"#4\">[Donnerstag]</a>|<ahref=\"#5\">[Freitag]</a><p>\n<tableclass=\"subst\">\n<tr><tdalign=\"center\"colspan=\"17\">Vertretungensindnichtfreigegeben</td></tr>\n</table>\n<p>\n<aname=\"4\">&nbsp;</a><br><ahref=\"#1\">[Montag]</a>|<ahref=\"#2\">[Dienstag]</a>|<ahref=\"#3\">[Mittwoch]</a>|<b>26.3.Donnerstag</b>|<ahref=\"#5\">[Freitag]</a><p>\n<tableclass=\"subst\">\n<tr><tdalign=\"center\"colspan=\"17\">Vertretungensindnichtfreigegeben</td></tr>\n</table>\n<p>\n<aname=\"5\">&nbsp;</a><br><ahref=\"#1\">[Montag]</a>|<ahref=\"#2\">[Dienstag]</a>|<ahref=\"#3\">[Mittwoch]</a>|<ahref=\"#4\">[Donnerstag]</a>|<b>27.3.Freitag</b><p>\n<tableborder=\"3\"rules=\"all\"bgcolor=\"#F4F4F4\"cellpadding=\"3\"cellspacing=\"3\">\n<tr><thalign=\"center\"colspan=\"2\">NachrichtenzumTag</th></tr>\n<tr><td>Unterrichtsfrei&nbsp;</td><td>4-11Std.</td></tr>\n<tr><tdcolspan=\"2\">SCHÖNEFERIEN!!!</td></tr><br></table>\n<p>\n<tableclass=\"subst\">\n<trclass='list'><thclass=\"list\"align=\"center\">Art</th><thclass=\"list\"align=\"center\">Datum</th><thclass=\"list\"align=\"center\">Stunde</th><thclass=\"list\"align=\"center\">Vertreter</th><thclass=\"list\"align=\"center\">Fach</th><thclass=\"list\"align=\"center\">(Fach)</th><thclass=\"list\"align=\"center\">Raum</th><thclass=\"list\"align=\"center\">Klasse(n)</th><thclass=\"list\"align=\"center\">(Lehrer)</th><thclass=\"list\"align=\"center\">(Klasse(n))</th><thclass=\"list\"align=\"center\">(Raum)</th><thclass=\"list\"align=\"center\">Vertr.von</th><thclass=\"list\"align=\"center\">(Le.)nach</th><thclass=\"list\"align=\"center\">Vertretungs-Text</th><thclass=\"list\"align=\"center\">Entfall</th><thclass=\"list\"align=\"center\">Mitbetreuung</th><thclass=\"list\"align=\"center\">Kopplung.</th></tr>\n<trclass='listodd'><tdclass=\"list\"align=\"center\">Vertretung</td><tdclass=\"list\"align=\"center\">27.3.</td><tdclass=\"list\"align=\"center\">1</td><tdclass=\"list\"align=\"center\">scli</td><tdclass=\"list\"align=\"center\">EK</td><tdclass=\"list\"align=\"center\">EK</td><tdclass=\"list\"align=\"center\">E22</td><tdclass=\"list\"align=\"center\">6F</td><tdclass=\"list\"align=\"center\">ST</td><tdclass=\"list\"align=\"center\">6F</td><tdclass=\"list\"align=\"center\">E22</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td></tr>\n<trclass='listeven'><tdclass=\"list\"align=\"center\">Entfall</td><tdclass=\"list\"align=\"center\">27.3.</td><tdclass=\"list\"align=\"center\">3</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">ER</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">SP</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">E27</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\"align=\"center\">Entfall</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\"align=\"center\">x</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td></tr>\n<trclass='listodd'><tdclass=\"list\"align=\"center\">Entfall</td><tdclass=\"list\"align=\"center\">27.3.</td><tdclass=\"list\"align=\"center\">3</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">KR</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">PA</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">E34</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\"align=\"center\">x</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td></tr>\n<trclass='listeven'><tdclass=\"list\"align=\"center\">Entfall</td><tdclass=\"list\"align=\"center\">27.3.</td><tdclass=\"list\"align=\"center\">3</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">KR</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">HAR</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">E32</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\"align=\"center\">x</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td></tr>\n<trclass='listodd'><tdclass=\"list\"align=\"center\">Entfall</td><tdclass=\"list\"align=\"center\">27.3.</td><tdclass=\"list\"align=\"center\">3</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">ER</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">WA</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">E25</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\"align=\"center\">x</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td></tr>\n<trclass='listeven'><tdclass=\"list\"align=\"center\">Entfall</td><tdclass=\"list\"align=\"center\">27.3.</td><tdclass=\"list\"align=\"center\">3</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">ET</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">NI</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">E35</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\"align=\"center\">x</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td></tr>\n<trclass='listodd'><tdclass=\"list\"align=\"center\">Entfall</td><tdclass=\"list\"align=\"center\">27.3.</td><tdclass=\"list\"align=\"center\">3</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">ET</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">SPN</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">E12</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\"align=\"center\">x</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td></tr>\n<trclass='listeven'><tdclass=\"list\"align=\"center\">Entfall</td><tdclass=\"list\"align=\"center\">27.3.</td><tdclass=\"list\"align=\"center\">3</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">ER</td><tdclass=\"list\"align=\"center\">---</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">HU</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">E26</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\"align=\"center\">x</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td></tr>\n<trclass='listodd'><tdclass=\"list\"align=\"center\">Raumvertretung</td><tdclass=\"list\"align=\"center\">27.3.</td><tdclass=\"list\"align=\"center\">3</td><tdclass=\"list\"align=\"center\">BD</td><tdclass=\"list\"align=\"center\">ER</td><tdclass=\"list\"align=\"center\">ER</td><tdclass=\"list\"align=\"center\">E25</td><tdclass=\"list\"align=\"center\">6E</td><tdclass=\"list\"align=\"center\">BD</td><tdclass=\"list\"align=\"center\">6A,6B,6D,6E,6F,6C,6G</td><tdclass=\"list\"align=\"center\">E22</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td></tr>\n<trclass='listeven'><tdclass=\"list\"align=\"center\">Statt-Vertretung</td><tdclass=\"list\"align=\"center\">27.3.</td><tdclass=\"list\"align=\"center\">3</td><tdclass=\"list\"align=\"center\">BN</td><tdclass=\"list\"align=\"center\">FR</td><tdclass=\"list\">&nbsp;</td><tdclass=\"list\"align=\"center\">E22</td><tdclass=\"list\"align=\"center\">6F</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td><tdclass=\"list\"align=\"center\">&nbsp;</td></tr>\n</table>\n<p>\n</div></font><fontsize=\"3\"face=\"Arial\">\nPeriode5++2014/15-II++PLAN-14-15-II\n</font></CENTER>\n</body>\n</html>"
             };
-            var sut = new Fetcher(callback, 12, 14, spy);
+            var sut = new Fetcher(callback, spy);
+            sut.GetTimes(5, Activity.GetNews, 14);
             var exp = new News { Title = "Vom Vertretungsplan:", Source = new Uri(VConfig.Url), Image = "http://centrallink.de/sr/Blackboard.png", Summary = "Freitag, 3.4:\nUnterrichtsfrei 4- 1 1 Std.\n\nFreitag, 3.4:\nSCHÖNEFERIEN!!!", Content = "Freitag, 3.4:\nUnterrichtsfrei 4- 1 1 Std.\n\nFreitag, 3.4:\nSCHÖNEFERIEN!!!" };
             var comparableRes = serializer.Serialize(res);
             var comparableExp = serializer.Serialize(exp);
@@ -310,54 +333,54 @@ namespace NUnitTests
 
             var exp = new List<Group>
             {
-                new Group{ClassName = "DRUCK", ID = 1},
-                new Group{ClassName = "5A", ID = 2},
-                new Group{ClassName = "5B", ID = 3},
-                new Group{ClassName = "5C", ID = 4},
-                new Group{ClassName = "5D", ID = 5},
-                new Group{ClassName = "5E", ID = 6},
-                new Group{ClassName = "6A", ID = 7},
-                new Group{ClassName = "6B", ID = 8},
-                new Group{ClassName = "6C", ID = 9},
-                new Group{ClassName = "6D", ID = 10},
-                new Group{ClassName = "6E", ID = 11},
-                new Group{ClassName = "6F", ID = 12},
-                new Group{ClassName = "6G", ID = 13},
-                new Group{ClassName = "7A1", ID = 14},
-                new Group{ClassName = "7A2", ID = 15},
-                new Group{ClassName = "7N1", ID = 16},
-                new Group{ClassName = "7N2", ID = 17},
-                new Group{ClassName = "7N3", ID = 18},
-                new Group{ClassName = "7N4", ID = 19},
-                new Group{ClassName = "8A1", ID = 20},
-                new Group{ClassName = "8A2", ID = 21},
-                new Group{ClassName = "8N1", ID = 22},
-                new Group{ClassName = "8N2", ID = 23},
-                new Group{ClassName = "8N3", ID = 24},
-                new Group{ClassName = "9A", ID = 25},
-                new Group{ClassName = "9D", ID = 26},
-                new Group{ClassName = "9B", ID = 27},
-                new Group{ClassName = "9C1", ID = 28},
-                new Group{ClassName = "9C2", ID = 29},
-                new Group{ClassName = "E2", ID = 30},
-                new Group{ClassName = "Q2", ID = 31},
-                new Group{ClassName = "Q4", ID = 32},
-                new Group{ClassName = "5", ID = 33},
-                new Group{ClassName = "6", ID = 34},
-                new Group{ClassName = "7", ID = 35},
-                new Group{ClassName = "8", ID = 36},
-                new Group{ClassName = "9", ID = 37},
-                new Group{ClassName = "abi-1", ID = 38},
-                new Group{ClassName = "abi-2", ID = 39},
-                new Group{ClassName = "abi-3", ID = 40},
-                new Group{ClassName = "abi-4", ID = 41},
-                new Group{ClassName = "abi-5", ID = 42},
-                new Group{ClassName = "abi-6", ID = 43},
-                new Group{ClassName = "abi-7", ID = 44},
-                new Group{ClassName = "abi-b", ID = 45},
-                new Group{ClassName = "abi-g", ID = 46},
-                new Group{ClassName = "8A", ID = 47},
-                new Group{ClassName = "DAF", ID = 48}
+                new Group{ClassName = "DRUCK", Id = 1},
+                new Group{ClassName = "5A", Id = 2},
+                new Group{ClassName = "5B", Id = 3},
+                new Group{ClassName = "5C", Id = 4},
+                new Group{ClassName = "5D", Id = 5},
+                new Group{ClassName = "5E", Id = 6},
+                new Group{ClassName = "6A", Id = 7},
+                new Group{ClassName = "6B", Id = 8},
+                new Group{ClassName = "6C", Id = 9},
+                new Group{ClassName = "6D", Id = 10},
+                new Group{ClassName = "6E", Id = 11},
+                new Group{ClassName = "6F", Id = 12},
+                new Group{ClassName = "6G", Id = 13},
+                new Group{ClassName = "7A1", Id = 14},
+                new Group{ClassName = "7A2", Id = 15},
+                new Group{ClassName = "7N1", Id = 16},
+                new Group{ClassName = "7N2", Id = 17},
+                new Group{ClassName = "7N3", Id = 18},
+                new Group{ClassName = "7N4", Id = 19},
+                new Group{ClassName = "8A1", Id = 20},
+                new Group{ClassName = "8A2", Id = 21},
+                new Group{ClassName = "8N1", Id = 22},
+                new Group{ClassName = "8N2", Id = 23},
+                new Group{ClassName = "8N3", Id = 24},
+                new Group{ClassName = "9A", Id = 25},
+                new Group{ClassName = "9D", Id = 26},
+                new Group{ClassName = "9B", Id = 27},
+                new Group{ClassName = "9C1", Id = 28},
+                new Group{ClassName = "9C2", Id = 29},
+                new Group{ClassName = "E2", Id = 30},
+                new Group{ClassName = "Q2", Id = 31},
+                new Group{ClassName = "Q4", Id = 32},
+                new Group{ClassName = "5", Id = 33},
+                new Group{ClassName = "6", Id = 34},
+                new Group{ClassName = "7", Id = 35},
+                new Group{ClassName = "8", Id = 36},
+                new Group{ClassName = "9", Id = 37},
+                new Group{ClassName = "abi-1", Id = 38},
+                new Group{ClassName = "abi-2", Id = 39},
+                new Group{ClassName = "abi-3", Id = 40},
+                new Group{ClassName = "abi-4", Id = 41},
+                new Group{ClassName = "abi-5", Id = 42},
+                new Group{ClassName = "abi-6", Id = 43},
+                new Group{ClassName = "abi-7", Id = 44},
+                new Group{ClassName = "abi-b", Id = 45},
+                new Group{ClassName = "abi-g", Id = 46},
+                new Group{ClassName = "8A", Id = 47},
+                new Group{ClassName = "DAF", Id = 48}
             };
 
             Assert.AreEqual(serializer.Serialize(exp), serializer.Serialize(res));

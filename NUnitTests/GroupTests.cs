@@ -11,7 +11,7 @@ namespace NUnitTests
         [Category("Constructors")]
         public void NormalConstructorIdWillBeEmpty()
         {
-            Assert.AreEqual(0, (new Group().ID));
+            Assert.AreEqual(0, (new Group().Id));
         }
 
         [Test]
@@ -32,7 +32,7 @@ namespace NUnitTests
         [Category("Constructors")]
         public void PrefilledConstructorWillFillOutId()
         {
-            Assert.AreEqual(2, (new Group(2, "5A").ID));
+            Assert.AreEqual(2, (new Group(2, "5A").Id));
         }
 
         [Test]

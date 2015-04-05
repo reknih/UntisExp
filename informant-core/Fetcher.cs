@@ -10,12 +10,15 @@ namespace UntisExp
     public class Fetcher
     {
 		// Actions to be called back on lifetime events
-        private INetworkAccessor _networkAccessor;
-		private Action _clearView;
-        private Action<String, String, String> _alert;
-        private Action<List<Data>> _refreshAll;
-		private Action<News> _addTheNews;
-        private Action<List<Group>> _refreshSet;
+        private readonly INetworkAccessor _networkAccessor;
+		private readonly Action _clearView;
+        private readonly Action<String, String, String> _alert;
+        private readonly Action<List<Data>> _refreshAll;
+		private readonly Action<News> _addTheNews;
+        private readonly Action<List<Group>> _refreshSet;
+
+        private Action<List<Data>> _temporaryRefresh;
+        private bool _rootToTemporary;
 
 		/// <summary>
 		/// Collections of retreived <see cref="UntisExp.Data"/>
@@ -25,17 +28,17 @@ namespace UntisExp
 		/// <summary>
 		/// Group to query WebUntis for
 		/// </summary>
-		protected int Group;
+		private int _group;
 
 		/// <summary>
 		/// Whether the method alerts if it fails or not
 		/// </summary>
-        private bool _silent;
+        private readonly bool _silent;
 
 		/// <summary>
 		/// MODE 0: Nur heute, MODE 1: Nur Morgen, MODE 2: Beide, MODE 5: Alles
 		/// </summary>
-        private int _mode = 5;
+        private readonly int _mode = 5;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UntisExp.Fetcher"/> class which is pre-equipped for background operation. Will surpress all rows which do not contain a timetable element, e.g. the date row. Useful for background services.
@@ -60,10 +63,9 @@ namespace UntisExp
         /// <param name="del">Callback function name for clearing the current list</param>
         /// <param name="alert">Callbck function name for displaying an error with title, text and dismiss-button</param>
         /// <param name="refeshAll">Callback function for updating the view with a List of event entries.</param>
-        /// <param name="refreshOne">Callback function for adding one event entry to the view.</param>
         /// <param name="refreshSet">Callback function for updating the view with a List of group entries.</param>
         /// <param name="networkAccessor">For testing purposes only. Will inject a <see cref="INetworkAccessor"/> into the class</param>
-        public Fetcher(Action del, Action<String, String, String> alert, Action<List<Data>> refeshAll, Action<Data> refreshOne = null, Action<List<Group>> refreshSet=null, INetworkAccessor networkAccessor = null)
+        public Fetcher(Action del, Action<String, String, String> alert, Action<List<Data>> refeshAll, Action<List<Group>> refreshSet=null, INetworkAccessor networkAccessor = null)
         {
             _clearView = del;
             _alert = alert;
@@ -88,20 +90,17 @@ namespace UntisExp
         }
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="UntisExp.Fetcher"/> class which will instantly checks for news in the schedule
+		/// Initializes a new instance of the <see cref="UntisExp.Fetcher"/> class. Please note that you'll have to check manually for news. Behavior of previous versions is now deprecated
 		/// </summary>
 		/// <param name="refreshOne">Callback for returning one element</param>
-		/// <param name="group">Which group to query for. It is kind of the same for all numbers, most of the time. Default is <c>5</c></param>
-		/// <param name="week">Week to query news for. For debugging purposes. Will default to <c>-1</c> which means that the current schedule will be read.</param>
         /// <param name="networkAccessor">For testing purposes only. Will inject a <see cref="INetworkAccessor"/> into the class</param>
-        public Fetcher(Action<News> refreshOne, int group = 5, int week = -1, INetworkAccessor networkAccessor = null)
+        public Fetcher(Action<News> refreshOne, INetworkAccessor networkAccessor = null)
 		{
 			_addTheNews = refreshOne;
 			_alert = delegate {
 			};
             if (networkAccessor == null) networkAccessor = new Networking();
                 _networkAccessor = networkAccessor;
-			GetTimes (group, Activity.GetNews, week);
 		}
 
 			
@@ -143,6 +142,12 @@ namespace UntisExp
             }
         }
 
+        private void Revert()
+        {
+            _rootToTemporary = false;
+            _temporaryRefresh = null;
+        }
+
         /// <summary>
         /// Downloads a list of events for the given group
         /// </summary>
@@ -152,7 +157,7 @@ namespace UntisExp
         public void GetTimes(int group, Activity activity = Activity.ParseFirstSchedule, int week = -1)
         {
 
-            Group = group;
+            _group = group;
             string weekStr = "";
 			int length = group.ToString ().Length;
 			string groupStr = "w";
@@ -188,11 +193,31 @@ namespace UntisExp
 			}
 		}
 
+        /// <summary>
+        /// This method fetches the schedules of more than one group.
+        /// </summary>
+        /// <param name="groups">An array of valid WebUntis group numbers.</param>
+        /// <param name="week">For debugging purposes only. Which week to fetch for. Will default to -1 which means that the current week will be selected.</param>
+        public void GetMultipleGroupTimes(int[] groups, int week = -1)
+        {
+            var tracker = new MulipleAwait(_refreshAll, Revert, groups.Length);
+            _temporaryRefresh = tracker.CallMe;
+            _rootToTemporary = true;
+            foreach (var group in groups)
+            {
+                GetTimes(group, Activity.ParseFirstSchedule, week);
+            }
+        }
+
 		/// <summary>
 		/// Will be called if subsequent downloads of <see cref="GetTimes"/> fail. Uses <see cref="_refreshAll"/> callback to write previous elements to the front-end
 		/// </summary>
-		private void Abort () {
-			_refreshAll (_globData);
+		private void Abort ()
+		{
+		    if (_rootToTemporary)
+                _temporaryRefresh(_globData);
+		    else
+		        _refreshAll(_globData);
 		}
 
 		/// <summary>
@@ -243,13 +268,16 @@ namespace UntisExp
 			    if (preliminaryResult.HasToGetSecondSchedule)
 			    {
 			        _globData = preliminaryResult.ParsedRows;
-                    GetTimes(Group, Activity.ParseSecondSchedule);
+                    GetTimes(_group, Activity.ParseSecondSchedule);
 			    }
 				resultCollection.AddRange (preliminaryResult.ParsedRows);
 			}
 			if (preliminaryResult.HasToGetSecondSchedule != true)
 			{
-				_refreshAll(resultCollection);
+                if (_rootToTemporary)
+                    _temporaryRefresh(resultCollection);
+                else
+                    _refreshAll(resultCollection);
 			}
 		}
 		private void news_DownloadStringCompleted(string res)
@@ -276,17 +304,22 @@ namespace UntisExp
             {
                 if (res == "")
                 {
-                    _refreshAll(_globData);
+                    if (_rootToTemporary)
+                        _temporaryRefresh(_globData);
+                    else
+                        _refreshAll(_globData);
                     return;
                 }
 				string comp = res.Replace(" ", string.Empty);
                 if (comp.IndexOf("NotFound", StringComparison.Ordinal) != -1 || comp.Length == 0)
                 {
-                    _refreshAll(_globData);
+                    if (_rootToTemporary)
+                        _temporaryRefresh(_globData);
+                    else
+                        _refreshAll(_globData);
                     return;
                 }
 				List<Data> resultCollection = new List<Data> ();
-                //TO-DO: Parse VPlan
 				int needleCount = GetNewsBoxesLength(comp);
 				int daysAndNewsBoxes = VConfig.ExpectedDayNum + needleCount;
 				string[] raw = GetDayArray (comp, daysAndNewsBoxes);
@@ -298,12 +331,282 @@ namespace UntisExp
 				}
 
 				_globData.AddRange(resultCollection);
-                _refreshAll(_globData);
+                if (_rootToTemporary)
+                    _temporaryRefresh(_globData);
+                else
+                    _refreshAll(_globData);
             }
             catch
             {
-                _refreshAll(_globData);
+                if (_rootToTemporary)
+                    _temporaryRefresh(_globData);
+                else
+                    _refreshAll(_globData);
             }
         }
+
+        /// <summary>
+        /// This class exists to manage the progress of fetching operations for multiple 
+        /// </summary>
+        class MulipleAwait
+        {
+            private List<Data> _receivedBits;
+            private readonly List<List<Data>> _queue = new List<List<Data>>(); 
+            private readonly Action<List<Data>> _callback;
+            private readonly Action _parentOriginalState;
+            private readonly int _num;
+
+            public MulipleAwait(Action<List<Data>> callback, Action resetParentState, int num)
+            {
+                _callback = callback;
+                _parentOriginalState = resetParentState;
+                _num = num;
+            }
+
+            public void CallMe(List<Data> bit)
+            {
+                _queue.Add(bit);
+                Finish();
+            }
+
+            private void Finish()
+            {
+                if (_queue.Count < _num) return;
+                for (int i = _queue.Count - 1; i >= 0; i--)
+                {
+                    _receivedBits = _receivedBits == null ? _queue[i] : Helpers.JoinTwoDataLists(_receivedBits, _queue[i]);
+                    _queue.RemoveAt(i);
+                }
+
+                _callback(_receivedBits);
+                _parentOriginalState();
+            }
+
+        }
+        /// <summary>
+        /// Contains a static method to process a table of a day and, when instanciated, will carry the result of these methods
+        /// </summary>
+        public class InterstitialFetching
+        {
+            /// <summary>
+            /// Which day the function is iterating through
+            /// </summary>
+            public int OuterLoopCursor;
+            /// <summary>
+            /// The parsed <see cref="UntisExp.Data"/> entries out of the table 
+            /// </summary>
+            public List<Data> ParsedRows;
+            /// <summary>
+            /// The parsed <see cref="UntisExp.News"/> entry out of the table
+            /// </summary>
+            public News ParsedNews;
+            /// <summary>
+            /// Whether the caller has to get another table from the network
+            /// </summary>
+            public bool HasToGetSecondSchedule;
+
+            /// <summary>
+            /// Given a string representing a table of a day in WebUntis' HTML, <see cref="ProcessRow"/> will return an object including the <see cref="UntisExp.Data"/> representations of each schedule value
+            /// </summary>
+            /// <returns>Object containing the current progress of parsing and the last <see cref="UntisExp.Data"/>-objects that were parsed</returns>
+            /// <param name="item">The HTML string representing the table of a day</param>
+            /// <param name="iOuter">The progress through the day tables</param>
+            /// <param name="mode">The background operations mode. See also <seealso cref="UntisExp.Fetcher"/></param>
+            /// <param name="silent">Whether the task will add headings</param>
+            /// <param name="daysAndNewsBoxes">The number of news tables in the week</param>
+            /// <param name="passDontImmediatelyRefresh">If appropriate, this value will be passed to <see cref="HasToGetSecondSchedule"/>.</param>
+            /// <param name="activity">The action which should be performed.</param>
+            public static InterstitialFetching ProcessRow(string item, int iOuter, int daysAndNewsBoxes, int mode, bool silent, bool passDontImmediatelyRefresh, Activity activity = Activity.ParseFirstSchedule)
+            {
+                List<Data> v1 = new List<Data>();
+                InterstitialFetching result = new InterstitialFetching { HasToGetSecondSchedule = passDontImmediatelyRefresh };
+                int daysRec = 0;
+                if (item.IndexOf(VConfig.SearchNoAccess, StringComparison.Ordinal) == -1)
+                {
+                    string it = item.Replace("&nbsp;", String.Empty);
+                    string searchInFront;
+                    News news = null;
+                    if (activity == Activity.GetNews)
+                    {
+                        searchInFront = "<tr>";
+                        news = new News { Image = "http://centrallink.de/sr/Blackboard.png", Source = new Uri(VConfig.Url) };
+                    }
+                    else
+                    {
+                        searchInFront = "<trclass='list";
+                    }
+                    if ((item.IndexOf(VConfig.NoEventsText.Replace(" ", string.Empty), StringComparison.Ordinal) == -1) || activity == Activity.GetNews)
+                    {
+                        int iterations = 0;
+                        it = it.Substring(it.IndexOf("</tr>", StringComparison.Ordinal) + 5, it.Length - it.IndexOf("</tr>", StringComparison.Ordinal) - 5);
+                        while (it.IndexOf(searchInFront, StringComparison.Ordinal) != -1)
+                        {
+                            if (iterations == 0)
+                            {
+                                // news box should not be a day so we count days here
+                                daysRec++;
+                            }
+                            if (activity == Activity.GetNews)
+                            {
+                                if (news != null && news.Summary != null)
+                                {
+                                    news.Summary += "\n\n";
+                                }
+                                DateTime date = GetDateFromDay(iOuter, Activity.ParseFirstSchedule);
+                                string dateName = new CultureInfo("de-DE").DateTimeFormat.GetDayName(date.DayOfWeek);
+                                if (news != null) news.Summary += dateName + ", " + date.Day + "." + date.Month + ":\n";
+                            }
+                            Data data = new Data();
+                            string w = it.Substring(it.IndexOf(searchInFront, StringComparison.Ordinal));
+                            w = w.Substring(0, w.IndexOf("</tr>", StringComparison.Ordinal));
+                            it = it.Substring(it.IndexOf("</tr>", StringComparison.Ordinal) + 5, it.Length - it.IndexOf("</tr>", StringComparison.Ordinal) - 5);
+                            var mc = VConfig.CellSearch.Matches(w);
+                            int webColumn = 0;
+                            foreach (var thing in mc)
+                            {
+                                string compute = PrepareScheduleItem(thing);
+                                if (activity != Activity.GetNews)
+                                {
+                                    data = ProceedScheduleItem(compute, data, webColumn, iterations, silent, v1);
+                                    webColumn++;
+                                }
+                                else
+                                {
+                                    news = ProcessNewsItem(compute, news);
+                                    result.ParsedNews = news;
+                                }
+                            }
+                            if (activity != Activity.GetNews)
+                            {
+                                data.Refresh();
+                                if ((mode == 1 && daysRec == 2) || (mode != 1 && mode != 0) || (mode == 0 && daysRec == 1))
+                                    v1.Add(data);
+                            }
+                            iterations++;
+                        }
+                        if ((iterations == 0 && activity != Activity.GetNews) || (iterations > 0 && activity == Activity.GetNews))
+                        {
+                            iOuter--;
+                        }
+                    }
+                    else
+                    {
+                        daysRec++;
+                        if (!silent)
+                        {
+                            //Adds Date
+                            v1.Add(new Data(GetDateFromDay(iOuter, activity)));
+                            //Adds no events message
+                            v1.Add(new Data());
+                        }
+                    }
+                }
+                iOuter++;
+                if (iOuter == daysAndNewsBoxes && (daysRec == 1) && mode != 0 && activity == Activity.ParseFirstSchedule)
+                {
+                    result.HasToGetSecondSchedule = true;
+                }
+                result.OuterLoopCursor = iOuter;
+                result.ParsedRows = v1;
+                return result;
+            }
+
+            private static string PrepareScheduleItem(object input)
+            {
+                string thingy = input.ToString();
+                return thingy.Substring(thingy.IndexOf(">", StringComparison.Ordinal) + 1, thingy.LastIndexOf("<", StringComparison.Ordinal) - thingy.IndexOf(">", StringComparison.Ordinal) - 1);
+            }
+
+            private static News ProcessNewsItem(string thingy, News scheduleNews)
+            {
+                scheduleNews.Title = "Vom Vertretungsplan:";
+                scheduleNews.Summary += Helpers.AddSpaces(thingy);
+                scheduleNews.Content = scheduleNews.Summary;
+                return scheduleNews;
+            }
+
+            private static Data ProceedScheduleItem(string thingy, Data individualEntry, int webColumn, int iteration, bool silent, ICollection<Data> rowsData)
+            {
+
+                switch (webColumn)
+                {
+                    case 0:
+                        if (thingy == VConfig.SpecialEvtAb)
+                        { individualEntry.Event = true; }
+                        break;
+                    case 1:
+                        int day = Convert.ToInt16(thingy.Substring(0, thingy.IndexOf(".", StringComparison.Ordinal)));
+                        string dayStr = thingy.Substring(thingy.IndexOf(".", StringComparison.Ordinal) + 1);
+                        dayStr = dayStr.Replace(".", string.Empty);
+                        int month = Convert.ToInt16(dayStr);
+                        int year = DateTime.Now.Year;
+                        DateTime dt = new DateTime(year, month, day);
+                        individualEntry.Date = dt;
+                        if (iteration == 0 && !silent)
+                        {
+                            rowsData.Add(new Data(dt));
+                        }
+                        break;
+                    case 2:
+                        individualEntry.Lesson = thingy;
+                        break;
+                    case 3:
+                        individualEntry.Cover = thingy;
+                        break;
+                    case 4:
+                        individualEntry.Subject = thingy;
+                        break;
+                    case 5:
+                        individualEntry.OldSubject = thingy;
+                        break;
+                    case 6:
+                        individualEntry.Room = thingy;
+                        break;
+                    case 7:
+                        individualEntry.Group = thingy;
+                        break;
+                    case 8:
+                        individualEntry.Teacher = thingy;
+                        break;
+                    case 13:
+                        individualEntry.Notice = thingy;
+                        break;
+                    case 14:
+                        individualEntry.OutageStr = thingy;
+                        break;
+                    case 15:
+                        individualEntry.CareStr = thingy;
+                        break;
+                }
+                return individualEntry;
+            }
+
+
+            /// <summary>
+            /// Will get a day object out of an int
+            /// </summary>
+            /// <returns>The date object for the day of week</returns>
+            /// <param name="day">Value representing the wished day (0=mo,1=tu...)</param>
+            /// <param name="activity">Which activity to perform</param>
+            private static DateTime GetDateFromDay(int day, Activity activity)
+            {
+                DateTime date = DateTime.Now;
+                while (date.DayOfWeek != DayOfWeek.Monday)
+                {
+                    date = activity == Activity.ParseFirstSchedule ? date.AddDays(-1) : date.AddDays(1);
+                }
+                return date.AddDays(day);
+            }
+
+            /// <summary>
+            /// Will construct a new empty object with default values for <see cref="UntisExp.Fetcher.InterstitialFetching.OuterLoopCursor"/> and <see cref="UntisExp.Fetcher.InterstitialFetching.HasToGetSecondSchedule"/>
+            /// </summary>
+            public InterstitialFetching()
+            {
+                HasToGetSecondSchedule = false;
+                OuterLoopCursor = 0;
+            }
+        }
+
     }
 }

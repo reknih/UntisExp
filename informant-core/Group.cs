@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace UntisExp
+﻿namespace UntisExp
 {
 	/// <summary>
 	/// This class represents an Untis-group
@@ -22,7 +16,7 @@ namespace UntisExp
 		/// <param name="id">Untis-ID</param>
 		/// <param name="name">Display-name</param>
 		public Group(int id, string name) {
-			ID = id;
+			Id = id;
 			ClassName = name;
 		}
 
@@ -42,6 +36,6 @@ namespace UntisExp
         /// <summary>
         /// Running number of the group on the website
         /// </summary>
-		public int ID { get; set; }
+		public int Id { get; set; }
 	}
 }

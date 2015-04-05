@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using NUnit;
 using NUnit.Framework;
 using UntisExp;
 
@@ -16,7 +12,7 @@ namespace NUnitTests
         [Category("Constructors")]
         public void MakeHeading()
         {
-            var s = "Jolla";
+            const string s = "Jolla";
             var sut = new Data(s);
             Assert.AreEqual(s, sut.Line1);
         }
@@ -34,7 +30,7 @@ namespace NUnitTests
         [Category("Constructors")]
         public void MakeHeadingEmptySecond()
         {
-            var s = "Jolla";
+            const string s = "Jolla";
             var sut = new Data(s);
             Assert.IsTrue(string.IsNullOrEmpty(sut.Line2));
         }
@@ -198,6 +194,23 @@ namespace NUnitTests
             var sut = new Data { Subject = "DS", Event = true, Teacher = "ME", Room = "BUE", Notice = "PeoplesTheater", Group = "7A1, 7A2, 7N1"};
             sut.Refresh();
             Assert.AreEqual("Peoples Theater; Raum: BUE | Mit ME und 7A1, 7A2, 7N1", sut.Line2);
+        }
+
+        [Test]
+        [Category("Extension methods")]
+        public void SortsCorrectly()
+        {
+            var a = new Data(DateTime.Now);
+            var b = new Data(DateTime.Now.AddDays(2));
+            var c = new Data("1", "DE", "ZE", "MD", "E21", "");
+            var d = new Data("1-2", "MA", "ZR", "ZS", "C14", "");
+            var e = new Data("1-4", "DS", "ME", "ME", "AULA", "Sonderprobe");
+            var f = new Data("4", "MU", "LK", "HAI", "317", "");
+            var g = new Data("5-6", "POWI", "CHR", "CHR", "BUE", "Vortrag");
+            var res = new List<Data> { e, b, d, g, f, a, c };
+            res.Sort();
+            var exp = new List<Data> { a, b, c, d, e, f, g };
+            Assert.AreEqual(exp, res);
         }
     
     }

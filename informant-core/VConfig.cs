@@ -80,9 +80,39 @@ namespace UntisExp
 	    public const string SpecialEvtAb = "Veranst.";
 
         /// <summary>
-        /// List of abbreviations for the lessons. Has to be populated once using <see cref="VConfig.Populate"/>
+        /// List of abbreviations for the lessons.
         /// </summary>
-	    public static readonly Dictionary<string, string> LessonAbbr = new Dictionary<string, string>();
+	    public static readonly Dictionary<string, string> LessonAbbr = new Dictionary<string, string>
+	    {
+	        {"DE", "Deutsch"},
+            {"EN", "Englisch"},
+            {"EN2", "Englisch"},
+            {"ET", "Ethik"},
+            {"ER", "Ev. Religion"},
+            {"KR", "Kath. Religion"},
+            {"MA", "Mathe"},
+            {"BIO", "Bio"},
+            {"BI", "Bio"},
+            {"CH", "Chemie"},
+            {"PH", "Physik"},
+            {"POWI", "PoWi"},
+            {"GE", "Geschichte"},
+            {"MU", "Musik"},
+            {"SPA4", "Spanisch"},
+            {"SPA3", "Spanisch"},
+            {"FR", "Französich"},
+            {"FR2", "Französich"},
+            {"SP", "Sport"},
+            {"SPA", "Spanisch"},
+            {"DS", "Darstellendes Spiel"},
+            {"KU", "Kunst"},
+            {"IN", "Informatik"},
+            {"LA2", "Latein"},
+            {"LA", "Latein"},
+            {"IT", "Italiensich"},
+            {"WU", "Wahlunterricht"},
+            {"KLALE", "Klassenlehrerstunde"}
+	    };
 
         /// <summary>
         /// Title for the error message if the WebUntis site could not be found
@@ -117,52 +147,12 @@ namespace UntisExp
         /// <summary>
         /// Jokes that may be displayed shortly after loading completed (E.g. in Windows Phone's status bar)
         /// </summary>
-	    public static string[] SuccessJokes = new string [] {"Und fertig!", "Heute schon Bertie gesehen?", "Sacrebleu", "Arrriba!", "Dein Tag könnte sich soeben verbessert haben", "Käsekuchen"};
+        // ReSharper disable once UnusedMember.Global
+	    public static string[] SuccessJokes = {"Und fertig!", "Heute schon Bertie gesehen?", "Sacrebleu", "Arrriba!", "Dein Tag könnte sich soeben verbessert haben", "Käsekuchen"};
 
         /// <summary>
         /// How many days are in a week
         /// </summary>
         public const int ExpectedDayNum = 5;
-
-	    /// <summary>
-        /// Used to give LessonAbbr its values
-        /// </summary>
-		public static void Populate () {
-	        try
-	        {
-	            LessonAbbr.Add("DE", "Deutsch");
-	            LessonAbbr.Add("EN", "Englisch");
-	            LessonAbbr.Add("EN2", "Englisch");
-	            LessonAbbr.Add("ET", "Ethik");
-	            LessonAbbr.Add("ER", "Ev. Religion");
-	            LessonAbbr.Add("KR", "Kath. Religion");
-	            LessonAbbr.Add("MA", "Mathe");
-	            LessonAbbr.Add("BIO", "Bio");
-	            LessonAbbr.Add("BI", "Bio");
-	            LessonAbbr.Add("CH", "Chemie");
-	            LessonAbbr.Add("PH", "Physik");
-	            LessonAbbr.Add("POWI", "PoWi");
-	            LessonAbbr.Add("GE", "Geschichte");
-	            LessonAbbr.Add("MU", "Musik");
-	            LessonAbbr.Add("SPA4", "Spanisch");
-	            LessonAbbr.Add("SPA3", "Spanisch");
-	            LessonAbbr.Add("FR", "Französich");
-	            LessonAbbr.Add("FR2", "Französich");
-	            LessonAbbr.Add("SP", "Sport");
-	            LessonAbbr.Add("SPA", "Spanisch");
-	            LessonAbbr.Add("DS", "Darstellendes Spiel");
-	            LessonAbbr.Add("KU", "Kunst");
-	            LessonAbbr.Add("IN", "Informatik");
-	            LessonAbbr.Add("LA2", "Latein");
-	            LessonAbbr.Add("LA", "Latein");
-	            LessonAbbr.Add("IT", "Italiensich");
-	            LessonAbbr.Add("WU", "Wahlunterricht");
-	            LessonAbbr.Add("KLALE", "Klassenlehrerstunde");
-	        }
-	        catch (ArgumentException)
-	        {
-	            
-	        }
-		}
 	}
 }

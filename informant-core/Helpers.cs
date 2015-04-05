@@ -9,7 +9,7 @@ namespace UntisExp
     /// <summary>
     /// Some useful methods
     /// </summary>
-	public class Helpers
+	public static class Helpers
 	{
         /// <summary>
         /// Will truncate a string to a length but never cut words of. Super handy!!
@@ -67,18 +67,14 @@ namespace UntisExp
         public static int[] GetTodayTomorrowNum (List<Data> source) {
             List<int> headIndexes = new List<int>();
             int currIndex = 0;
-            for (int i = source.Count - 1; i >= 0; i--)
-            {
-                if (source[i].Head && !source[i].DateHeader)
-                {
-                    source.RemoveAt(i);
-                }
-            }
+            int maxIndex = 0;
+            source = CleanEntries(source);
             foreach (var item in source)
             {
                 if (item.DateHeader)
                 {
                     headIndexes.Add(currIndex);
+                    maxIndex++;
                 }
                 currIndex++;
             }
@@ -86,7 +82,7 @@ namespace UntisExp
             {
                 return new[] { source.Count - 1, 0 };
             }
-            List<Data>[] listlist = new List<Data>[2];
+            List<Data>[] listlist = new List<Data>[maxIndex];
             currIndex = 0;
             foreach (var item in headIndexes)
             {
@@ -102,14 +98,138 @@ namespace UntisExp
                 if (listlist[currIndex] == null)
                     listlist[currIndex] = new List<Data>();
                 currIndex++;
-                if (currIndex >= 2)
+                if (currIndex >= maxIndex)
                     break;
             }
-            return new[] { listlist[0].Count, listlist[1].Count };
+            var res = new int[maxIndex];
+            for (int i = 0; i < maxIndex; i++)
+            {
+                res[i] = listlist[i].Count;
+            }
+            return res;
         }
 
-		public List<List<Data>> getSortableLists() {
-			
+        /// <summary>
+        /// Will remove all meaningless entries from an list of data
+        /// </summary>
+        /// <param name="toClean">The dirty list</param>
+        /// <returns>The cleaned list</returns>
+        private static List<Data> CleanEntries(List<Data> toClean)
+        {
+            var result = toClean;
+            for (int i = result.Count - 1; i >= 0; i--)
+            {
+                if (result[i].Head && !result[i].DateHeader)
+                {
+                    result.RemoveAt(i);
+                }
+            }
+            return result;
+        } 
+
+        /// <summary>
+        /// Should be used  to concatenate two Lists of VPlan data.
+        /// </summary>
+        /// <param name="l1">The first original list</param>
+        /// <param name="l2">The second original list</param>
+        /// <returns>The concatenated lists</returns>
+		public static List<Data> JoinTwoDataLists(List<Data> l1, List<Data> l2)
+        {
+            l1 = CleanEntries(l1);
+            l2 = CleanEntries(l2);
+
+            var l1Specs = GetTodayTomorrowNum(l1);
+            var l2Specs = GetTodayTomorrowNum(l2);
+
+            var l1Meaningful = l1Specs.Any(spec => spec != 0);
+            if (!l1Meaningful) return l2;
+
+            var l2Meaningful = l2Specs.Any(spec => spec != 0);
+            if (!l2Meaningful) return l1;
+
+		    List<Data> l1Headings = new List<Data>();
+		    List<Data> l2Headings = new List<Data>();
+
+		    List<List<Data>> l1Sections = new List<List<Data>>();
+		    List<List<Data>> l2Sections = new List<List<Data>>();
+
+		    int l1Cursor = 0;
+            for (int i = 0; i < l1Specs.Length; i++)
+            {
+                var toExpect = l1Specs[i];
+                if (toExpect == 0) break;
+
+                l1Headings.Add(l1[l1Cursor]);
+                l1Cursor++;
+
+                l1Sections.Add(new List<Data>());
+
+                l1Sections[i].AddRange(l1.GetRange(l1Cursor, toExpect));
+                l1Cursor = l1Cursor + toExpect;
+            }
+
+		    int l2Cursor = 0;
+            for (int i = 0; i < l2Specs.Length; i++)
+            {
+                var toExpect = l2Specs[i];
+                if (toExpect == 0) break;
+
+                l2Headings.Add(l2[l2Cursor]);
+                l2Cursor++;
+
+                l2Sections.Add(new List<Data>());
+
+                l2Sections[i].AddRange(l2.GetRange(l2Cursor, toExpect));
+                l2Cursor = l2Cursor + toExpect;
+            }
+
+            List<List<Data>> outputSections = new List<List<Data>>();
+		    List<Data> output = new List<Data>();
+		    var added = new bool[l2Headings.Count];
+
+		    for (int i = 0; i < l1Headings.Count; i++)
+		    {
+                outputSections.Add(new List<Data>());
+		        bool wasJoined = false;
+		        for (int j = 0; j < l2Headings.Count; j++)
+		        {
+		            if (l1Headings[i].Date.Date == l2Headings[j].Date.Date)
+		            {
+		                outputSections.Last().Add(l1Headings[i]);
+                        outputSections.Last().AddRange(l1Sections[i]);
+                        outputSections.Last().AddRange(l2Sections[j]);
+		                added[j] = true;
+		                wasJoined = true;
+                        break;
+		            }
+		        }
+		        if (!wasJoined)
+		        {
+		            outputSections.Last().Add(l1Headings[i]);
+		            outputSections.Last().AddRange(l1Sections[i]);
+		        }
+		    }
+		    for (int i = 0; i < l2Headings.Count; i++)
+		    {
+		        if (!added[i])
+		        {
+		            outputSections.Add(new List<Data>());
+                    outputSections.Last().Add(l2Headings[i]);
+                    outputSections.Last().AddRange(l2Sections[i]);
+                }
+		    }
+
+		    var orderedOutputSections = from element in outputSections
+		        orderby element.First().Date
+		        select element;
+
+		    foreach (var section in orderedOutputSections)
+		    {
+		        section.Sort();
+                output.AddRange(section);
+		    }
+
+            return output;
 		}
 
         /// <summary>

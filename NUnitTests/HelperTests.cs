@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Web.Script.Serialization;
 using System.Linq;
 using NUnit.Framework;
 using UntisExp;
@@ -59,12 +60,53 @@ namespace NUnitTests
             var a = new List<Data>(new[]
             {
                 new Data(new DateTime(2015, 7, 20)), new Data("1", "", "", "", "", ""), new Data(new DateTime(2015, 7, 21)),
+                new Data("1", "", "", "", "", ""), new Data("3", "", "", "", "", ""), new Data("4", "", "", "", "", ""),
+                new Data(new DateTime(2015, 7, 22)), new Data("1", "", "", "", "", ""), new Data(new DateTime(2015, 7, 23)),
                 new Data("1", "", "", "", "", ""), new Data("3", "", "", "", "", ""), new Data("4", "", "", "", "", "")
             });
-            var exp = new[] { 1, 3 };
+            var exp = new[] { 1, 3, 1, 3 };
             var res = Helpers.GetTodayTomorrowNum(a);
             Assert.AreEqual(exp, res);
         }
+
+        [Test]
+        public void DayListsWillCorrectlyJoin()
+        {
+            var serializer = new JavaScriptSerializer();
+            var a = new List<Data>(new[]
+            {
+                new Data(new DateTime(2015, 7, 20)), new Data("1", "Deutsch", "", "", "", ""),
+                new Data(new DateTime(2015, 7, 21)), new Data("1", "", "", "", "", ""),
+                new Data("3", "", "", "", "", ""), new Data("4", "", "", "", "", ""),
+                new Data(new DateTime(2015, 7, 23)), new Data("5", "", "", "", "", "")
+            });
+
+            var b = new List<Data>(new[]
+            {
+                new Data(new DateTime(2015, 7, 20)), new Data("3-4", "Englisch", "", "", "", ""),
+                new Data(new DateTime(2015, 7, 22)), new Data("5", "", "", "", "", "")
+            });
+
+            var exp = new List<Data>(new[]
+            {
+                new Data(new DateTime(2015, 7, 20)), new Data("1", "Deutsch", "", "", "", ""),
+                new Data("3-4", "Englisch", "", "", "", ""), new Data(new DateTime(2015, 7, 21)),
+                new Data("1", "", "", "", "", ""), new Data("3", "", "", "", "", ""),
+                new Data("4", "", "", "", "", ""), new Data(new DateTime(2015, 7, 22)),
+                new Data("5", "", "", "", "", ""), new Data(new DateTime(2015, 7, 23)),
+                new Data("5", "", "", "", "", "")
+            });
+
+            var res = Helpers.JoinTwoDataLists(b, a);
+
+            var comparableRes = serializer.Serialize(res);
+            var comparableExp = serializer.Serialize(exp);
+
+            Assert.AreEqual(comparableExp, comparableRes);
+
+        }
+
+
         [Test]
         public void CountsTodayTomorrowArrayCorrectlyWithEmptyDays()
         {

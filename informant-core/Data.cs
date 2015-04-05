@@ -18,7 +18,6 @@ namespace UntisExp
 			Event = false;
             DateHeader = false;
 			Head = true;
-			VConfig.Populate ();
 		} 
 		/// <summary>
 		/// Creates a heading for the given day.
@@ -28,9 +27,9 @@ namespace UntisExp
 		{
 			Head = true;
             DateHeader = true;
+		    Date = date;
 			Line1 = date.ToString("dddd", new CultureInfo("de-DE")) + ", " + Convert.ToString(date.Day) + "." + Convert.ToString(date.Month);
 			Line2 = "";
-			VConfig.Populate ();
 		}
        
 		/// <summary>
@@ -50,7 +49,6 @@ namespace UntisExp
 			Lesson = std;
 			Room = room;
 			Notice = notice;
-			VConfig.Populate ();
 			Refresh();
             DateHeader = false;
 		}
@@ -64,7 +62,6 @@ namespace UntisExp
 			Head = true;
 			Line1 = head;
 			Line2 = "";
-			VConfig.Populate ();
             DateHeader = false;
 		}
 
@@ -74,26 +71,10 @@ namespace UntisExp
 		public Data Refresh()
 		{
 			Head = false;
-			Subject = faecherSchreib(Subject);
-			OldSubject = faecherSchreib(OldSubject);
-			if (!Helpers.IsEmpty(OutageStr))
-			{
-				Outage = true;
-			}
-			else
-			{
-				Outage = false;
-			}
-			if (!Helpers.IsEmpty(CareStr))
-			{
-				Cared = true;
-              //  PrintMitbet = "Ja";
-			}
-			else
-			{
-				Cared = false;
-               // PrintMitbet = "Nein";
-			}
+			Subject = FaecherSchreib(Subject);
+			OldSubject = FaecherSchreib(OldSubject);
+			Outage = !Helpers.IsEmpty(OutageStr);
+			Cared = !Helpers.IsEmpty(CareStr);
 		    if (!Helpers.IsEmpty(Subject))
 		    {
 		        Line1 = Lesson + ". Std: " + Subject;
@@ -169,7 +150,7 @@ namespace UntisExp
 			}
             return this;
 		}
-		private string faecherSchreib(string fach)
+		private static string FaecherSchreib(string fach)
 		{
 		    if (fach == null)
 		        return null;
@@ -186,29 +167,44 @@ namespace UntisExp
 		/// <param name="obj">Object to compare against</param>
 		public int CompareTo (object obj)
 		{
-			if (obj == null) 
-				return 1;
-			
-			Data otherObject = obj as Data;
+		    Data otherObject = obj as Data;
 
-			if (string.IsNullOrEmpty (otherObject.Lesson) || string.IsNullOrEmpty (this.Lesson))
+            if (otherObject == null)
+                return 1;
+
+            if (otherObject.DateHeader && !DateHeader)
+                return 1;
+            if (!otherObject.DateHeader && DateHeader)
+                return -1;
+
+		    if (otherObject.DateHeader && DateHeader)
+		    {
+                if (otherObject.Date.Date > Date.Date)
+                    return -1;
+                if (otherObject.Date.Date < Date.Date)
+                    return 1;
+                if (otherObject.Date.Date == Date.Date)
+                    return 0;
+            }
+
+		    if (string.IsNullOrEmpty (otherObject.Lesson) || string.IsNullOrEmpty (Lesson))
 				return 0;
 
 			int itsFirst = int.Parse(otherObject.Lesson.Substring (0, 1));
-			int myFirst = int.Parse (this.Lesson.Substring (0, 1));
+			int myFirst = int.Parse (Lesson.Substring (0, 1));
 
 			if (itsFirst < myFirst)
 				return 1;
 			if (itsFirst > myFirst)
 				return -1;
-			if (otherObject.Lesson.Length < this.Lesson.Length)
+			if (otherObject.Lesson.Length > Lesson.Length)
 				return -1;
-			if (otherObject.Lesson.Length < this.Lesson.Length)
+			if (otherObject.Lesson.Length < Lesson.Length)
 				return 1;
 			
-			if (this.Lesson.Length == 3) {
+			if (Lesson.Length == 3) {
 				int itsSec = int.Parse(otherObject.Lesson.Substring (2, 1));
-				int mySec = int.Parse (this.Lesson.Substring (2, 1));
+				int mySec = int.Parse (Lesson.Substring (2, 1));
 				if (itsSec < mySec)
 					return 1;
 				if (itsSec > mySec)

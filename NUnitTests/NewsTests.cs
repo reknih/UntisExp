@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
-using System.Threading.Tasks;
 using NUnit.Framework;
 using UntisExp;
 
@@ -68,9 +67,9 @@ namespace NUnitTests
         {
             bool calledBack = false;
             List<News> res = new List<News>();
-            Action<List<News>> callback = (List<News> _res) => {
+            Action<List<News>> callback = locRes => {
                 calledBack = true;
-                res = _res;
+                res = locRes;
             };
             var sut = new Press();
             sut.GetCalledBackForNews(callback);

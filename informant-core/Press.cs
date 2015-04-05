@@ -17,7 +17,7 @@ namespace UntisExp
 	    readonly XNamespace _namespaces = XNamespace.Get("http://purl.org/rss/1.0/modules/content/");
 	    readonly XNamespace _mediaNs = XNamespace.Get("http://search.yahoo.com/mrss/");
 	    readonly Regex _r = new Regex("<.*?>");
-	    private INetworkAccessor _networkAccessor;
+	    private readonly INetworkAccessor _networkAccessor;
 #if (WINDOWS || WINDOWS_PHONE || DEBUG)
         Action<List<News>> _newscallback;
 #endif
@@ -44,11 +44,7 @@ namespace UntisExp
                 doc = XDocument.Load(VConfig.Feed);
                 var articles = from article in doc.Descendants("item")
                                select article;
-                foreach (XElement articlet in articles)
-                {
-                    var writing = ProcessXml(articlet);
-                    gathered.Add(writing);
-                }
+                gathered.AddRange(articles.Select(ProcessXml));
             });
             return gathered;
         }
@@ -67,13 +63,8 @@ namespace UntisExp
             var doc = XDocument.Load(newsstream);
             var articles = from article in doc.Descendants("item")
                            select article;
-            var gathered = new List<News>();
-            foreach (XElement articlet in articles)
-            {
-                var writing = ProcessXml(articlet);
-                gathered.Add(writing);
-            }
-            _newscallback(gathered);
+            var gathered = articles.Select(ProcessXml).ToList();
+	        _newscallback(gathered);
         }
 #endif
 
