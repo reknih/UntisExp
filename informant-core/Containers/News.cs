@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace UntisExp
+namespace UntisExp.Containers
 {
     /// <summary>
     /// Represents a news article

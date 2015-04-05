@@ -3,6 +3,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Linq;
+using UntisExp.Containers;
 
 namespace UntisExp
 {
@@ -60,7 +61,7 @@ namespace UntisExp
 #endif
 
         /// <summary>
-        /// Will get how much entries for today and how much for another day are in a set of <see cref="UntisExp.Data"/> objects
+        /// Will get how much entries for today and how much for another day are in a set of <see cref="Data"/> objects
         /// </summary>
         /// <param name="source">The set of <see cref="Data"/> objects</param>
         /// <returns>An int array with two entries representing the two counts</returns>

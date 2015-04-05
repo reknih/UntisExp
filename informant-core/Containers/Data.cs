@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Globalization;
 
-namespace UntisExp
+namespace UntisExp.Containers
 {
 	/// <summary>
 	/// Object wich can hold either headings or info for an schedule update

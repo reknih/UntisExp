@@ -1,4 +1,4 @@
-﻿namespace UntisExp
+﻿namespace UntisExp.Interfaces
 {
 	/// <summary>
 	/// Platform independant description for preference management.

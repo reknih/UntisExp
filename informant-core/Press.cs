@@ -6,6 +6,9 @@ using System.IO;
 using System.Xml.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using UntisExp.Containers;
+using UntisExp.EventHandlers;
+using UntisExp.Interfaces;
 
 namespace UntisExp
 {
@@ -19,7 +22,10 @@ namespace UntisExp
 	    readonly Regex _r = new Regex("<.*?>");
 	    private readonly INetworkAccessor _networkAccessor;
 #if (WINDOWS || WINDOWS_PHONE || DEBUG)
-        Action<List<News>> _newscallback;
+        /// <summary>
+        /// Fires when the list of news objects is retreived
+        /// </summary>
+        public event EventHandler<MassiveNewsEventArgs> RaiseRetreivedNewsItems; 
 #endif
 
         /// <summary>
@@ -50,12 +56,10 @@ namespace UntisExp
         }
 #if (WINDOWS || WINDOWS_PHONE || DEBUG)
         /// <summary>
-        /// Will callback with the news articles from the RSS feed specified in <seealso cref="VConfig"/> as an parameter
+        /// Will fire <see cref="RaiseRetreivedNewsItems"/> with the news articles from the RSS feed specified in <seealso cref="VConfig"/> as an parameter
         /// </summary>
-        /// <param name="newscallbackAction">The callback which is called after execution</param>
-        public void GetCalledBackForNews(Action<List<News>> newscallbackAction)
+        public void FireEventForNews()
         {
-            _newscallback = newscallbackAction;
             _networkAccessor.DownloadLegacyStream(VConfig.Feed, NewsStreamCallback);
         }
 
@@ -64,7 +68,20 @@ namespace UntisExp
             var articles = from article in doc.Descendants("item")
                            select article;
             var gathered = articles.Select(ProcessXml).ToList();
-	        _newscallback(gathered);
+	        OnRaiseRetreivedNewsItemEvent(new MassiveNewsEventArgs(gathered));
+        }
+
+        /// <summary>
+        /// Will raise a News event
+        /// </summary>
+        /// <param name="e">The event arguments that should be passed</param>
+        protected virtual void OnRaiseRetreivedNewsItemEvent(MassiveNewsEventArgs e)
+        {
+            EventHandler<MassiveNewsEventArgs> handler = RaiseRetreivedNewsItems;
+            if (handler != null)
+            {
+                handler(this, e);
+            }
         }
 #endif
 

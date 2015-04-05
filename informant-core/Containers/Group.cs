@@ -1,4 +1,4 @@
-﻿namespace UntisExp
+﻿namespace UntisExp.Containers
 {
 	/// <summary>
 	/// This class represents an Untis-group

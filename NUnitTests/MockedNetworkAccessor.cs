@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
 using UntisExp;
+using UntisExp.EventHandlers;
+using UntisExp.Interfaces;
 
 namespace NUnitTests
 {
@@ -12,7 +14,7 @@ namespace NUnitTests
         public bool CalledDownloadStream;
         public Stream StreamToReturn;
 
-        public void DownloadData(string url, Action<string> callback, Action<string, string, string> alertmet = null, Action returnOnError = null, string aHead = "", string aBody = "", string aBtn = "")
+        public void DownloadData(string url, Action<string> callback, Action<ErrorMessageEventArgs> alertmet = null, Action returnOnError = null, string aHead = "", string aBody = "", string aBtn = "")
         {
             CalledUri = url;
             CalledDownloadData = true;
@@ -20,7 +22,7 @@ namespace NUnitTests
                 callback(DataToReturn);
         }
 
-        public void DownloadLegacyStream(string url, Action<Stream> callback, Action<string, string, string> alertmet = null, bool alerting = false, string aHead = "", string aBody = "", string aBtn = "")
+        public void DownloadLegacyStream(string url, Action<Stream> callback, Action<ErrorMessageEventArgs> alertmet = null, bool alerting = false, string aHead = "", string aBody = "", string aBtn = "")
         {
             CalledUri = url;
             CalledDownloadStream = true;

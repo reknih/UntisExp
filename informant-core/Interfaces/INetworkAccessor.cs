@@ -1,7 +1,8 @@
 ﻿using System;
 using System.IO;
+using UntisExp.EventHandlers;
 
-namespace UntisExp
+namespace UntisExp.Interfaces
 {
     /// <summary>
     /// An interface describing classes interacting with the WWW
@@ -19,7 +20,7 @@ namespace UntisExp
         /// <param name="aHead">Optional. Standard error message head</param>
         /// <param name="aBody">Optional. Standard error message caption</param>
         /// <param name="aBtn">Optional. Standard error message button title</param>
-        void DownloadData(string url, Action<String> callback, Action<string, string, string> alertmet = null, Action returnOnError = null, string aHead = "", string aBody = "", string aBtn = "");
+        void DownloadData(string url, Action<String> callback, Action<ErrorMessageEventArgs> alertmet = null, Action returnOnError = null, string aHead = "", string aBody = "", string aBtn = "");
 
         /// <summary>
         /// Should download a rescource from the internet and return it to a callback as a stream
@@ -31,6 +32,6 @@ namespace UntisExp
         /// <param name="aHead">Optional. Standard error message head</param>
         /// <param name="aBody">Optional. Standard error message caption</param>
         /// <param name="aBtn">Optional. Standard error message button title</param>
-        void DownloadLegacyStream(string url, Action<Stream> callback, Action<string, string, string> alertmet = null, bool alerting = false, string aHead = "", string aBody = "", string aBtn = "");
+        void DownloadLegacyStream(string url, Action<Stream> callback, Action<ErrorMessageEventArgs> alertmet = null, bool alerting = false, string aHead = "", string aBody = "", string aBtn = "");
     }
 }

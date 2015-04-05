@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using UntisExp.Containers;
+using UntisExp.EventHandlers;
+using UntisExp.Interfaces;
 
 namespace UntisExp
 {
@@ -9,19 +12,33 @@ namespace UntisExp
     /// </summary>
     public class Fetcher
     {
-		// Actions to be called back on lifetime events
         private readonly INetworkAccessor _networkAccessor;
-		private readonly Action _clearView;
-        private readonly Action<String, String, String> _alert;
-        private readonly Action<List<Data>> _refreshAll;
-		private readonly Action<News> _addTheNews;
-        private readonly Action<List<Group>> _refreshSet;
+        /// <summary>
+        /// Fires if the view should be cleared of old entries
+        /// </summary>
+        public event EventHandler<EventArgs> RaiseReadyToClearView;
+        /// <summary>
+        /// Fires if the desired schedule was retreived
+        /// </summary>
+        public event EventHandler<ScheduleEventArgs> RaiseRetreivedScheduleItems;
+        /// <summary>
+        /// Fires if news items were found
+        /// </summary>
+        public event EventHandler<NewsEventArgs> RaiseRetreivedNewsItem;
+        /// <summary>
+        /// Fires if the list of groups was retreived
+        /// </summary>
+        public event EventHandler<GroupEventArgs> RaiseRetreivedGroupItems;
+        /// <summary>
+        /// Fires if something went wrong and the UI should display an error message
+        /// </summary>
+        public event EventHandler<ErrorMessageEventArgs> RaiseErrorMessage;
 
         private Action<List<Data>> _temporaryRefresh;
         private bool _rootToTemporary;
 
 		/// <summary>
-		/// Collections of retreived <see cref="UntisExp.Data"/>
+		/// Collections of retreived <see cref="Data"/>
 		/// </summary>
         private List<Data> _globData;
 
@@ -43,14 +60,11 @@ namespace UntisExp
         /// <summary>
         /// Initializes a new instance of the <see cref="UntisExp.Fetcher"/> class which is pre-equipped for background operation. Will surpress all rows which do not contain a timetable element, e.g. the date row. Useful for background services.
         /// </summary>
-        /// <param name="stop">Callback for the case that the fetching failed. Useful to stop the background service</param>
-        /// <param name="refreshAll">Callback function that will be called once the <see cref="GetTimes"/> function and all of its callbacks are finished</param>
         /// <param name="mode">The mode of operation: MODE 0: Nur heute, MODE 1: Nur Morgen, MODE 2: Beide, MODE 5: Alles</param>
         /// <param name="networkAccessor">For testing purposes only. Will inject a <see cref="INetworkAccessor"/> into the class</param>
-        public Fetcher(Action stop, Action<List<Data>> refreshAll, int mode, INetworkAccessor networkAccessor = null)
+        // ReSharper disable once UnusedMember.Global
+        public Fetcher(int mode, INetworkAccessor networkAccessor = null)
         {
-            _alert = delegate { stop(); };
-            _refreshAll = refreshAll;
             _mode = mode;
             _silent = true;
             if (networkAccessor == null) networkAccessor = new Networking();
@@ -60,60 +74,23 @@ namespace UntisExp
         /// <summary>
         /// Initializes a new instance of the <see cref="UntisExp.Fetcher"/> class.
         /// </summary>
-        /// <param name="del">Callback function name for clearing the current list</param>
-        /// <param name="alert">Callbck function name for displaying an error with title, text and dismiss-button</param>
-        /// <param name="refeshAll">Callback function for updating the view with a List of event entries.</param>
-        /// <param name="refreshSet">Callback function for updating the view with a List of group entries.</param>
         /// <param name="networkAccessor">For testing purposes only. Will inject a <see cref="INetworkAccessor"/> into the class</param>
-        public Fetcher(Action del, Action<String, String, String> alert, Action<List<Data>> refeshAll, Action<List<Group>> refreshSet=null, INetworkAccessor networkAccessor = null)
+        public Fetcher(INetworkAccessor networkAccessor = null)
         {
-            _clearView = del;
-            _alert = alert;
-            _refreshAll = refeshAll;
-            _refreshSet = refreshSet;
             if (networkAccessor == null) networkAccessor = new Networking();
             _networkAccessor = networkAccessor;
         }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="UntisExp.Fetcher"/> class.
-        /// </summary>
-        /// <param name="alert">Callbck function name for displaying an error with title, text and dismiss-button</param>
-        /// <param name="refeshAll">Callback function for updating the view with a List of entries.</param>
-        /// <param name="networkAccessor">For testing purposes only. Will inject a <see cref="INetworkAccessor"/> into the class</param>
-        public Fetcher(Action<String, String, String> alert, Action<List<Group>> refeshAll, INetworkAccessor networkAccessor = null)
-        {
-            _alert = alert;
-            _refreshSet = refeshAll;
-            if (networkAccessor == null) networkAccessor = new Networking();
-            _networkAccessor = networkAccessor;
-        }
-
-		/// <summary>
-		/// Initializes a new instance of the <see cref="UntisExp.Fetcher"/> class. Please note that you'll have to check manually for news. Behavior of previous versions is now deprecated
-		/// </summary>
-		/// <param name="refreshOne">Callback for returning one element</param>
-        /// <param name="networkAccessor">For testing purposes only. Will inject a <see cref="INetworkAccessor"/> into the class</param>
-        public Fetcher(Action<News> refreshOne, INetworkAccessor networkAccessor = null)
-		{
-			_addTheNews = refreshOne;
-			_alert = delegate {
-			};
-            if (networkAccessor == null) networkAccessor = new Networking();
-                _networkAccessor = networkAccessor;
-		}
-
 			
         /// <summary>
-        /// Downloads a list of groups asynchronously. Uses the callbacks from the constructor.
+        /// Downloads a list of groups asynchronously. Uses the callbacks from the constructor. Subscribe to <see cref="RaiseErrorMessage"/> and <see cref="RaiseRetreivedGroupItems"/>
         /// </summary>
         public void GetClasses()
         {
-			_networkAccessor.DownloadData (VConfig.Url + VConfig.PathToNavbar, groups_DownloadStringCompleted, _alert, null, VConfig.GroupIErrorTtl, VConfig.GroupIErrorTxt, VConfig.GroupIErrorBtn);
+            _networkAccessor.DownloadData(VConfig.Url + VConfig.PathToNavbar, groups_DownloadStringCompleted, OnRaiseErrorMessageEvent, null, VConfig.GroupIErrorTtl, VConfig.GroupIErrorTxt, VConfig.GroupIErrorBtn);
         }
 
 		/// <summary>
-		/// Will parse the site for groups and call <see cref="_refreshSet"/> once finished
+		/// Will parse the site for groups and fire <see cref="RaiseRetreivedGroupItems"/> once finished
 		/// </summary>
 		/// <param name="res">The HTML string</param>
         private void groups_DownloadStringCompleted(String res)
@@ -134,7 +111,7 @@ namespace UntisExp
                     groupObj.Add(new Group(i, item));
                     i++;
                 }
-                _refreshSet(groupObj);
+                OnRaiseRetreivedGroupsItemsEvent(new GroupEventArgs(groupObj));
             }
             catch
             {
@@ -149,10 +126,10 @@ namespace UntisExp
         }
 
         /// <summary>
-        /// Downloads a list of events for the given group
+        /// Downloads a list of events for the given group. Subscribe to <see cref="RaiseReadyToClearView"/>, <see cref="RaiseErrorMessage"/> and either <see cref="RaiseRetreivedScheduleItems"/> or <see cref="RaiseRetreivedNewsItem"/>, depending on which <see cref="Activity"/> you are performing
         /// </summary>
         /// <param name="group">The group number</param>
-        /// <param name="activity">Optional. What activity to perform. Will default to a check of the first and all upfollowing schedules</param>
+        /// <param name="activity">Optional. What <see cref="Activity"/> to perform. Will default to a check of the first and all upfollowing schedules</param>
         /// <param name="week">Optional, if it's not set, the current week will be fetched. Sets the calender week to get.</param>
         public void GetTimes(int group, Activity activity = Activity.ParseFirstSchedule, int week = -1)
         {
@@ -184,23 +161,29 @@ namespace UntisExp
             }
 
 			var nav = VConfig.Url + weekStr + "/w/" + groupStr + ".htm";
-			if (activity == Activity.ParseSecondSchedule) {
-                _networkAccessor.DownloadData(nav, timesNext_DownloadStringCompleted, _alert, Abort);
+			if (activity == Activity.ParseSecondSchedule)
+			{
+                _networkAccessor.DownloadData(nav, timesNext_DownloadStringCompleted, OnRaiseErrorMessageEvent, Abort);
 			} else if (activity == Activity.ParseFirstSchedule) {
-                _networkAccessor.DownloadData(nav, times_DownloadStringCompleted, _alert, null, VConfig.EventIErrorTtl, VConfig.EventIErrorTxt, VConfig.EventIErrorBtn);
+                _networkAccessor.DownloadData(nav, times_DownloadStringCompleted, OnRaiseErrorMessageEvent, null, VConfig.EventIErrorTtl, VConfig.EventIErrorTxt, VConfig.EventIErrorBtn);
 			} else if (activity == Activity.GetNews) {
-                _networkAccessor.DownloadData(nav, news_DownloadStringCompleted, _alert, null, VConfig.EventIErrorTtl, VConfig.EventIErrorTxt, VConfig.EventIErrorBtn);
+                _networkAccessor.DownloadData(nav, news_DownloadStringCompleted, OnRaiseErrorMessageEvent, null, VConfig.EventIErrorTtl, VConfig.EventIErrorTxt, VConfig.EventIErrorBtn);
 			}
 		}
 
         /// <summary>
-        /// This method fetches the schedules of more than one group.
+        /// This method fetches the schedules of more than one group. Subscribe to <see cref="RaiseReadyToClearView"/>, <see cref="RaiseErrorMessage"/> and either <see cref="RaiseRetreivedScheduleItems"/> or <see cref="RaiseRetreivedNewsItem"/>, depending on which <see cref="Activity"/> you are performing
         /// </summary>
         /// <param name="groups">An array of valid WebUntis group numbers.</param>
         /// <param name="week">For debugging purposes only. Which week to fetch for. Will default to -1 which means that the current week will be selected.</param>
         public void GetMultipleGroupTimes(int[] groups, int week = -1)
         {
-            var tracker = new MulipleAwait(_refreshAll, Revert, groups.Length);
+            var tracker = new MulipleAwait(groups.Length);
+            tracker.RaiseFinishedWaitingAndJoining += (sender, e) =>
+            {
+                OnRaiseRetreivedScheduleItemsEvent(e);
+                Revert();
+            };
             _temporaryRefresh = tracker.CallMe;
             _rootToTemporary = true;
             foreach (var group in groups)
@@ -210,14 +193,14 @@ namespace UntisExp
         }
 
 		/// <summary>
-		/// Will be called if subsequent downloads of <see cref="GetTimes"/> fail. Uses <see cref="_refreshAll"/> callback to write previous elements to the front-end
+        /// Will be called if subsequent downloads of <see cref="GetTimes"/> fail. Raises <see cref="RaiseRetreivedScheduleItems"/> event to write previous elements to the front-end
 		/// </summary>
 		private void Abort ()
 		{
 		    if (_rootToTemporary)
                 _temporaryRefresh(_globData);
 		    else
-		        _refreshAll(_globData);
+		        OnRaiseRetreivedScheduleItemsEvent(new ScheduleEventArgs(_globData));
 		}
 
 		/// <summary>
@@ -257,7 +240,7 @@ namespace UntisExp
 			//TO-DO: Parse VPlan
 			//lastD = false;
 			if (!_silent)
-				_clearView();
+				OnRaiseReadyToClearViewEvent();
 			int needleCount = GetNewsBoxesLength(comp);
 			int daysAndNewsBoxes = VConfig.ExpectedDayNum + needleCount;
 			string[] raw = GetDayArray (comp, daysAndNewsBoxes);
@@ -277,7 +260,7 @@ namespace UntisExp
                 if (_rootToTemporary)
                     _temporaryRefresh(resultCollection);
                 else
-                    _refreshAll(resultCollection);
+                    OnRaiseRetreivedScheduleItemsEvent(new ScheduleEventArgs(resultCollection));
 			}
 		}
 		private void news_DownloadStringCompleted(string res)
@@ -294,10 +277,10 @@ namespace UntisExp
 			{
 				preliminaryResult = InterstitialFetching.ProcessRow (item, preliminaryResult.OuterLoopCursor, daysAndNewsBoxes, _mode, _silent, preliminaryResult.HasToGetSecondSchedule, Activity.GetNews);
 				if(preliminaryResult.ParsedNews!=null &&(preliminaryResult.ParsedNews.Content!=null||preliminaryResult.ParsedNews.Summary!=null))
-					_addTheNews (preliminaryResult.ParsedNews);
+					OnRaiseRetreivedNewsItemEvent(new NewsEventArgs(preliminaryResult.ParsedNews));
 			}
 		}
-        private void timesNext_DownloadStringCompleted(String res)
+        private void timesNext_DownloadStringCompleted(string res)
         {
             
             try
@@ -307,7 +290,7 @@ namespace UntisExp
                     if (_rootToTemporary)
                         _temporaryRefresh(_globData);
                     else
-                        _refreshAll(_globData);
+                        OnRaiseRetreivedScheduleItemsEvent(new ScheduleEventArgs(_globData));
                     return;
                 }
 				string comp = res.Replace(" ", string.Empty);
@@ -316,7 +299,7 @@ namespace UntisExp
                     if (_rootToTemporary)
                         _temporaryRefresh(_globData);
                     else
-                        _refreshAll(_globData);
+                        OnRaiseRetreivedScheduleItemsEvent(new ScheduleEventArgs(_globData));
                     return;
                 }
 				List<Data> resultCollection = new List<Data> ();
@@ -334,14 +317,80 @@ namespace UntisExp
                 if (_rootToTemporary)
                     _temporaryRefresh(_globData);
                 else
-                    _refreshAll(_globData);
+                    OnRaiseRetreivedScheduleItemsEvent(new ScheduleEventArgs(_globData));
             }
             catch
             {
                 if (_rootToTemporary)
                     _temporaryRefresh(_globData);
                 else
-                    _refreshAll(_globData);
+                    OnRaiseRetreivedScheduleItemsEvent(new ScheduleEventArgs(_globData));
+            }
+        }
+
+        /// <summary>
+        /// Will raise a Clear event
+        /// </summary>
+        /// <param name="e">The event arguments that should be passed</param>
+        protected virtual void OnRaiseReadyToClearViewEvent(EventArgs e = null)
+        {
+            if (e == null) e = new EventArgs();
+            EventHandler<EventArgs> handler = RaiseReadyToClearView;
+            if (handler != null)
+            {
+                handler(this, e);
+            }
+        }
+
+        /// <summary>
+        /// Will raise a Schedule event
+        /// </summary>
+        /// <param name="e">The event arguments that should be passed</param>
+        protected virtual void OnRaiseRetreivedScheduleItemsEvent(ScheduleEventArgs e)
+        {
+            EventHandler<ScheduleEventArgs> handler = RaiseRetreivedScheduleItems;
+            if (handler != null)
+            {
+                handler(this, e);
+            }
+        }
+
+        /// <summary>
+        /// Will raise a Groups event
+        /// </summary>
+        /// <param name="e">The event arguments that should be passed</param>
+        protected virtual void OnRaiseRetreivedGroupsItemsEvent(GroupEventArgs e)
+        {
+            EventHandler<GroupEventArgs> handler = RaiseRetreivedGroupItems;
+            if (handler != null)
+            {
+                handler(this, e);
+            }
+        }
+
+        /// <summary>
+        /// Will raise a News event
+        /// </summary>
+        /// <param name="e">The event arguments that should be passed</param>
+        protected virtual void OnRaiseRetreivedNewsItemEvent(NewsEventArgs e)
+        {
+            EventHandler<NewsEventArgs> handler = RaiseRetreivedNewsItem;
+            if (handler != null)
+            {
+                handler(this, e);
+            }
+        }
+
+        /// <summary>
+        /// Will raise an alarm event
+        /// </summary>
+        /// <param name="e">The event arguments that should be passed</param>
+        protected virtual void OnRaiseErrorMessageEvent(ErrorMessageEventArgs e)
+        {
+            EventHandler<ErrorMessageEventArgs> handler = RaiseErrorMessage;
+            if (handler != null)
+            {
+                handler(this, e);
             }
         }
 
@@ -352,17 +401,35 @@ namespace UntisExp
         {
             private List<Data> _receivedBits;
             private readonly List<List<Data>> _queue = new List<List<Data>>(); 
-            private readonly Action<List<Data>> _callback;
-            private readonly Action _parentOriginalState;
+            public event EventHandler<ScheduleEventArgs> RaiseFinishedWaitingAndJoining;
             private readonly int _num;
 
-            public MulipleAwait(Action<List<Data>> callback, Action resetParentState, int num)
+            /// <summary>
+            /// This constructor creates a new instance of this class with an expected num of entries 
+            /// </summary>
+            /// <param name="num">How many schedules to expect</param>
+            public MulipleAwait(int num)
             {
-                _callback = callback;
-                _parentOriginalState = resetParentState;
                 _num = num;
             }
 
+            /// <summary>
+            /// Will raise a Schedule event
+            /// </summary>
+            /// <param name="e">The event arguments that should be passed</param>
+            protected virtual void OnRaiseFinishedWaitingAndJoining(ScheduleEventArgs e)
+            {
+                EventHandler<ScheduleEventArgs> handler = RaiseFinishedWaitingAndJoining;
+                if (handler != null)
+                {
+                    handler(this, e);
+                }
+            }
+
+            /// <summary>
+            /// Callback for finished assembly of a schedule
+            /// </summary>
+            /// <param name="bit">The schedule</param>
             public void CallMe(List<Data> bit)
             {
                 _queue.Add(bit);
@@ -378,8 +445,7 @@ namespace UntisExp
                     _queue.RemoveAt(i);
                 }
 
-                _callback(_receivedBits);
-                _parentOriginalState();
+                OnRaiseFinishedWaitingAndJoining(new ScheduleEventArgs(_receivedBits));
             }
 
         }
@@ -393,11 +459,11 @@ namespace UntisExp
             /// </summary>
             public int OuterLoopCursor;
             /// <summary>
-            /// The parsed <see cref="UntisExp.Data"/> entries out of the table 
+            /// The parsed <see cref="Data"/> entries out of the table 
             /// </summary>
             public List<Data> ParsedRows;
             /// <summary>
-            /// The parsed <see cref="UntisExp.News"/> entry out of the table
+            /// The parsed <see cref="News"/> entry out of the table
             /// </summary>
             public News ParsedNews;
             /// <summary>
@@ -406,9 +472,9 @@ namespace UntisExp
             public bool HasToGetSecondSchedule;
 
             /// <summary>
-            /// Given a string representing a table of a day in WebUntis' HTML, <see cref="ProcessRow"/> will return an object including the <see cref="UntisExp.Data"/> representations of each schedule value
+            /// Given a string representing a table of a day in WebUntis' HTML, <see cref="ProcessRow"/> will return an object including the <see cref="Data"/> representations of each schedule value
             /// </summary>
-            /// <returns>Object containing the current progress of parsing and the last <see cref="UntisExp.Data"/>-objects that were parsed</returns>
+            /// <returns>Object containing the current progress of parsing and the last <see cref="Data"/>-objects that were parsed</returns>
             /// <param name="item">The HTML string representing the table of a day</param>
             /// <param name="iOuter">The progress through the day tables</param>
             /// <param name="mode">The background operations mode. See also <seealso cref="UntisExp.Fetcher"/></param>

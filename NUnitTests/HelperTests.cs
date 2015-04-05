@@ -4,6 +4,7 @@ using System.Web.Script.Serialization;
 using System.Linq;
 using NUnit.Framework;
 using UntisExp;
+using UntisExp.Containers;
 
 namespace NUnitTests
 {

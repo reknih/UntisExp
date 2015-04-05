@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using NUnit.Framework;
 using UntisExp;
+using UntisExp.Containers;
 
 namespace NUnitTests
 {
@@ -67,12 +68,13 @@ namespace NUnitTests
         {
             bool calledBack = false;
             List<News> res = new List<News>();
-            Action<List<News>> callback = locRes => {
-                calledBack = true;
-                res = locRes;
-            };
             var sut = new Press();
-            sut.GetCalledBackForNews(callback);
+            sut.RaiseRetreivedNewsItems += (sender, e) =>
+            {
+                calledBack = true;
+                res = e.News;
+            };
+            sut.FireEventForNews();
             for (int i = 0; (i < 10) && !calledBack; i++)
             {
                 Thread.Sleep(1000);

@@ -2,6 +2,8 @@
 using System.Net;
 using System.IO;
 using System.Text;
+using UntisExp.EventHandlers;
+using UntisExp.Interfaces;
 
 namespace UntisExp
 {
@@ -21,7 +23,7 @@ namespace UntisExp
         /// <param name="aHead">Optional. Standard error message head</param>
         /// <param name="aBody">Optional. Standard error message caption</param>
         /// <param name="aBtn">Optional. Standard error message button title</param>
-		public void DownloadData(string url, Action<String> callback, Action<string, string, string> alertmet = null, Action returnOnError = null, string aHead = "", string aBody = "", string aBtn = "")
+		public void DownloadData(string url, Action<String> callback, Action<ErrorMessageEventArgs> alertmet = null, Action returnOnError = null, string aHead = "", string aBody = "", string aBtn = "")
 		{
             bool alerting = alertmet != null;
 
@@ -52,7 +54,7 @@ namespace UntisExp
 				catch
 				{
 					if (alerting)
-						alertmet(aHead, aBody, aBtn);
+						alertmet(new ErrorMessageEventArgs(aHead, aBody, aBtn));
 				}
 			}
 		}
@@ -68,7 +70,7 @@ namespace UntisExp
         /// <param name="aHead">Optional. Standard error message head</param>
         /// <param name="aBody">Optional. Standard error message caption</param>
         /// <param name="aBtn">Optional. Standard error message button title</param>
-        public void DownloadLegacyStream(string url, Action<Stream> callback, Action<string, string, string> alertmet = null, bool alerting = false, string aHead = "", string aBody = "", string aBtn = "")
+        public void DownloadLegacyStream(string url, Action<Stream> callback, Action<ErrorMessageEventArgs> alertmet = null, bool alerting = false, string aHead = "", string aBody = "", string aBtn = "")
         {
             try
             {
@@ -78,11 +80,11 @@ namespace UntisExp
             catch
             {
                 if (alerting && alertmet != null)
-                    alertmet(aHead, aBody, aBtn);
+                    alertmet(new ErrorMessageEventArgs(aHead, aBody, aBtn));
             }
         }
 
-	    private void DoWithResponse(HttpWebRequest request, bool alerting, Action onError, Action<string,string,string> alert, Action<HttpWebResponse> responseAction)
+	    private void DoWithResponse(HttpWebRequest request, bool alerting, Action onError, Action<ErrorMessageEventArgs> alert, Action<HttpWebResponse> responseAction)
 		{
 			Action wrapperAction = () =>
 			{
@@ -95,7 +97,7 @@ namespace UntisExp
 				        if (onError != null)
 				            onError();
 				        if(alerting)
-				            alert(VConfig.NoPageErrTtl, VConfig.NoPageErrTxt, VConfig.NoPageErrBtn);
+				            alert(new ErrorMessageEventArgs(VConfig.NoPageErrTtl, VConfig.NoPageErrTxt, VConfig.NoPageErrBtn));
 				    }
 				}, request);
 			};
@@ -106,7 +108,7 @@ namespace UntisExp
 			}, wrapperAction);
 		}
 
-	    private string GetBody(Action<string,string,string> alert, IAsyncResult result)
+	    private string GetBody(Action<ErrorMessageEventArgs> alert, IAsyncResult result)
 		{
             Object[] param = (Object[])result.AsyncState;
             string body = "";
@@ -124,7 +126,7 @@ namespace UntisExp
                     }
                     else
                     {
-                        if (alert != null) alert(VConfig.UnknownErrTtl, VConfig.UnknownErrTxt, VConfig.UnknownErrBtn);
+                        if (alert != null) alert(new ErrorMessageEventArgs(VConfig.UnknownErrTtl, VConfig.UnknownErrTxt, VConfig.UnknownErrBtn));
                     }
                 }
                 try
@@ -139,19 +141,19 @@ namespace UntisExp
             catch {
                 if ((bool)param[1])
                 {
-                    alert(VConfig.NoPageErrTtl, VConfig.NoPageErrTxt, VConfig.NoPageErrBtn);
+                    alert(new ErrorMessageEventArgs(VConfig.NoPageErrTtl, VConfig.NoPageErrTxt, VConfig.NoPageErrBtn));
                 }
             }
 			return body;
 		}
 
-	    private void FinishRequest(Action<string> callback,Action<string,string,string> alert, IAsyncResult result)
+	    private void FinishRequest(Action<string> callback,Action<ErrorMessageEventArgs> alert, IAsyncResult result)
         {
             string body = GetBody(alert, result);
                 callback(body);
         }
 
-	    private void FinishStreamRequest(IAsyncResult result, Action<Stream> streamCallback, Action<string,string,string> alert)
+	    private void FinishStreamRequest(IAsyncResult result, Action<Stream> streamCallback, Action<ErrorMessageEventArgs> alert)
 	    {
 	        HttpWebRequest request = result.AsyncState as HttpWebRequest;
 	        if (request != null)
@@ -164,13 +166,13 @@ namespace UntisExp
 	            }
 	            else
 	            {
-	                if (alert != null) alert(VConfig.UnknownErrTtl, VConfig.UnknownErrTxt, VConfig.UnknownErrBtn);
+	                if (alert != null) alert(new ErrorMessageEventArgs(VConfig.UnknownErrTtl, VConfig.UnknownErrTxt, VConfig.UnknownErrBtn));
 	            }
 	        }
 	        else
 	        {
-                if (alert != null) alert(VConfig.UnknownErrTtl, VConfig.UnknownErrTxt, VConfig.UnknownErrBtn);
-	        }
+                if (alert != null) alert(new ErrorMessageEventArgs(VConfig.UnknownErrTtl, VConfig.UnknownErrTxt, VConfig.UnknownErrBtn));
+            }
 	    }
 	}
 }
