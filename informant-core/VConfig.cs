@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
+using NodaTime;
 
 namespace UntisExp
 {
@@ -75,6 +76,11 @@ namespace UntisExp
 	    public static readonly Regex  CellSearch = new Regex("<t{1}d{1}.*?>.*?</td>");
 
         /// <summary>
+        /// A RegExp determining that the schedule table cells describing the timeslot should match for time serialization
+        /// </summary>
+        public static readonly Regex TimeSearch = new Regex("^\\d(\\s*-\\s*\\d)?");
+        
+        /// <summary>
         /// String determining a special event
         /// </summary>
 	    public const string SpecialEvtAb = "Veranst.";
@@ -113,6 +119,44 @@ namespace UntisExp
             {"WU", "Wahlunterricht"},
             {"KLALE", "Klassenlehrerstunde"}
 	    };
+
+        /// <summary>
+        /// Describes when a specific lesson time slot starts
+        /// </summary>
+        public static readonly Dictionary<int, LocalTime> LessonStart = new Dictionary<int, LocalTime>
+        {
+            {1, new LocalTime(7,55)},
+            {2, new LocalTime(8,45)},
+            {3, new LocalTime(9,30)},
+            {4, new LocalTime(10,35)},
+            {5, new LocalTime(11,35)},
+            {6, new LocalTime(12,20)},
+            {7, new LocalTime(13,10)},
+            {8, new LocalTime(14,00)},
+            {9, new LocalTime(14,45)},
+            {10, new LocalTime(15,40)},
+            {11, new LocalTime(16,25)},
+            {12, new LocalTime(17,15)}
+        };
+
+        /// <summary>
+        /// Describes when a specific lesson time slot ends
+        /// </summary>
+        public static readonly Dictionary<int, LocalTime> LessonEnd = new Dictionary<int, LocalTime>
+        {
+            {1, new LocalTime(8,40)},
+            {2, new LocalTime(9,30)},
+            {3, new LocalTime(10,30)},
+            {4, new LocalTime(11,20)},
+            {5, new LocalTime(12,20)},
+            {6, new LocalTime(13,00)},
+            {7, new LocalTime(13,50)},
+            {8, new LocalTime(14,45)},
+            {9, new LocalTime(15,30)},
+            {10, new LocalTime(16,25)},
+            {11, new LocalTime(17,10)},
+            {12, new LocalTime(18,00)}
+        };
 
         /// <summary>
         /// Title for the error message if the WebUntis site could not be found

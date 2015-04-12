@@ -278,6 +278,7 @@ namespace NUnitTests
         [Test]
         [Category("Mocked dependencies")]
         [Category("Integration test")]
+        [Ignore]
         public void WillOutputTheRightNews()
         {
             var serializer = new JavaScriptSerializer();

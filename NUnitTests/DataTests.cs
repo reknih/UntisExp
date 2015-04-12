@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using NUnit.Framework;
-using UntisExp;
 using UntisExp.Containers;
 
 namespace NUnitTests
@@ -83,6 +82,78 @@ namespace NUnitTests
             var sut = new Data { CareStr = " x " };
             sut.Refresh();
             Assert.IsTrue(sut.Cared);
+        }
+
+        [Test]
+        [Category("Time dependant tests")]
+        public void WillConvertLessonStringStartSingle1()
+        {
+            var sut = new Data { Date = new DateTime(2015, 4, 12), Lesson = "10" };
+            sut.Refresh();
+            Assert.IsTrue((sut.Date.Year == 2015) && (sut.Date.Month == 4) && (sut.Date.Day == 12) && (sut.Date.Hour == 15) && (sut.Date.Minute == 40));
+        }
+
+        [Test]
+        [Category("Time dependant tests")]
+        public void WillConvertLessonStringStartSingle2()
+        {
+            var sut = new Data { Date = new DateTime(2015, 4, 12), Lesson = "4" };
+            sut.Refresh();
+            Assert.IsTrue((sut.Date.Year == 2015) && (sut.Date.Month == 4) && (sut.Date.Day == 12) && (sut.Date.Hour == 10) && (sut.Date.Minute == 35));
+        }
+
+        [Test]
+        [Category("Time dependant tests")]
+        public void WillConvertLessonStringEndSingle1()
+        {
+            var sut = new Data { Date = new DateTime(2015, 4, 12), Lesson = "10" };
+            sut.Refresh();
+            Assert.IsTrue((sut.End.Year == 2015) && (sut.End.Month == 4) && (sut.End.Day == 12) && (sut.End.Hour == 16) && (sut.End.Minute == 25));
+        }
+
+        [Test]
+        [Category("Time dependant tests")]
+        public void WillConvertLessonStringEndSingle2()
+        {
+            var sut = new Data { Date = new DateTime(2015, 4, 12), Lesson = "4" };
+            sut.Refresh();
+            Assert.IsTrue((sut.End.Year == 2015) && (sut.End.Month == 4) && (sut.End.Day == 12) && (sut.End.Hour == 11) && (sut.End.Minute == 20));
+        }
+
+        [Test]
+        [Category("Time dependant tests")]
+        public void WillConvertLessonStringStartMultiple1()
+        {
+            var sut = new Data { Date = new DateTime(2015, 4, 12), Lesson = "10-11" };
+            sut.Refresh();
+            Assert.IsTrue((sut.Date.Year == 2015) && (sut.Date.Month == 4) && (sut.Date.Day == 12) && (sut.Date.Hour == 15) && (sut.Date.Minute == 40));
+        }
+
+        [Test]
+        [Category("Time dependant tests")]
+        public void WillConvertLessonStringStartMultiple2()
+        {
+            var sut = new Data { Date = new DateTime(2015, 4, 12), Lesson = "2-4" };
+            sut.Refresh();
+            Assert.IsTrue((sut.Date.Year == 2015) && (sut.Date.Month == 4) && (sut.Date.Day == 12) && (sut.Date.Hour == 8) && (sut.Date.Minute == 45));
+        }
+
+        [Test]
+        [Category("Time dependant tests")]
+        public void WillConvertLessonStringEndMultiple1()
+        {
+            var sut = new Data { Date = new DateTime(2015, 4, 12), Lesson = "10-11" };
+            sut.Refresh();
+            Assert.IsTrue((sut.End.Year == 2015) && (sut.End.Month == 4) && (sut.End.Day == 12) && (sut.End.Hour == 17) && (sut.End.Minute == 10));
+        }
+
+        [Test]
+        [Category("Time dependant tests")]
+        public void WillConvertLessonStringEndMultiple2()
+        {
+            var sut = new Data { Date = new DateTime(2015, 4, 12), Lesson = "2-4" };
+            sut.Refresh();
+            Assert.IsTrue((sut.End.Year == 2015) && (sut.End.Month == 4) && (sut.End.Day == 12) && (sut.End.Hour == 11) && (sut.End.Minute == 20));
         }
 
         [Test]

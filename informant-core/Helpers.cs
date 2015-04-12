@@ -47,7 +47,7 @@ namespace UntisExp
 			result = Regex.Replace(result, "(\\.(?=\\S)|:(?=\\S))(.)", "$1 $2");
 			return result;
 		}
-#if WINDOWS_PHONE || DEBUG
+
         /// <summary>
         /// Will get a random item out of a string array
         /// </summary>
@@ -58,7 +58,6 @@ namespace UntisExp
             int pos = rand.Next(array.Length);
             return array[pos];
         }
-#endif
 
         /// <summary>
         /// Will get how much entries for today and how much for another day are in a set of <see cref="Data"/> objects

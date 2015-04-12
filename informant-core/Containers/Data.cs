@@ -148,6 +148,11 @@ namespace UntisExp.Containers
 				Notice = Helpers.AddSpaces (Notice);
 				Line2 = Notice + "; " + Line2;
 			}
+		    if (IsAValidLessonTime(Lesson))
+		    {
+		        Date = GetStartTime(Lesson, Date);
+		        End = GetEndTime(Lesson, Date);
+		    }
             return this;
 		}
 		private static string FaecherSchreib(string fach)
@@ -290,9 +295,14 @@ namespace UntisExp.Containers
 		public string Line2 { get; set; }
 
         /// <summary>
-        /// The date of the rescheduled lesson
+        /// The start of the rescheduled lesson
         /// </summary>
-		public DateTime Date { get; set; }
+        public DateTime Date { get; set; }
+
+        /// <summary>
+        /// The end of the rescheduled lesson
+        /// </summary>
+        public DateTime End { get; set; }
 
         /// <summary>
         /// Whether this object is an heading
@@ -303,5 +313,91 @@ namespace UntisExp.Containers
         /// Whether this object is an heading containing a date
         /// </summary>
         public bool DateHeader { get; set; }
-	}
+
+	    private static bool IsAValidLessonTime(string cellsContent)
+	    {
+	        if (string.IsNullOrEmpty(cellsContent)) return false;
+	        return VConfig.TimeSearch.IsMatch(cellsContent);
+	    }
+
+        /// <summary>
+        /// Will get the <see cref="System.DateTime"/> object for the specified arguments
+        /// </summary>
+        /// <param name="timeCellContent">Content of the table cell representing the time slot</param>
+        /// <param name="day">The day where the lesson takes place</param>
+        /// <returns>Its exact start time</returns>
+        private static DateTime GetStartTime(string timeCellContent, DateTime day)
+        {
+            var length = 0;
+            for (var i = 0; i < timeCellContent.Length; i++)
+            {
+                try
+                {
+                    // ReSharper disable once ReturnValueOfPureMethodIsNotUsed
+                    int.Parse(timeCellContent[i].ToString());
+                }
+                catch (FormatException)
+                {
+                    break;
+                }
+                length++;
+            }
+            var usable = timeCellContent.Substring(0, length);
+            var lessonTimeIndex = int.Parse(usable);
+            if (!VConfig.LessonStart.ContainsKey(lessonTimeIndex)) return day;
+            var startTime = VConfig.LessonStart[lessonTimeIndex];
+            var preciseDate = new DateTime(day.Year, day.Month, day.Day, startTime.Hour, startTime.Minute, startTime.Second,
+                startTime.Millisecond, DateTimeKind.Local);
+            return preciseDate;
+        }
+
+        /// <summary>
+        /// Will get the <see cref="System.DateTime"/> object for the specified arguments
+        /// </summary>
+        /// <param name="timeCellContent">Content of the table cell representing the time slot</param>
+        /// <param name="day">The day where the lesson takes place</param>
+        /// <returns>Its exact end time</returns>
+        private static DateTime GetEndTime(string timeCellContent, DateTime day)
+        {
+            timeCellContent = timeCellContent.Replace(" ", string.Empty);
+            int stringLastIndex;
+
+            for (stringLastIndex = timeCellContent.Length - 1; stringLastIndex >= 0; stringLastIndex--)
+            {
+                try
+                {
+                    // ReSharper disable once ReturnValueOfPureMethodIsNotUsed
+                    int.Parse(timeCellContent[stringLastIndex].ToString());
+                    break;
+                }
+                catch (FormatException) { }
+                
+            }
+
+            var length = 0;
+
+            for (var i = timeCellContent.Length - 1; i >= 0; i--)
+            {
+                try
+                {
+                    // ReSharper disable once ReturnValueOfPureMethodIsNotUsed
+                    int.Parse(timeCellContent[i].ToString());
+                }
+                catch (FormatException)
+                {
+                    break;
+                }
+                length++;
+            }
+
+            var usable = timeCellContent.Substring(stringLastIndex + 1 - length, length);
+            int lessonTimeIndex = int.Parse(usable);
+
+            if (!VConfig.LessonEnd.ContainsKey(lessonTimeIndex)) return day;
+            var endTime = VConfig.LessonEnd[lessonTimeIndex];
+            var preciseDate = new DateTime(day.Year, day.Month, day.Day, endTime.Hour, endTime.Minute, endTime.Second,
+                endTime.Millisecond, DateTimeKind.Local);
+            return preciseDate;
+        }
+    }
 }

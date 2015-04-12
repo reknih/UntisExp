@@ -16,6 +16,7 @@ namespace UntisExp
         /// <summary>
         /// Fires if the view should be cleared of old entries
         /// </summary>
+        // ReSharper disable once EventNeverSubscribedTo.Global
         public event EventHandler<EventArgs> RaiseReadyToClearView;
         /// <summary>
         /// Fires if the desired schedule was retreived
@@ -32,6 +33,7 @@ namespace UntisExp
         /// <summary>
         /// Fires if something went wrong and the UI should display an error message
         /// </summary>
+        // ReSharper disable once EventNeverSubscribedTo.Global
         public event EventHandler<ErrorMessageEventArgs> RaiseErrorMessage;
 
         private Action<List<Data>> _temporaryRefresh;

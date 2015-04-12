@@ -21,12 +21,10 @@ namespace UntisExp
 	    readonly XNamespace _mediaNs = XNamespace.Get("http://search.yahoo.com/mrss/");
 	    readonly Regex _r = new Regex("<.*?>");
 	    private readonly INetworkAccessor _networkAccessor;
-#if (WINDOWS || WINDOWS_PHONE || DEBUG)
         /// <summary>
         /// Fires when the list of news objects is retreived
         /// </summary>
         public event EventHandler<MassiveNewsEventArgs> RaiseRetreivedNewsItems; 
-#endif
 
         /// <summary>
         /// Creates a new Press object
@@ -54,7 +52,7 @@ namespace UntisExp
             });
             return gathered;
         }
-#if (WINDOWS || WINDOWS_PHONE || DEBUG)
+
         /// <summary>
         /// Will fire <see cref="RaiseRetreivedNewsItems"/> with the news articles from the RSS feed specified in <seealso cref="VConfig"/> as an parameter
         /// </summary>
@@ -83,9 +81,8 @@ namespace UntisExp
                 handler(this, e);
             }
         }
-#endif
 
-	    private News ProcessXml(XElement articlet)
+        private News ProcessXml(XElement articlet)
         {
             var writing = new News();
             var titleQuery = from titles in articlet.Descendants("title")
