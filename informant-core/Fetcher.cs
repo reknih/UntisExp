@@ -165,7 +165,7 @@ namespace UntisExp
 			var nav = VConfig.Url + weekStr + "/w/" + groupStr + ".htm";
 			if (activity == Activity.ParseSecondSchedule)
 			{
-                _networkAccessor.DownloadData(nav, timesNext_DownloadStringCompleted, OnRaiseErrorMessageEvent, Abort);
+                _networkAccessor.DownloadData(nav, timesNext_DownloadStringCompleted, null, Abort);
 			} else if (activity == Activity.ParseFirstSchedule) {
                 _networkAccessor.DownloadData(nav, times_DownloadStringCompleted, OnRaiseErrorMessageEvent, null, VConfig.EventIErrorTtl, VConfig.EventIErrorTxt, VConfig.EventIErrorBtn);
 			} else if (activity == Activity.GetNews) {
@@ -252,17 +252,16 @@ namespace UntisExp
 				preliminaryResult = InterstitialFetching.ProcessRow (item, preliminaryResult.OuterLoopCursor, daysAndNewsBoxes, _mode, _silent, preliminaryResult.HasToGetSecondSchedule);
 			    if (preliminaryResult.HasToGetSecondSchedule)
 			    {
-			        _globData = preliminaryResult.ParsedRows;
                     GetTimes(_group, Activity.ParseSecondSchedule);
 			    }
 				resultCollection.AddRange (preliminaryResult.ParsedRows);
 			}
-			if (preliminaryResult.HasToGetSecondSchedule != true)
-			{
-                if (_rootToTemporary)
-                    _temporaryRefresh(resultCollection);
-                else
-                    OnRaiseRetreivedScheduleItemsEvent(new ScheduleEventArgs(resultCollection));
+			_globData = resultCollection;
+			if (!preliminaryResult.HasToGetSecondSchedule) {
+				if (_rootToTemporary)
+					_temporaryRefresh (resultCollection);
+				else
+					OnRaiseRetreivedScheduleItemsEvent (new ScheduleEventArgs (resultCollection));
 			}
 		}
 		private void news_DownloadStringCompleted(string res)

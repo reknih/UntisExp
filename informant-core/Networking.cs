@@ -87,20 +87,17 @@ namespace UntisExp
 	    private void DoWithResponse(HttpWebRequest request, bool alerting, Action onError, Action<ErrorMessageEventArgs> alert, Action<HttpWebResponse> responseAction)
 		{
 			Action wrapperAction = () =>
-			{
-				request.BeginGetResponse(iar =>
-				{
-				    try {
-				        var response = (HttpWebResponse)((HttpWebRequest)iar.AsyncState).EndGetResponse(iar);
-				        responseAction(response);
-				    } catch {			
-				        if (onError != null)
-				            onError();
-				        if(alerting)
-				            alert(new ErrorMessageEventArgs(VConfig.NoPageErrTtl, VConfig.NoPageErrTxt, VConfig.NoPageErrBtn));
-				    }
-				}, request);
-			};
+			request.BeginGetResponse (iar => {
+				try {
+					var response = (HttpWebResponse)((HttpWebRequest)iar.AsyncState).EndGetResponse (iar);
+					responseAction (response);
+					} catch (WebException e) {
+					if (onError != null)
+						onError ();
+					if (alerting)
+						alert (new ErrorMessageEventArgs (VConfig.NoPageErrTtl, VConfig.NoPageErrTxt, VConfig.NoPageErrBtn));
+				}
+			}, request);
 			wrapperAction.BeginInvoke(iar =>
 			{
 			    var action = (Action)iar.AsyncState;
@@ -133,9 +130,8 @@ namespace UntisExp
                 {
                     body = WebUtility.HtmlDecode(body);
                 }
-                catch
+				catch
                 {
-                    // ignored
                 }
             }
             catch {
