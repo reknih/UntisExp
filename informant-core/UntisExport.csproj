@@ -57,17 +57,7 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Droid|AnyCPU'">
-    <OutputPath>bin\Droid\</OutputPath>
-    <DefineConstants>CODE_ANALYSIS;__ANDROID__</DefineConstants>
-    <Optimize>true</Optimize>
-    <RunCodeAnalysis>true</RunCodeAnalysis>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <WarningLevel>4</WarningLevel>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>pdbonly</DebugType>
-  </PropertyGroup>
+  
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug-iOS|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\Debug-iOS\</OutputPath>
@@ -98,6 +88,80 @@
     <RunCodeAnalysis>true</RunCodeAnalysis>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Droid|AnyCPU'">
+    <OutputPath>bin\Droid\</OutputPath>
+    <DefineConstants>CODE_ANALYSIS;__ANDROID__</DefineConstants>
+    <Optimize>true</Optimize>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <WarningLevel>4</WarningLevel>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>pdbonly</DebugType>
+  </PropertyGroup>
+
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug-WP-Lehrer|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug-WP\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS;SILVERLIGHT;WINDOWS_PHONE;LEHRER</DefineConstants>
+    <DebugType>full</DebugType>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <WarningLevel>4</WarningLevel>
+    <Optimize>false</Optimize>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release-WP-Lehrer|AnyCPU'">
+    <OutputPath>bin\Release-WP\</OutputPath>
+    <DefineConstants>TRACE;CODE_ANALYSIS;SILVERLIGHT;WINDOWS_PHONE;LEHRER</DefineConstants>
+    <Optimize>true</Optimize>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+ 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug-iOS-Lehrer|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug-iOS\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS;__IOS__;LEHRER</DefineConstants>
+    <DebugType>full</DebugType>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <WarningLevel>4</WarningLevel>
+    <Optimize>false</Optimize>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release-iOS-Lehrer|AnyCPU'">
+    <OutputPath>bin\Release-iOS\</OutputPath>
+    <DefineConstants>TRACE;CODE_ANALYSIS;__IOS__;LEHRER</DefineConstants>
+    <Optimize>true</Optimize>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug-Droid-Lehrer|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Droid\</OutputPath>
+    <DefineConstants>CODE_ANALYSIS;__ANDROID__;LEHRER</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Droid-Lehrer|AnyCPU'">
+    <OutputPath>bin\Droid\</OutputPath>
+    <DefineConstants>CODE_ANALYSIS;__ANDROID__;LEHRER</DefineConstants>
+    <Optimize>true</Optimize>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <WarningLevel>4</WarningLevel>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>pdbonly</DebugType>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="EventHandlers\ErrorMessageEventArgs.cs" />
     <Compile Include="EventHandlers\NewsEventArgs.cs" />
@@ -124,7 +188,7 @@
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <ItemGroup>
     <Reference Include="NodaTime">
-      <HintPath>..\..\vplan\packages\NodaTime.1.3.1\lib\portable-net4+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1+XamariniOS1\NodaTime.dll</HintPath>
+      <HintPath>..\packages\NodaTime.1.3.1\lib\portable-net4+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1+XamariniOS1\NodaTime.dll</HintPath>
     </Reference>
     <Reference Include="System.Xml" />
   </ItemGroup>

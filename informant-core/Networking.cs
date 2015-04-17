@@ -30,6 +30,12 @@ namespace UntisExp
             try
 			{
 				var request = (HttpWebRequest)WebRequest.Create(url);
+                #if LEHRER
+                if(url.IndexOf(VConfig.Url, StringComparison.Ordinal) != -1)
+                {
+                    request.Credentials = new NetworkCredential("cwslehrer","u51n63n");
+                }          
+                #endif
 				DoWithResponse(request, alerting, returnOnError, alertmet, response =>
 					{
 					    var body = url.IndexOf(VConfig.Url, StringComparison.Ordinal) != -1 ? new StreamReader(response.GetResponseStream(), Encoding.GetEncoding("ISO-8859-1")).ReadToEnd() : new StreamReader(response.GetResponseStream(), Encoding.UTF8).ReadToEnd();
