@@ -118,7 +118,7 @@ namespace UntisExp.Containers
 			}
 			else if (Cared)
 			{
-				Line2 = Group + " wird in " + Subject + " durch Sie mitbetreut.";
+				Line2 = Group + " wird in " + Subject + " durch " + Cover + " mitbetreut.";
                 if (!Helpers.IsEmpty(Room))
 			    {
 			        Line2 += " | " + Room;
@@ -158,13 +158,13 @@ namespace UntisExp.Containers
 			    if (Helpers.IsEmpty(OldSubject) && Helpers.IsEmpty(Subject) && Helpers.IsEmpty(Group) &&
 			        Helpers.IsEmpty(OldGroup) && !Event)
 			    {
-			        Line2 = "Sie führen die " + Room + "-Aufsicht";
+			        Line2 = Cover + " führt die " + Room + "-Aufsicht";
 			        if (!Helpers.IsEmpty(Teacher))
 			            Line2 += " anstatt von " + Teacher;
 			    }
 			    else
 			    {
-			        Line2 = "Sie vertreten " + Teacher;
+			        Line2 =  Cover + " vertritt " + Teacher;
 			        if (!Helpers.IsEmpty(Subject))
 			            Line2 += " in " + Subject;
 			        if (!Helpers.IsEmpty(Room))
