@@ -1,4 +1,6 @@
-﻿using System;
+﻿
+
+using System;
 using System.Globalization;
 
 namespace UntisExp.Containers
@@ -75,6 +77,98 @@ namespace UntisExp.Containers
 			OldSubject = FaecherSchreib(OldSubject);
 			Outage = !Helpers.IsEmpty(OutageStr);
 			Cared = !Helpers.IsEmpty(CareStr);
+
+			#if LEHRER
+			if (!Helpers.IsEmpty(Group))
+		    {
+		        Line1 = Lesson + ". Std: " + Group;
+		    }
+            if (!Helpers.IsEmpty(oldGroup))
+            {
+                Line1 = Lesson + ". Std: " + oldGroup;
+            }
+		    else if (!Helpers.IsEmpty(Subject))
+		    {
+		        Line1 = Lesson + ". Std: " + Subject;
+		    }
+		    else if(!Helpers.IsEmpty(OldSubject))
+		    {
+		        Line1 = Lesson + ". Std: " + OldSubject;
+		    }
+		    else
+		    {
+		    	Line1 = Lesson + ". Std";
+		    }
+
+		    if (Outage)
+			{
+				Line1 = Lesson + ". Std: " + Group;
+				Line2 = OldSubject + " bei " + Group + " entfällt.";
+			}
+			else if (Cared)
+			{
+				Line2 = Group + " wird in " + Subject + " durch Sie mitbetreut.";
+			    if (Room != null)
+			    {
+			        Line2 += " | " + Room;
+			    }
+			}
+			else if (Event)
+			{
+				Line1 = Lesson + ". Std: Veranstaltung";
+			    Line2 = "";
+				if (!string.IsNullOrEmpty(Room))
+				{
+					Line2 = "Raum: " + Room + " | ";
+				}
+                if (!string.IsNullOrWhiteSpace(Group))
+                {
+                    Line2 += "Mit " + Group;
+                }
+			}
+			else if (Helpers.IsEmpty(Teacher) && !Helpers.IsEmpty(Cover))
+			{
+			    Line2 = "Bei " + Cover;
+			    if (!string.IsNullOrEmpty(Room))
+			    {
+                    Line2 += " in " + Room;
+			    }
+			}
+			else if (Subject != OldSubject)
+			{
+                Line2 = Subject + " bei " + Cover + " statt " + OldSubject + " bei " + Teacher;
+                if (!string.IsNullOrEmpty(Room))
+                {
+                    Line2 += " | " + Room;
+                }
+			}
+			else if (Cover != Teacher)
+			{
+                Line2 = Cover + " vertritt " + Teacher;
+                if (!string.IsNullOrEmpty(Room))
+                {
+                    Line2 += " | " + Room;
+                }
+			}
+			else
+			{
+				Line2 = Teacher;
+                if (!string.IsNullOrEmpty(Room))
+                {
+                    Line2 += " | " + Room;
+                }
+			}
+			if (!Helpers.IsEmpty(Notice))
+			{
+				Notice = Helpers.AddSpaces (Notice);
+				Line2 = Notice + "; " + Line2;
+			}
+		    if (IsAValidLessonTime(Lesson))
+		    {
+		        Date = GetStartTime(Lesson, Date);
+		        End = GetEndTime(Lesson, Date);
+		    }
+			#else
 		    if (!Helpers.IsEmpty(Subject))
 		    {
 		        Line1 = Lesson + ". Std: " + Subject;
@@ -153,6 +247,7 @@ namespace UntisExp.Containers
 		        Date = GetStartTime(Lesson, Date);
 		        End = GetEndTime(Lesson, Date);
 		    }
+		    #endif
             return this;
 		}
 		private static string FaecherSchreib(string fach)
@@ -289,6 +384,7 @@ namespace UntisExp.Containers
         /// </summary>
 		public string Group { get; set; }
 
+
         /// <summary>
         /// Presentation of the content, details
         /// </summary>
@@ -313,6 +409,12 @@ namespace UntisExp.Containers
         /// Whether this object is an heading containing a date
         /// </summary>
         public bool DateHeader { get; set; }
+
+        /// <summary>
+        /// The original class of this lesson
+        /// </summary>
+        public string oldGroup { get; set; }
+
 
 	    private static bool IsAValidLessonTime(string cellsContent)
 	    {

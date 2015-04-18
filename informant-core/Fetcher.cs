@@ -597,6 +597,71 @@ namespace UntisExp
 
                 switch (webColumn)
                 {
+                    #if LEHRER
+                    case 0:
+                        if (thingy == VConfig.SpecialEvtAb)
+                        { individualEntry.Event = true; }
+                        break;
+                    case 1:
+                        int day = Convert.ToInt16(thingy.Substring(0, thingy.IndexOf(".", StringComparison.Ordinal)));
+                        string dayStr = thingy.Substring(thingy.IndexOf(".", StringComparison.Ordinal) + 1);
+                        dayStr = dayStr.Replace(".", string.Empty);
+                        int month = Convert.ToInt16(dayStr);
+                        int year = DateTime.Now.Year;
+                        DateTime dt = new DateTime(year, month, day);
+                        individualEntry.Date = dt;
+                        if (iteration == 0 && !silent)
+                        {
+                            rowsData.Add(new Data(dt));
+                        }
+                        break;
+                    case 2:
+                        break;
+                    case 3:
+                        individualEntry.Lesson = thingy;
+                        break;
+                    case 4:
+                        individualEntry.OldSubject = thingy;
+                        break;
+                    case 5:
+                        //time
+                        break;
+                    case 6:
+                        individualEntry.Subject = thingy;
+                        break;
+                    case 7:
+                        individualEntry.Teacher = thingy;
+                        break;
+                    case 8:
+                        individualEntry.Cover = thingy;
+                        break;
+                    case 9:
+                        individualEntry.oldGroup = thingy;
+                        break;
+                     case 10:
+                        individualEntry.Group = thingy;
+                        break;
+                    case 11:
+                        //old room
+                        break;
+                    case 12:
+                        individualEntry.Room = thingy;
+                        break;
+                    case 13:
+                        //old lesson
+                        break;
+                    case 14:
+                        //teacher to
+                        break;
+                    case 15:
+                        individualEntry.OutageStr = thingy;
+                        break;
+                    case 16:
+                        individualEntry.CareStr = thingy;
+                        break;
+                    
+                    
+                    #else
                     case 0:
                         if (thingy == VConfig.SpecialEvtAb)
                         { individualEntry.Event = true; }
@@ -644,6 +709,7 @@ namespace UntisExp
                     case 15:
                         individualEntry.CareStr = thingy;
                         break;
+                    #endif
                 }
                 return individualEntry;
             }

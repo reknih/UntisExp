@@ -13,7 +13,11 @@ namespace UntisExp
 	    /// <summary>
 	    /// The WebUntis url to fetch from
 	    /// </summary>
-	    public const string Url = "http://vp.cws-usingen.de/Schueler/";
+        #if LEHRER
+	    public const string Url = "http://vp.cws-usingen.de/Lehrer/";
+        #else
+        public const string Url = "http://vp.cws-usingen.de/Schueler/";
+        #endif
 
 	    /// <summary>
 	    /// The Url to fetch news from
@@ -25,6 +29,7 @@ namespace UntisExp
 	    /// </summary>
 	    public const string PathToNavbar = "frames/navbar.htm";
 
+       
 	    /// <summary>
 	    /// Title for the error message if the groups could not be determined
 	    /// </summary>
@@ -83,7 +88,29 @@ namespace UntisExp
         /// <summary>
         /// String determining a special event
         /// </summary>
-	    public const string SpecialEvtAb = "Veranst.";
+	    public const string SpecialEvtAb = "Veranst."; 
+        
+        /// <summary>
+        /// The text to welcome new users to the App
+        /// </summary>
+#if LEHRER
+        public const string WelcomeText = "Hallo und danke für den Download der App! Wenn Sie hier einen Fehler finden schreiben Sie ihn uns doch bitte, denn es ist alles noch ganz neu hier.";
+
+#else
+        public const string WelcomeText = "Hallo und danke für den Download der App! Wir schicken dich jetzt zur Klassenauswahl, die App merkt sich danach diese Klasse. Wenn du einen Fehler findest schreib ihn uns doch bitte. Denn es ist alles noch ganz neu hier. Wir wünschen viel Ausfall!";
+#endif
+
+        
+#if LEHRER
+        ///<summary>
+        ///If the app is deployed for teacher text to enter password
+        /// </summary>
+        public const String enterPW = "Bitte geben Sie das Passwort ein, dass Sie erhalten haben, um sich in dieser App als Lehrer zu identifizieren.";
+        ///<summary>
+        ///If the app is deployed for teacher the password
+        /// </summary>
+        public const String password = "IchLehrer";
+#endif
 
         /// <summary>
         /// List of abbreviations for the lessons.
