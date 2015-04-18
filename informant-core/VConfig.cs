@@ -94,7 +94,7 @@ namespace UntisExp
         /// The text to welcome new users to the App
         /// </summary>
 #if LEHRER
-        public const string WelcomeText = "Hallo und danke für den Download der App! Wenn Sie hier einen Fehler finden schreiben Sie ihn uns doch bitte, denn es ist alles noch ganz neu hier.";
+        public const string WelcomeText = "Hallo und danke für den Download des CWS Informants, wie der Onlinevertretungsplan, nur besser! Wenn Sie hier einen Fehler (außer Du-Sie-Verwechslungen, das wissen wir) finden schreiben Sie ihn uns doch bitte (mhaug@live.de). Ihr SR.";
 
 #else
         public const string WelcomeText = "Hallo und danke für den Download der App! Wir schicken dich jetzt zur Klassenauswahl, die App merkt sich danach diese Klasse. Wenn du einen Fehler findest schreib ihn uns doch bitte. Denn es ist alles noch ganz neu hier. Wir wünschen viel Ausfall!";
@@ -105,11 +105,11 @@ namespace UntisExp
         ///<summary>
         ///If the app is deployed for teacher text to enter password
         /// </summary>
-        public const String EnterPw = "Bitte geben Sie das Passwort ein, dass Sie erhalten haben, um sich in dieser App als Lehrer zu identifizieren.";
+        public const String EnterPw = "Bitte geben Sie das Vertretungsplan-Passwort ein, um sich zu authentifizieren. Das ist nur einmal nötig.";
         ///<summary>
         ///If the app is deployed for teacher the password
         /// </summary>
-        public const String Password = "IchLehrer";
+        public const String Password = "u51n63n";
 #endif
 
         /// <summary>
@@ -219,7 +219,11 @@ namespace UntisExp
         /// Jokes that may be displayed shortly after loading completed (E.g. in Windows Phone's status bar)
         /// </summary>
         // ReSharper disable once UnusedMember.Global
+#if LEHRER
+        public static readonly string[] SuccessJokes = { "Und fertig!", "Sacrebleu", "Arrriba!", "Ihr Tag könnte sich soeben verbessert haben!", "Käsekuchen" };
+#else
 	    public static readonly string[] SuccessJokes = {"Und fertig!", "Heute schon Bertie gesehen?", "Sacrebleu", "Arrriba!", "Dein Tag könnte sich soeben verbessert haben", "Käsekuchen"};
+#endif
 
         /// <summary>
         /// How many days are in a week
