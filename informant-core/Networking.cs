@@ -50,11 +50,15 @@ namespace UntisExp
 					    callback(body);
 					});
 			}
-			catch
+			catch (Exception e)
 			{
 				try
 				{ 
 					var request = (HttpWebRequest)WebRequest.Create(url);
+                    if (url.IndexOf(VConfig.Url, StringComparison.Ordinal) != -1)
+                    {
+                        request.Credentials = new NetworkCredential("cwslehrer", "u51n63n");
+                    } 
 					request.BeginGetResponse(result => {FinishRequest(callback, alertmet, result);}, new object[] {request, alerting});
 				}
 				catch
@@ -136,8 +140,9 @@ namespace UntisExp
                 {
                     body = WebUtility.HtmlDecode(body);
                 }
-				catch
+                catch
                 {
+                    // ignored
                 }
             }
             catch {

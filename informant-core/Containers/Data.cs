@@ -1,6 +1,4 @@
-﻿
-
-using System;
+﻿using System;
 using System.Globalization;
 
 namespace UntisExp.Containers
@@ -83,9 +81,9 @@ namespace UntisExp.Containers
 		    {
 		        Line1 = Lesson + ". Std: " + Group;
 		    }
-            if (!Helpers.IsEmpty(oldGroup))
+            if (!Helpers.IsEmpty(OldGroup))
             {
-                Line1 = Lesson + ". Std: " + oldGroup;
+                Line1 = Lesson + ". Std: " + OldGroup;
             }
 		    else if (!Helpers.IsEmpty(Subject))
 		    {
@@ -95,20 +93,33 @@ namespace UntisExp.Containers
 		    {
 		        Line1 = Lesson + ". Std: " + OldSubject;
 		    }
-		    else
+            else if (Helpers.IsEmpty(OldSubject) && Helpers.IsEmpty(Subject) && Helpers.IsEmpty(Group) &&
+                    Helpers.IsEmpty(OldGroup))
 		    {
-		    	Line1 = Lesson + ". Std";
+		    	Line1 = Lesson + ". Std: Aufsicht";
 		    }
+            else
+            {
+                Line1 = Lesson + ". Std";
+            }
 
 		    if (Outage)
 			{
-				Line1 = Lesson + ". Std: " + Group;
-				Line2 = OldSubject + " bei " + Group + " entfällt.";
+			    if (Helpers.IsEmpty(OldSubject) && Helpers.IsEmpty(OldGroup) && Helpers.IsEmpty(Group) && !Event)
+			    {
+                    Line1 = Lesson + ". Std: Aufsicht";
+                    Line2 = "Aufsicht in " + Room + " entfällt.";
+                }
+			    else
+			    {
+                    Line1 = Lesson + ". Std: " + Group;
+                    Line2 = OldSubject + " bei " + Group + " entfällt.";
+                }
 			}
 			else if (Cared)
 			{
 				Line2 = Group + " wird in " + Subject + " durch Sie mitbetreut.";
-			    if (Room != null)
+                if (!Helpers.IsEmpty(Room))
 			    {
 			        Line2 += " | " + Room;
 			    }
@@ -117,11 +128,11 @@ namespace UntisExp.Containers
 			{
 				Line1 = Lesson + ". Std: Veranstaltung";
 			    Line2 = "";
-				if (!string.IsNullOrEmpty(Room))
+                if (!Helpers.IsEmpty(Room))
 				{
 					Line2 = "Raum: " + Room + " | ";
 				}
-                if (!string.IsNullOrWhiteSpace(Group))
+                if (!Helpers.IsEmpty(Group))
                 {
                     Line2 += "Mit " + Group;
                 }
@@ -129,7 +140,7 @@ namespace UntisExp.Containers
 			else if (Helpers.IsEmpty(Teacher) && !Helpers.IsEmpty(Cover))
 			{
 			    Line2 = "Bei " + Cover;
-			    if (!string.IsNullOrEmpty(Room))
+                if (!Helpers.IsEmpty(Room))
 			    {
                     Line2 += " in " + Room;
 			    }
@@ -137,23 +148,58 @@ namespace UntisExp.Containers
 			else if (Subject != OldSubject)
 			{
                 Line2 = Subject + " bei " + Cover + " statt " + OldSubject + " bei " + Teacher;
-                if (!string.IsNullOrEmpty(Room))
+                if (!Helpers.IsEmpty(Room))
                 {
                     Line2 += " | " + Room;
                 }
 			}
 			else if (Cover != Teacher)
 			{
-                Line2 = Cover + " vertritt " + Teacher;
-                if (!string.IsNullOrEmpty(Room))
-                {
-                    Line2 += " | " + Room;
-                }
+			    if (Helpers.IsEmpty(OldSubject) && Helpers.IsEmpty(Subject) && Helpers.IsEmpty(Group) &&
+			        Helpers.IsEmpty(OldGroup) && !Event)
+			    {
+			        Line2 = "Sie führen die " + Room + "-Aufsicht";
+			        if (!Helpers.IsEmpty(Teacher))
+			            Line2 += " anstatt von " + Teacher;
+			    }
+			    else
+			    {
+			        Line2 = "Sie vertreten " + Teacher;
+			        if (!Helpers.IsEmpty(Subject))
+			            Line2 += " in " + Subject;
+			        if (!Helpers.IsEmpty(Room))
+			        {
+			            Line2 += " | " + Room;
+			        }
+			    }
 			}
+            else if (OldRoom != Room)
+            {
+                if (!Helpers.IsEmpty(Subject))
+                {
+                    Line2 = Subject + " in " + Room + " anstatt " + OldRoom;
+                }
+                else
+                {
+                    Line2 = "In " + Room + " anstatt " + OldRoom;
+                }
+            }
 			else
 			{
-				Line2 = Teacher;
-                if (!string.IsNullOrEmpty(Room))
+			    if (!Helpers.IsEmpty(Subject))
+		        {
+		            Line2 = Subject;
+		        }
+		        else if(!Helpers.IsEmpty(OldSubject))
+		        {
+		            Line2 = "Geplant als " + OldSubject;
+		        }
+		        else
+		        {
+		            Line2 = Teacher;
+		        }
+
+                if (!Helpers.IsEmpty(Room))
                 {
                     Line2 += " | " + Room;
                 }
@@ -413,7 +459,12 @@ namespace UntisExp.Containers
         /// <summary>
         /// The original class of this lesson
         /// </summary>
-        public string oldGroup { get; set; }
+        public string OldGroup { get; set; }
+
+        /// <summary>
+        /// The original room of this lesson
+        /// </summary>
+        public string OldRoom { get; set; }
 
 
 	    private static bool IsAValidLessonTime(string cellsContent)

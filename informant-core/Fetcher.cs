@@ -102,7 +102,11 @@ namespace UntisExp
                 List<Group> groupObj = new List<Group>();
                 string raw = res.Replace(" ", string.Empty);
 
+#if LEHRER
+                raw = raw.Substring(raw.IndexOf("varteachers=[", StringComparison.Ordinal) + "varteachers=[".Length);
+#else
                 raw = raw.Substring(raw.IndexOf("varclasses=[", StringComparison.Ordinal) + "varclasses=[".Length);
+#endif
                 raw = raw.Substring(0, raw.IndexOf("];", StringComparison.Ordinal));
                 raw = raw.Replace("\"", string.Empty);
                 raw = raw.Replace("\n", string.Empty);
@@ -139,11 +143,16 @@ namespace UntisExp
             _group = group;
             string weekStr = "";
 			int length = group.ToString ().Length;
-			string groupStr = "w";
+#if LEHRER
+            const string namespaceStr = "v";
+#else
+            const string namespaceStr = "w";
+#endif
+			string groupStr = namespaceStr;
 			if (group == 0)
 				return;
 			for (int i = 0; i < (5 - length); i++) {
-				groupStr = groupStr + "0";
+				groupStr += "0";
 			}
 			groupStr = groupStr + Convert.ToString (group);
             DateTimeFormatInfo dfi = DateTimeFormatInfo.CurrentInfo;
@@ -162,7 +171,7 @@ namespace UntisExp
                 weekStr = Convert.ToString(week);
             }
 
-			var nav = VConfig.Url + weekStr + "/w/" + groupStr + ".htm";
+			var nav = VConfig.Url + weekStr + "/" + namespaceStr + "/" + groupStr + ".htm";
 			if (activity == Activity.ParseSecondSchedule)
 			{
                 _networkAccessor.DownloadData(nav, timesNext_DownloadStringCompleted, null, Abort);
@@ -636,13 +645,13 @@ namespace UntisExp
                         individualEntry.Cover = thingy;
                         break;
                     case 9:
-                        individualEntry.oldGroup = thingy;
+                        individualEntry.OldGroup = thingy;
                         break;
                      case 10:
                         individualEntry.Group = thingy;
                         break;
                     case 11:
-                        //old room
+                        individualEntry.OldRoom = thingy;
                         break;
                     case 12:
                         individualEntry.Room = thingy;

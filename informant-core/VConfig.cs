@@ -105,11 +105,11 @@ namespace UntisExp
         ///<summary>
         ///If the app is deployed for teacher text to enter password
         /// </summary>
-        public const String enterPW = "Bitte geben Sie das Passwort ein, dass Sie erhalten haben, um sich in dieser App als Lehrer zu identifizieren.";
+        public const String EnterPw = "Bitte geben Sie das Passwort ein, dass Sie erhalten haben, um sich in dieser App als Lehrer zu identifizieren.";
         ///<summary>
         ///If the app is deployed for teacher the password
         /// </summary>
-        public const String password = "IchLehrer";
+        public const String Password = "IchLehrer";
 #endif
 
         /// <summary>
@@ -219,7 +219,7 @@ namespace UntisExp
         /// Jokes that may be displayed shortly after loading completed (E.g. in Windows Phone's status bar)
         /// </summary>
         // ReSharper disable once UnusedMember.Global
-	    public static string[] SuccessJokes = {"Und fertig!", "Heute schon Bertie gesehen?", "Sacrebleu", "Arrriba!", "Dein Tag könnte sich soeben verbessert haben", "Käsekuchen"};
+	    public static readonly string[] SuccessJokes = {"Und fertig!", "Heute schon Bertie gesehen?", "Sacrebleu", "Arrriba!", "Dein Tag könnte sich soeben verbessert haben", "Käsekuchen"};
 
         /// <summary>
         /// How many days are in a week
