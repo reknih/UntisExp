@@ -38,7 +38,11 @@ namespace UntisExp
 	    /// <summary>
 	    /// Body for the error message if the groups could not be determined
 	    /// </summary>
-	    public const string GroupIErrorTxt = "Wir haben keine Verbndung zum Internet. Die brauchst du aber jetzt.";
+#if LEHRER
+	    public const string GroupIErrorTxt = "Leider konnte keine Internetverbindung hergestellt werden.";
+#else
+        public const string GroupIErrorTxt = "Wir haben keine Verbndung zum Internet. Die brauchst du aber jetzt.";
+#endif
 
 	    /// <summary>
 	    /// Button caption for the error message if the groups could not be determined
@@ -94,7 +98,7 @@ namespace UntisExp
         /// The text to welcome new users to the App
         /// </summary>
 #if LEHRER
-        public const string WelcomeText = "Hallo und danke für den Download des CWS Informants, wie der Onlinevertretungsplan, nur besser! Wenn Sie hier einen Fehler (außer Du-Sie-Verwechslungen, das wissen wir) finden schreiben Sie ihn uns doch bitte (mhaug@live.de). Ihr SR.";
+        public const string WelcomeText = "Hallo und danke für den Download des CWS Informants, wie der Onlinevertretungsplan, nur besser! Wenn Sie hier einen Fehler finden schreiben Sie ihn uns doch bitte (mhaug@live.de). Ihr SR.";
 
 #else
         public const string WelcomeText = "Hallo und danke für den Download der App! Wir schicken dich jetzt zur Klassenauswahl, die App merkt sich danach diese Klasse. Wenn du einen Fehler findest schreib ihn uns doch bitte. Denn es ist alles noch ganz neu hier. Wir wünschen viel Ausfall!";
@@ -188,7 +192,11 @@ namespace UntisExp
         /// <summary>
         /// Title for the error message if the WebUntis site could not be found
         /// </summary>
+#if LEHRER
+        public const string NoPageErrTtl = "Passiert...";
+#else
         public const string NoPageErrTtl = "Du bist nicht schuld";
+#endif
 
         /// <summary>
         /// Body for the error message if the WebUntis site could not be found
