@@ -81,7 +81,7 @@ namespace UntisExp.Containers
 		    {
 		        Line1 = Lesson + ". Std: " + Group;
 		    }
-            if (!Helpers.IsEmpty(OldGroup))
+            else if (!Helpers.IsEmpty(OldGroup))
             {
                 Line1 = Lesson + ". Std: " + OldGroup;
             }
@@ -147,11 +147,19 @@ namespace UntisExp.Containers
 			}
 			else if (Subject != OldSubject)
 			{
+if (!Helpers.IsEmpty(Cover)&&!Helpers.IsEmpty(Subject)){
                 Line2 = Subject + " bei " + Cover + " statt " + OldSubject + " bei " + Teacher;
-                if (!Helpers.IsEmpty(Room))
+if (!Helpers.IsEmpty(Room))
                 {
                     Line2 += " | " + Room;
                 }
+}
+else if (Helpers.IsEmpty(Subject)){
+Line1 = Lesson + ". Std: "+OldSubject;
+                    Line2 =OldSubject + " in " + Room + " entfällt.";
+               
+
+}
 			}
 			else if (Cover != Teacher)
 			{
@@ -552,5 +560,4 @@ namespace UntisExp.Containers
                 endTime.Millisecond, DateTimeKind.Local);
             return preciseDate;
         }
-    }
-}
+  
