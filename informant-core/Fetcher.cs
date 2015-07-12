@@ -560,6 +560,7 @@ namespace UntisExp
                             }
                             iterations++;
                         }
+                        //skips News-Boxes in iOuter-count to have the right current-day in iOuter
                         if ((iterations == 0 && activity != Activity.GetNews) || (iterations > 0 && activity == Activity.GetNews))
                         {
                             iOuter--;
@@ -578,7 +579,7 @@ namespace UntisExp
                     }
                 }
                 iOuter++;
-                if (iOuter == daysAndNewsBoxes && (daysRec == 1) && mode != 0 && activity == Activity.ParseFirstSchedule)
+                if (iOuter == VConfig.ExpectedDayNum && (daysRec == 1) && mode != 0 && activity == Activity.ParseFirstSchedule)
                 {
                     result.HasToGetSecondSchedule = true;
                 }
