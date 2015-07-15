@@ -158,7 +158,14 @@ namespace UntisExp.Containers
                 else if (Helpers.IsEmpty(Subject))
                 {
                     Line1 = Lesson + ". Std: " + OldSubject;
-                    Line2 = OldSubject + " in " + Room + " entfällt.";
+                    if (!Helpers.IsEmpty(OldGroup))
+                    {
+                        Line2 = OldSubject + " bei " + OldGroup + " entfällt.";
+                    }
+                    else
+                    {
+                        Line2 = OldSubject + " in " + Room + " entfällt.";
+                    }
                 }
             }
             else if (Cover != Teacher)

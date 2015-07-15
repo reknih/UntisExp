@@ -241,7 +241,7 @@ namespace UntisExp
 		{
 			Regex emptycheck = new Regex(@"^\s*$");
 		    if (s == null) return true;
-			if (emptycheck.Matches(s).Count > 0 || s == "")
+			if (emptycheck.Matches(s).Count > 0 || s == "" || s=="---")
 			{
 				return true;
 			}

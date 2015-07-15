@@ -167,16 +167,23 @@ namespace UntisExp
 	        HttpWebRequest request = result.AsyncState as HttpWebRequest;
 	        if (request != null)
 	        {
-	            HttpWebResponse response = request.EndGetResponse(result) as HttpWebResponse;
-	            if (response != null)
-	            {
-	                Stream receiveStream = response.GetResponseStream();
-	                streamCallback(receiveStream);
-	            }
-	            else
-	            {
-	                if (alert != null) alert(new ErrorMessageEventArgs(VConfig.UnknownErrTtl, VConfig.UnknownErrTxt, VConfig.UnknownErrBtn));
-	            }
+                try
+                {
+                    HttpWebResponse response = request.EndGetResponse(result) as HttpWebResponse;
+                    if (response != null)
+                    {
+                        Stream receiveStream = response.GetResponseStream();
+                        streamCallback(receiveStream);
+                    }
+                    else
+                    {
+                        if (alert != null) alert(new ErrorMessageEventArgs(VConfig.UnknownErrTtl, VConfig.UnknownErrTxt, VConfig.UnknownErrBtn));
+                    }
+                }
+                catch
+                {
+                    if (alert != null) alert(new ErrorMessageEventArgs(VConfig.UnknownErrTtl, VConfig.UnknownErrTxt, VConfig.UnknownErrBtn));
+                }
 	        }
 	        else
 	        {

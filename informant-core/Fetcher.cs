@@ -244,6 +244,12 @@ namespace UntisExp
 
 		private void times_DownloadStringCompleted(string res)
 		{
+#if DEBUG
+            if (VConfig.testhtml != null)
+            {
+                res = VConfig.testhtml;
+            }
+#endif
             if (res == "") { return; }
 
             string comp = res.Replace(" ", string.Empty);
@@ -258,7 +264,7 @@ namespace UntisExp
 			InterstitialFetching preliminaryResult = new InterstitialFetching();
 			foreach (var item in raw)
 			{
-				preliminaryResult = InterstitialFetching.ProcessRow (item, preliminaryResult.OuterLoopCursor, daysAndNewsBoxes, _mode, _silent, preliminaryResult.HasToGetSecondSchedule);
+				preliminaryResult = InterstitialFetching.ProcessRow (item, preliminaryResult.OuterLoopCursor, daysAndNewsBoxes, _mode, _silent, preliminaryResult.HasToGetSecondSchedule,preliminaryResult.RecordedDays);
 			    if (preliminaryResult.HasToGetSecondSchedule)
 			    {
                     GetTimes(_group, Activity.ParseSecondSchedule);
@@ -275,6 +281,12 @@ namespace UntisExp
 		}
 		private void news_DownloadStringCompleted(string res)
 		{
+#if DEBUG
+            if (VConfig.testhtml != null)
+            {
+                res = VConfig.testhtml;
+            }
+#endif
             if (res == "") { return; }
 			string comp = res.Replace (" ", string.Empty);
 			//TO-DO: Parse VPlan
@@ -285,14 +297,14 @@ namespace UntisExp
 			InterstitialFetching preliminaryResult = new InterstitialFetching();
 			foreach (var item in raw)
 			{
-				preliminaryResult = InterstitialFetching.ProcessRow (item, preliminaryResult.OuterLoopCursor, daysAndNewsBoxes, _mode, _silent, preliminaryResult.HasToGetSecondSchedule, Activity.GetNews);
-				if(preliminaryResult.ParsedNews!=null &&(preliminaryResult.ParsedNews.Content!=null||preliminaryResult.ParsedNews.Summary!=null))
-					OnRaiseRetreivedNewsItemEvent(new NewsEventArgs(preliminaryResult.ParsedNews));
+				preliminaryResult = InterstitialFetching.ProcessRow (item, preliminaryResult.OuterLoopCursor, daysAndNewsBoxes, _mode, _silent, preliminaryResult.HasToGetSecondSchedule,preliminaryResult.RecordedDays, Activity.GetNews,preliminaryResult.ParsedNews);
+				
 			}
+            if (preliminaryResult.ParsedNews != null && (preliminaryResult.ParsedNews.Content != null || preliminaryResult.ParsedNews.Summary != null))
+                OnRaiseRetreivedNewsItemEvent(new NewsEventArgs(preliminaryResult.ParsedNews));
 		}
         private void timesNext_DownloadStringCompleted(string res)
         {
-            
             try
             {
                 if (res == "")
@@ -319,7 +331,7 @@ namespace UntisExp
 				InterstitialFetching preliminaryResult = new InterstitialFetching();
 				foreach (var item in raw)
 				{
-                    preliminaryResult = InterstitialFetching.ProcessRow(item, preliminaryResult.OuterLoopCursor, daysAndNewsBoxes, _mode, _silent, preliminaryResult.HasToGetSecondSchedule, Activity.ParseSecondSchedule);
+                    preliminaryResult = InterstitialFetching.ProcessRow(item, preliminaryResult.OuterLoopCursor, daysAndNewsBoxes, _mode, _silent, preliminaryResult.HasToGetSecondSchedule,preliminaryResult.RecordedDays, Activity.ParseSecondSchedule);
 					resultCollection.AddRange (preliminaryResult.ParsedRows);
 				}
 
@@ -477,6 +489,10 @@ namespace UntisExp
             /// </summary>
             public News ParsedNews;
             /// <summary>
+            /// The number of recorded days in the week
+            /// </summary>
+            public int RecordedDays;
+            /// <summary>
             /// Whether the caller has to get another table from the network
             /// </summary>
             public bool HasToGetSecondSchedule;
@@ -492,19 +508,18 @@ namespace UntisExp
             /// <param name="daysAndNewsBoxes">The number of news tables in the week</param>
             /// <param name="passDontImmediatelyRefresh">If appropriate, this value will be passed to <see cref="HasToGetSecondSchedule"/>.</param>
             /// <param name="activity">The action which should be performed.</param>
-            public static InterstitialFetching ProcessRow(string item, int iOuter, int daysAndNewsBoxes, int mode, bool silent, bool passDontImmediatelyRefresh, Activity activity = Activity.ParseFirstSchedule)
+            public static InterstitialFetching ProcessRow(string item, int iOuter, int daysAndNewsBoxes, int mode, bool silent, bool passDontImmediatelyRefresh,int daysRec, Activity activity = Activity.ParseFirstSchedule,News news = null)
             {
                 List<Data> v1 = new List<Data>();
                 InterstitialFetching result = new InterstitialFetching { HasToGetSecondSchedule = passDontImmediatelyRefresh };
-                int daysRec = 0;
                 if (item.IndexOf(VConfig.SearchNoAccess, StringComparison.Ordinal) == -1)
                 {
                     string it = item.Replace("&nbsp;", String.Empty);
                     string searchInFront;
-                    News news = null;
                     if (activity == Activity.GetNews)
                     {
                         searchInFront = "<tr>";
+                        if(news==null)
                         news = new News { Image = "http://centrallink.de/sr/Blackboard.png", Source = new Uri(VConfig.Url) };
                     }
                     else
@@ -549,7 +564,6 @@ namespace UntisExp
                                 else
                                 {
                                     news = ProcessNewsItem(compute, news);
-                                    result.ParsedNews = news;
                                 }
                             }
                             if (activity != Activity.GetNews)
@@ -585,13 +599,20 @@ namespace UntisExp
                 }
                 result.OuterLoopCursor = iOuter;
                 result.ParsedRows = v1;
+                result.ParsedNews = news;
+                result.RecordedDays = daysRec;
                 return result;
             }
 
             private static string PrepareScheduleItem(object input)
             {
                 string thingy = input.ToString();
-                return thingy.Substring(thingy.IndexOf(">", StringComparison.Ordinal) + 1, thingy.LastIndexOf("<", StringComparison.Ordinal) - thingy.IndexOf(">", StringComparison.Ordinal) - 1);
+                thingy = thingy.Substring(thingy.IndexOf(">", StringComparison.Ordinal) + 1, thingy.LastIndexOf("<", StringComparison.Ordinal) - thingy.IndexOf(">", StringComparison.Ordinal) - 1);
+                if (thingy.IndexOf("<span", StringComparison.Ordinal) == 0)
+                {
+                    thingy = thingy.Substring(thingy.IndexOf(">", StringComparison.Ordinal) + 1, thingy.LastIndexOf("<", StringComparison.Ordinal) - thingy.IndexOf(">", StringComparison.Ordinal) - 1);
+                }
+                return thingy;
             }
 
             private static News ProcessNewsItem(string thingy, News scheduleNews)
@@ -748,6 +769,7 @@ namespace UntisExp
             {
                 HasToGetSecondSchedule = false;
                 OuterLoopCursor = 0;
+                RecordedDays = 0;
             }
         }
 

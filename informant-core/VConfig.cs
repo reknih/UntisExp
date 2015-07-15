@@ -9,8 +9,16 @@ namespace UntisExp
 	/// This static class holds options for the lib. It is prefilled to work with Untis of Christian-Wirth-Schule, Usingen
 	/// </summary>
 	public static class VConfig
-	{
-	    /// <summary>
+    {
+
+        #if DEBUG
+        /// <summary>
+        /// A constant Html-String for tests
+        /// If you want to use the real data from web, just set it null!
+        /// </summary>
+        public const string testhtml = null;
+#endif
+        /// <summary>
 	    /// The WebUntis url to fetch from
 	    /// </summary>
         #if LEHRER
